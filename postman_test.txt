@@ -1,0 +1,31 @@
+GET http://localhost:8080/moneychanger_api/moneychangers                      --return a list of money changers
+
+DELETE http://localhost:8080/moneychanger_api/moneychangers/1?role=admin             --soft delete particular money changer by role admin; staff cannot delete
+
+PUT http://localhost:8080/moneychanger_api/moneychangers/{id}    --insert particular moneychanger by id
+Choose: raw -> Select JSON from dropdown
+Paste JSON Body:
+json
+
+{
+  "companyName": "NewlyUpdatedCompanyName",
+  "email": "updated@example.com",
+  "address": "Updated Address",
+  "postalCode": "999999",
+  "notes": "Updated via Postman"
+}
+
+
+
+POST http://localhost:8080/moneychanger_api/moneychangers   --add a new moneychanger
+{
+  "companyName": "New Changer Co",
+  "email": "newco@example.com",
+  "dateOfIncorporation": "2015-06-01",
+  "address": "456 New Road",
+  "country": "Singapore",
+  "postalCode": "S567890",
+  "notes": "Test entry from Postman",
+  "uen": "UEN2025XYZ",
+  "schemeId": 1
+}
