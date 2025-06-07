@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/company-commission-schemes")
+@RequestMapping("/v1/company-commission-schemes")
 public class CompanyCommissionSchemeController {
     @Autowired
     private CompanyCommissionSchemeService service;

@@ -10,7 +10,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/schemes")
+@RequestMapping("/v1/schemes")
 public class SchemeController {
     @Autowired
     private SchemeService service;

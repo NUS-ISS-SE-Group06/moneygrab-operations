@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/commission-rates")
+@RequestMapping("/v1/commission-rates")
 public class CommissionRateController {
     @Autowired
     private CommissionRateService service;
