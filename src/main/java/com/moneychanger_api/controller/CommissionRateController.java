@@ -20,7 +20,7 @@ public class CommissionRateController {
     @GetMapping("/{id}")
     public ResponseEntity<CommissionRate> get(@PathVariable Integer id) {
         CommissionRate item = service.get(id);
-        return ResponseEntity.ok(item);   
+        return ResponseEntity.ok(item);
     }
 
     @PostMapping
