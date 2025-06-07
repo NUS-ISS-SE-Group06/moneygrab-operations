@@ -1,3 +1,4 @@
+USE moneychangerdb;
 
 -- Truncate all dependent tables first
 SET FOREIGN_KEY_CHECKS = 0;
