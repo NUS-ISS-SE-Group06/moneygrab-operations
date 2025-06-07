@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 
 @Data
 @Entity
-@Table(name = "commission_rate")
+@Table(name = "commission_rate") 
 public class CommissionRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
