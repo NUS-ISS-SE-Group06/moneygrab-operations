@@ -97,11 +97,7 @@ jobs:
     steps:
       - name:  SonarCloud Analysis
         run: |
-            echo "Scan result: https://sonarcloud.io/project/key?id=NUS-ISS-SE-Group06_moneygrab-operations"
+            echo "Automatic Analysis result: https://sonarcloud.io/project/key?id=NUS-ISS-SE-Group06_moneygrab-operations"
             
-
-
-
-
 
 
