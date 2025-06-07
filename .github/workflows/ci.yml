@@ -13,6 +13,8 @@ on:
     paths:
       - 'src/**'
       - 'pom.xml'
+  workflow_dispatch:
+
 
 jobs:
   test_build:
