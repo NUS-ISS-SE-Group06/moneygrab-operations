@@ -17,12 +17,13 @@ public class CommissionRate {
     @Column(nullable = false, precision = 5, scale = 2)
     private BigDecimal rate;
 
+    @Column(length = 255, unique = true)
     private String description;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private Timestamp updatedAt;
 
     @Column(name = "created_by")
@@ -31,8 +32,8 @@ public class CommissionRate {
     @Column(name = "updated_by")
     private Integer updatedBy;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    @Column(name = "is_deleted", nullable = false, columnDefinition ="TINYINT(1) DEFAULT 0" )
+    private Boolean isDeleted=false;
 
     // Getters and Setters
 }
