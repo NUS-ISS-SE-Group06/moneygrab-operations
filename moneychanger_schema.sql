@@ -4,7 +4,7 @@ CREATE TABLE scheme (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(500),
-    isdefault BOOLEAN DEFAULT FALSE
+    is_default BOOLEAN DEFAULT FALSE
 );
 
 -- STEP 2: Create money_changer table

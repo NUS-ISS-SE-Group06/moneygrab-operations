@@ -17,6 +17,6 @@ public class Scheme {
     @Column(length = 500)
     private String description;
 
-    @Column(name = "isdefault", nullable = false)
+    @Column(name = "is_default", nullable = false)
     private Boolean isDefault = false;
 }
