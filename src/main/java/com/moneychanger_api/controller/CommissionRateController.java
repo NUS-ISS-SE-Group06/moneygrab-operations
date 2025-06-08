@@ -9,10 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/commission-rates")
+@RequestMapping("/v1/commission-rates")
 public class CommissionRateController {
+    private final CommissionRateService service;
+
     @Autowired
-    private CommissionRateService service;
+    public CommissionRateController(CommissionRateService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<CommissionRate> list() { return service.listAll(); }

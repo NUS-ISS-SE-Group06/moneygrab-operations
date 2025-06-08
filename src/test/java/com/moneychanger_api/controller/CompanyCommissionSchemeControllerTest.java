@@ -1,31 +1,29 @@
 package com.moneychanger_api.controller;
 
 import com.moneychanger_api.exception.ResourceNotFoundException;
-import com.moneychanger_api.service.CompanyCommissionSchemeService;
+import com.moneychanger_api.model.CommissionRate;
 import com.moneychanger_api.model.CompanyCommissionScheme;
 import com.moneychanger_api.model.MoneyChanger;
-import com.moneychanger_api.model.CommissionRate;
-
+import com.moneychanger_api.service.CompanyCommissionSchemeService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.Mockito.*;
-import org.mockito.Mockito;
+import java.util.List;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import org.springframework.http.MediaType;
-
-import java.math.BigDecimal;
-import java.util.List;
-import static org.hamcrest.Matchers.hasSize;
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CompanyCommissionSchemeControllerTest {
+class CompanyCommissionSchemeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -34,17 +32,17 @@ public class CompanyCommissionSchemeControllerTest {
     private CompanyCommissionSchemeService service;
 
     @Test
-    public void testListCompanyCommissionSchemes() throws Exception {
+    void testListCompanyCommissionSchemes() throws Exception {
         List<CompanyCommissionScheme> list = List.of(new CompanyCommissionScheme());
         Mockito.when(service.listAll()).thenReturn(list);
 
-        mockMvc.perform(get("/api/company-commission-schemes"))
+        mockMvc.perform(get("/v1/company-commission-schemes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));
     }
 
     @Test
-    public void testGetCompanyCommissionSchemeFound() throws Exception {
+    void testGetCompanyCommissionSchemeFound() throws Exception {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
         item.setId(1);
 
@@ -58,24 +56,24 @@ public class CompanyCommissionSchemeControllerTest {
 
         Mockito.when(service.get(1)).thenReturn(item);
 
-        mockMvc.perform(get("/api/company-commission-schemes/1"))
+        mockMvc.perform(get("/v1/company-commission-schemes/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.moneyChangerId.id").value(2))
                 .andExpect(jsonPath("$.commissionRateId.id").value(3));
     }
 
     @Test
-    public void testGetCompanyCommissionSchemeNotFound() throws Exception {
+    void testGetCompanyCommissionSchemeNotFound() throws Exception {
         Mockito.when(service.get(1)).thenThrow(new ResourceNotFoundException("CompanyCommissionScheme with ID 1 not found"));
 
-        mockMvc.perform(get("/api/company-commission-schemes/1"))
+        mockMvc.perform(get("/v1/company-commission-schemes/1"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("CompanyCommissionScheme with ID 1 not found"));
 
     }
 
     @Test
-    public void testCreateCompanyCommissionScheme() throws Exception {
+    void testCreateCompanyCommissionScheme() throws Exception {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
         item.setId(1);
 
@@ -89,7 +87,7 @@ public class CompanyCommissionSchemeControllerTest {
 
         Mockito.when(service.save(Mockito.any())).thenReturn(item);
 
-        mockMvc.perform(post("/api/company-commission-schemes")
+        mockMvc.perform(post("/v1/company-commission-schemes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
@@ -103,7 +101,7 @@ public class CompanyCommissionSchemeControllerTest {
     }
 
     @Test
-    public void testUpdateCompanyCommissionScheme() throws Exception {
+    void testUpdateCompanyCommissionScheme() throws Exception {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
         item.setId(1);
 
@@ -117,7 +115,7 @@ public class CompanyCommissionSchemeControllerTest {
 
         Mockito.when(service.save(Mockito.any())).thenReturn(item);
 
-        mockMvc.perform(put("/api/company-commission-schemes/1")
+        mockMvc.perform(put("/v1/company-commission-schemes/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                         {
@@ -131,8 +129,8 @@ public class CompanyCommissionSchemeControllerTest {
     }
 
     @Test
-    public void testDeleteCompanyCommissionScheme() throws Exception {
-        mockMvc.perform(delete("/api/company-commission-schemes/1"))
+    void testDeleteCompanyCommissionScheme() throws Exception {
+        mockMvc.perform(delete("/v1/company-commission-schemes/1"))
                 .andExpect(status().isOk());
 
         Mockito.verify(service, times(1)).delete(1);

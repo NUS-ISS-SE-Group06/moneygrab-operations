@@ -10,10 +10,14 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/api/schemes")
+@RequestMapping("/v1/schemes")
 public class SchemeController {
+    private final SchemeService service;
+
     @Autowired
-    private SchemeService service;
+    public SchemeController(SchemeService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<Scheme> list() { return service.listAll(); }
