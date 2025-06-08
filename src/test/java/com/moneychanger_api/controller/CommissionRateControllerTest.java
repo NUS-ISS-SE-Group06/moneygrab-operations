@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CommissionRateControllerTest {
+class CommissionRateControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -32,7 +32,7 @@ public class CommissionRateControllerTest {
     private CommissionRateService commissionRateService;
 
     @Test
-    public void testListCommissionRates() throws Exception {
+    void testListCommissionRates() throws Exception {
         List<CommissionRate> list = List.of(new CommissionRate());
         Mockito.when(commissionRateService.listAll()).thenReturn(list);
 
@@ -42,7 +42,7 @@ public class CommissionRateControllerTest {
     }
 
     @Test
-    public void testGetCommissionRateFound() throws Exception {
+    void testGetCommissionRateFound() throws Exception {
         CommissionRate item = new CommissionRate();
         item.setId(1);
         item.setRate(new BigDecimal("2.50"));
@@ -55,7 +55,7 @@ public class CommissionRateControllerTest {
     }
 
     @Test
-    public void testGetCommissionRateNotFound() throws Exception {
+    void testGetCommissionRateNotFound() throws Exception {
         Mockito.when(commissionRateService.get(999)).thenThrow(new ResourceNotFoundException("CommissionRate with ID 999 not found"));
 
         mockMvc.perform(get("/v1/commission-rates/999"))
@@ -65,7 +65,7 @@ public class CommissionRateControllerTest {
     }
 
     @Test
-    public void testCreateCommissionRate() throws Exception {
+    void testCreateCommissionRate() throws Exception {
         CommissionRate item = new CommissionRate();
         item.setId(1);
         item.setRate(new BigDecimal("3.00"));
@@ -82,7 +82,7 @@ public class CommissionRateControllerTest {
     }
 
     @Test
-    public void testCreateDuplicateCommissionRate() throws Exception {
+    void testCreateDuplicateCommissionRate() throws Exception {
         Mockito.when(commissionRateService.save(Mockito.any()))
                 .thenThrow(new DuplicateResourceException("Commission rate with description 'VIP1' already exists"));
 
@@ -94,7 +94,7 @@ public class CommissionRateControllerTest {
     }
 
     @Test
-    public void testUpdateCommissionRate() throws Exception {
+    void testUpdateCommissionRate() throws Exception {
         CommissionRate item = new CommissionRate();
         item.setId(1);
         item.setRate(new BigDecimal("4.50"));
@@ -109,7 +109,7 @@ public class CommissionRateControllerTest {
     }
 
     @Test
-    public void testDeleteCommissionRate() throws Exception {
+    void testDeleteCommissionRate() throws Exception {
         mockMvc.perform(delete("/v1/commission-rates/1"))
                 .andExpect(status().isOk());
 

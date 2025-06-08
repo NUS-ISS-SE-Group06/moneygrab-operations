@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class SchemeControllerTest {
+class SchemeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -32,7 +32,7 @@ public class SchemeControllerTest {
     private SchemeService schemeService;
 
     @Test
-    public void testListSchemes() throws Exception {
+    void testListSchemes() throws Exception {
         List<Scheme> schemes = List.of(new Scheme());
         Mockito.when(schemeService.listAll()).thenReturn(schemes);
 
@@ -42,7 +42,7 @@ public class SchemeControllerTest {
     }
 
     @Test
-    public void testGetSchemeFound() throws Exception {
+    void testGetSchemeFound() throws Exception {
         Scheme scheme = new Scheme();
         scheme.setId(1);
         scheme.setName("Standard");
@@ -55,7 +55,7 @@ public class SchemeControllerTest {
     }
 
     @Test
-    public void testGetSchemeNotFound() throws Exception {
+    void testGetSchemeNotFound() throws Exception {
         Mockito.when(schemeService.get(999)).thenThrow(new ResourceNotFoundException("Scheme with ID 999 not found"));
 
         mockMvc.perform(get("/v1/schemes/999"))
@@ -64,7 +64,7 @@ public class SchemeControllerTest {
     }
 
     @Test
-    public void testCreateScheme() throws Exception {
+    void testCreateScheme() throws Exception {
         Scheme scheme = new Scheme();
         scheme.setId(1);
         scheme.setName("Gold");
@@ -79,7 +79,7 @@ public class SchemeControllerTest {
     }
 
     @Test
-    public void testUpdateScheme() throws Exception {
+    void testUpdateScheme() throws Exception {
         Scheme scheme = new Scheme();
         scheme.setId(1);
         scheme.setName("Updated");
@@ -94,7 +94,7 @@ public class SchemeControllerTest {
     }
 
     @Test
-    public void testDeleteScheme() throws Exception {
+    void testDeleteScheme() throws Exception {
         mockMvc.perform(delete("/v1/schemes/1"))
                 .andExpect(status().isOk());
 

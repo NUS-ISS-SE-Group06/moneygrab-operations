@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CompanyCommissionSchemeControllerTest {
+class CompanyCommissionSchemeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -32,7 +32,7 @@ public class CompanyCommissionSchemeControllerTest {
     private CompanyCommissionSchemeService service;
 
     @Test
-    public void testListCompanyCommissionSchemes() throws Exception {
+    void testListCompanyCommissionSchemes() throws Exception {
         List<CompanyCommissionScheme> list = List.of(new CompanyCommissionScheme());
         Mockito.when(service.listAll()).thenReturn(list);
 
@@ -42,7 +42,7 @@ public class CompanyCommissionSchemeControllerTest {
     }
 
     @Test
-    public void testGetCompanyCommissionSchemeFound() throws Exception {
+    void testGetCompanyCommissionSchemeFound() throws Exception {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
         item.setId(1);
 
@@ -63,7 +63,7 @@ public class CompanyCommissionSchemeControllerTest {
     }
 
     @Test
-    public void testGetCompanyCommissionSchemeNotFound() throws Exception {
+    void testGetCompanyCommissionSchemeNotFound() throws Exception {
         Mockito.when(service.get(1)).thenThrow(new ResourceNotFoundException("CompanyCommissionScheme with ID 1 not found"));
 
         mockMvc.perform(get("/v1/company-commission-schemes/1"))
@@ -73,7 +73,7 @@ public class CompanyCommissionSchemeControllerTest {
     }
 
     @Test
-    public void testCreateCompanyCommissionScheme() throws Exception {
+    void testCreateCompanyCommissionScheme() throws Exception {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
         item.setId(1);
 
@@ -101,7 +101,7 @@ public class CompanyCommissionSchemeControllerTest {
     }
 
     @Test
-    public void testUpdateCompanyCommissionScheme() throws Exception {
+    void testUpdateCompanyCommissionScheme() throws Exception {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
         item.setId(1);
 
@@ -129,7 +129,7 @@ public class CompanyCommissionSchemeControllerTest {
     }
 
     @Test
-    public void testDeleteCompanyCommissionScheme() throws Exception {
+    void testDeleteCompanyCommissionScheme() throws Exception {
         mockMvc.perform(delete("/v1/company-commission-schemes/1"))
                 .andExpect(status().isOk());
 

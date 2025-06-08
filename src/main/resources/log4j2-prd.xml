@@ -63,7 +63,6 @@
             <!-- Suitable for Local & UAT -->
             <AppenderRef ref="${LOG_APPENDER}" />
             <!-- Suitable for Prod -->
-            <!-- <AppenderRef ref="fileLoggerInfo"  /> -->
         </Logger>
     </Loggers>
 </Configuration>
