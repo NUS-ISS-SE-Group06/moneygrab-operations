@@ -15,6 +15,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -33,12 +34,21 @@ class SchemeControllerTest {
 
     @Test
     void testListSchemes() throws Exception {
-        List<Scheme> schemes = List.of(new Scheme());
+        Scheme scheme = new Scheme();
+        scheme.setId(1);
+        scheme.setName("Basic");
+        scheme.setDescription("Basic plan");
+        scheme.setIsDefault(false);
+
+        List<Scheme> schemes = List.of(scheme);
         Mockito.when(schemeService.listAll()).thenReturn(schemes);
 
         mockMvc.perform(get("/v1/schemes"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)));
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].name", is("Basic")))
+                .andExpect(jsonPath("$[0].description", is("Basic plan")))
+                .andExpect(jsonPath("$[0].isDefault", is(false)));
     }
 
     @Test
@@ -46,12 +56,16 @@ class SchemeControllerTest {
         Scheme scheme = new Scheme();
         scheme.setId(1);
         scheme.setName("Standard");
+        scheme.setDescription("Standard scheme");
+        scheme.setIsDefault(true);
 
         Mockito.when(schemeService.get(1)).thenReturn(scheme);
 
         mockMvc.perform(get("/v1/schemes/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Standard"));
+                .andExpect(jsonPath("$.name").value("Standard"))
+                .andExpect(jsonPath("$.description").value("Standard scheme"))
+                .andExpect(jsonPath("$.isDefault").value(true));
     }
 
     @Test
@@ -68,14 +82,25 @@ class SchemeControllerTest {
         Scheme scheme = new Scheme();
         scheme.setId(1);
         scheme.setName("Gold");
+        scheme.setDescription("Gold plan");
+        scheme.setIsDefault(true);
 
         Mockito.when(schemeService.save(Mockito.any(Scheme.class))).thenReturn(scheme);
 
         mockMvc.perform(post("/v1/schemes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Gold\"}"))
+                        .content("""
+                                {
+                                    "name": "Gold",
+                                    "description": "Gold plan",
+                                    "isDefault": true
+                                }
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Gold"));
+                .andExpect(jsonPath("$.name").value("Gold"))
+                .andExpect(jsonPath("$.description").value("Gold plan"))
+                .andExpect(jsonPath("$.isDefault").value(true));
+
     }
 
     @Test
@@ -83,14 +108,25 @@ class SchemeControllerTest {
         Scheme scheme = new Scheme();
         scheme.setId(1);
         scheme.setName("Updated");
+        scheme.setDescription("Updated description");
+        scheme.setIsDefault(false);
 
         Mockito.when(schemeService.save(Mockito.any(Scheme.class))).thenReturn(scheme);
 
         mockMvc.perform(put("/v1/schemes/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Updated\"}"))
+                        .content("""
+                                {
+                                    "name": "Updated",
+                                    "description": "Updated description",
+                                    "isDefault": false
+                                }
+                                """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated"));
+                .andExpect(jsonPath("$.name").value("Updated"))
+                .andExpect(jsonPath("$.description").value("Updated description"))
+                .andExpect(jsonPath("$.isDefault").value(false));
+
     }
 
     @Test
