@@ -1,18 +1,24 @@
 package com.moneychanger_api.service;
 
+import com.moneychanger_api.exception.UnauthorizedAccessException;
 import com.moneychanger_api.model.MoneyChanger;
 import com.moneychanger_api.repository.MoneyChangerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+
 @Service
 public class MoneyChangerServiceImpl implements MoneyChangerService {
 
-    @Autowired
     private MoneyChangerRepository repository;
+    @Autowired
+    public MoneyChangerServiceImpl(MoneyChangerRepository repository) {
+        this.repository = repository;
+    }
 
     @Override
     public List<MoneyChanger> getAll() {
@@ -48,9 +54,11 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
     @Override
     public void delete(Long id, String role) {
         if (!"admin".equals(role)) {
-            throw new RuntimeException("Only admin can delete staff.");
+            throw new UnauthorizedAccessException("Only admin can delete staff.");
         }
-        MoneyChanger changer = repository.findById(id).orElseThrow();
+        MoneyChanger changer = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("MoneyChanger with ID " + id + " not found"));
+
         changer.setIsDeleted(true);
         changer.setUpdatedAt(LocalDateTime.now());
         repository.save(changer);
