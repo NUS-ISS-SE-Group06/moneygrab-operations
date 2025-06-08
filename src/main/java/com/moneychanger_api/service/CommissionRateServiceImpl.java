@@ -11,11 +11,25 @@ import java.util.List;
 
 @Service
 public class CommissionRateServiceImpl implements CommissionRateService {
-    @Autowired
-    private CommissionRateRepository repo;
+    private final CommissionRateRepository repo;
 
-    public List<CommissionRate> listAll() { return repo.findAll(); }
+    @Autowired
+    public CommissionRateServiceImpl(CommissionRateRepository repo) {
+        this.repo = repo;
+    }
+
+    @Override
+    public List<CommissionRate> listAll() {
+        return repo.findAll()
+                .stream()
+                .filter(rate -> Boolean.FALSE.equals(rate.getIsDeleted()))
+                .toList();
+    }
+
+    @Override
     public CommissionRate get(Integer id) { return repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Commission Rate with ID " + id + " not found")); }
+
+    @Override
     public CommissionRate save(CommissionRate item) {
         String normalizedName = item.getDescription().trim();
 
@@ -25,6 +39,8 @@ public class CommissionRateServiceImpl implements CommissionRateService {
         }
         return repo.save(item);
     }
+
+    @Override
     public void delete(Integer id) {
         CommissionRate commissionRate = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Commission Rate with ID " + id + " not found"));

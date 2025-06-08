@@ -13,11 +13,21 @@ import java.util.List;
 
 @Service
 public class SchemeServiceImpl implements SchemeService {
-    @Autowired
+
     private SchemeRepository repo;
 
+    @Autowired
+    public SchemeServiceImpl(SchemeRepository repo) {
+        this.repo = repo;
+    }
+
+    @Override
     public List<Scheme> listAll() { return repo.findAll(); }
+
+    @Override
     public Scheme get(Integer id) { return repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Scheme with ID " + id + " not found")); }
+
+    @Override
     public Scheme save(Scheme item) {
         String normalizedName = item.getName().toLowerCase();
 
@@ -31,6 +41,8 @@ public class SchemeServiceImpl implements SchemeService {
 
         return repo.save(item);
     }
+
+    @Override
     public void delete(Integer id) {
         try {
             repo.deleteById(id);

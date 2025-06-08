@@ -33,26 +33,59 @@ public class CompanyCommissionSchemeServiceImplTest {
     @Mock
     private CommissionRateRepository commissionRateRepository;
 
-    @InjectMocks
     private CompanyCommissionSchemeServiceImpl service;
 
     @BeforeEach
     public void init() {
+
         MockitoAnnotations.openMocks(this);
+        service = new CompanyCommissionSchemeServiceImpl(repository, commissionRateRepository, moneyChangerRepository);
     }
 
     @Test
     public void testListAll() {
-        when(repository.findAll()).thenReturn(List.of(new CompanyCommissionScheme()));
-        Assertions.assertEquals(1, service.listAll().size());
+        CompanyCommissionScheme activeScheme = new CompanyCommissionScheme();
+        activeScheme.setIsDeleted(false);
+
+        CompanyCommissionScheme deletedScheme = new CompanyCommissionScheme();
+        deletedScheme.setIsDeleted(true);
+
+        // The repository returns both active and deleted records
+        when(repository.findAll()).thenReturn(List.of(activeScheme, deletedScheme));
+
+        // The service should return only the non-deleted ones
+        List<CompanyCommissionScheme> result = service.listAll();
+
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertFalse(result.get(0).getIsDeleted());
     }
 
     @Test
-    public void testGet() {
+    public void testGet_Success() {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
         item.setId(1);
+        item.setIsDeleted(false);  // important to set not deleted
         when(repository.findById(1)).thenReturn(Optional.of(item));
-        Assertions.assertEquals(1, service.get(1).getId());
+
+        CompanyCommissionScheme result = service.get(1);
+        Assertions.assertEquals(1, result.getId());
+    }
+
+    @Test
+    public void testGet_Deleted_ThrowsException() {
+        CompanyCommissionScheme deletedItem = new CompanyCommissionScheme();
+        deletedItem.setId(1);
+        deletedItem.setIsDeleted(true);  // marked as deleted
+        when(repository.findById(1)).thenReturn(Optional.of(deletedItem));
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.get(1));
+    }
+
+    @Test
+    public void testGet_NotFound_ThrowsException() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.get(1));
     }
 
 

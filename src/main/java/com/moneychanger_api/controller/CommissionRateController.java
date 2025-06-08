@@ -11,8 +11,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/commission-rates")
 public class CommissionRateController {
+    private final CommissionRateService service;
+
     @Autowired
-    private CommissionRateService service;
+    public CommissionRateController(CommissionRateService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<CommissionRate> list() { return service.listAll(); }

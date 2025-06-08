@@ -11,8 +11,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/v1/company-commission-schemes")
 public class CompanyCommissionSchemeController {
+    private final CompanyCommissionSchemeService service;
+
     @Autowired
-    private CompanyCommissionSchemeService service;
+    public CompanyCommissionSchemeController(CompanyCommissionSchemeService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<CompanyCommissionScheme> list() { return service.listAll(); }

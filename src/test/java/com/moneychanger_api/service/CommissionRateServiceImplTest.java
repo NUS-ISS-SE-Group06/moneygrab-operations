@@ -16,6 +16,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
@@ -24,18 +25,23 @@ public class CommissionRateServiceImplTest {
     @Mock
     private CommissionRateRepository repository;
 
-    @InjectMocks
     private CommissionRateServiceImpl service;
 
     @BeforeEach
     public void init() {
+
         MockitoAnnotations.openMocks(this);
+        service = new CommissionRateServiceImpl(repository);
     }
 
     @Test
     public void testListAll() {
-        when(repository.findAll()).thenReturn(List.of(new CommissionRate()));
-        Assertions.assertEquals(1, service.listAll().size());
+        CommissionRate item = new CommissionRate();
+        item.setIsDeleted(false); // Simulate active record
+        when(repository.findAll()).thenReturn(List.of(item));
+
+        List<CommissionRate> result = service.listAll();
+        assertEquals(1, result.size());
     }
 
     @Test
@@ -43,7 +49,7 @@ public class CommissionRateServiceImplTest {
         CommissionRate item = new CommissionRate();
         item.setId(1);
         when(repository.findById(1)).thenReturn(Optional.of(item));
-        Assertions.assertEquals(1, service.get(1).getId());
+        assertEquals(1, service.get(1).getId());
     }
 
     @Test
@@ -62,8 +68,8 @@ public class CommissionRateServiceImplTest {
         when(repository.save(item)).thenReturn(item);
 
         CommissionRate saved = service.save(item);
-        Assertions.assertEquals("Retail", saved.getDescription());
-        Assertions.assertEquals(new BigDecimal("5.0"), saved.getRate());
+        assertEquals("Retail", saved.getDescription());
+        assertEquals(new BigDecimal("5.0"), saved.getRate());
     }
 
     @Test

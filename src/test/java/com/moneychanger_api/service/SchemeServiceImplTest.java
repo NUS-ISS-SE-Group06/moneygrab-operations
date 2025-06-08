@@ -25,12 +25,13 @@ public class SchemeServiceImplTest {
     @Mock
     private SchemeRepository schemeRepository;
 
-    @InjectMocks
     private SchemeServiceImpl schemeService;
 
     @BeforeEach
     public void setup() {
+
         MockitoAnnotations.openMocks(this);
+        schemeService = new SchemeServiceImpl(schemeRepository);
     }
 
     @Test
