@@ -11,7 +11,6 @@ import com.moneychanger_api.repository.MoneyChangerRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,7 +21,7 @@ import java.util.Optional;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class CompanyCommissionSchemeServiceImplTest {
+class CompanyCommissionSchemeServiceImplTest {
 
     @Mock
     private CompanyCommissionSchemeRepository repository;
@@ -43,7 +42,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testListAll() {
+    void testListAll() {
         CompanyCommissionScheme activeScheme = new CompanyCommissionScheme();
         activeScheme.setIsDeleted(false);
 
@@ -61,7 +60,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testGet_Success() {
+    void testGet_Success() {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
         item.setId(1);
         item.setIsDeleted(false);  // important to set not deleted
@@ -72,7 +71,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testGet_Deleted_ThrowsException() {
+    void testGet_Deleted_ThrowsException() {
         CompanyCommissionScheme deletedItem = new CompanyCommissionScheme();
         deletedItem.setId(1);
         deletedItem.setIsDeleted(true);  // marked as deleted
@@ -82,7 +81,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testGet_NotFound_ThrowsException() {
+    void testGet_NotFound_ThrowsException() {
         when(repository.findById(1)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> service.get(1));
@@ -90,7 +89,7 @@ public class CompanyCommissionSchemeServiceImplTest {
 
 
     @Test
-    public void testSaveSuccess() {
+    void testSaveSuccess() {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
 
         MoneyChanger mc = new MoneyChanger();
@@ -115,7 +114,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testSaveThrowsIllegalArgumentExceptionWhenNullIds() {
+    void testSaveThrowsIllegalArgumentExceptionWhenNullIds() {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
 
         // moneyChangerId null
@@ -130,7 +129,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testSaveThrowsResourceNotFoundWhenMoneyChangerNotFound() {
+    void testSaveThrowsResourceNotFoundWhenMoneyChangerNotFound() {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
 
         MoneyChanger mc = new MoneyChanger();
@@ -147,7 +146,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testSaveThrowsResourceNotFoundWhenCommissionRateNotFound() {
+    void testSaveThrowsResourceNotFoundWhenCommissionRateNotFound() {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
 
         MoneyChanger mc = new MoneyChanger();
@@ -165,7 +164,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testSaveDuplicateThrowsException() {
+    void testSaveDuplicateThrowsException() {
         CompanyCommissionScheme existing = new CompanyCommissionScheme();
 
         MoneyChanger mc = new MoneyChanger();
@@ -188,7 +187,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testDeleteSuccess() {
+    void testDeleteSuccess() {
         CompanyCommissionScheme item = new CompanyCommissionScheme();
         item.setId(1);
         item.setIsDeleted(false);
@@ -206,7 +205,7 @@ public class CompanyCommissionSchemeServiceImplTest {
     }
 
     @Test
-    public void testDeleteThrowsResourceNotFound() {
+    void testDeleteThrowsResourceNotFound() {
         when(repository.findById(1)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> service.delete(1));

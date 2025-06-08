@@ -7,7 +7,6 @@ import com.moneychanger_api.repository.SchemeRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +19,7 @@ import static org.mockito.Mockito.*;
 
 
 @SpringBootTest
-public class SchemeServiceImplTest {
+class SchemeServiceImplTest {
 
     @Mock
     private SchemeRepository schemeRepository;
@@ -35,14 +34,14 @@ public class SchemeServiceImplTest {
     }
 
     @Test
-    public void testListAll() {
+    void testListAll() {
         List<Scheme> list = List.of(new Scheme());
         when(schemeRepository.findAll()).thenReturn(list);
         Assertions.assertEquals(1, schemeService.listAll().size());
     }
 
     @Test
-    public void testGet() {
+    void testGet() {
         Scheme scheme = new Scheme();
         scheme.setId(1);
         when(schemeRepository.findById(1)).thenReturn(Optional.of(scheme));
@@ -50,7 +49,7 @@ public class SchemeServiceImplTest {
     }
 
     @Test
-    public void testSave_NewScheme_Success() {
+    void testSave_NewScheme_Success() {
         Scheme scheme = new Scheme();
         scheme.setName("Test");
 
@@ -63,7 +62,7 @@ public class SchemeServiceImplTest {
     }
 
     @Test
-    public void testSave_DuplicateScheme_ThrowsException() {
+    void testSave_DuplicateScheme_ThrowsException() {
         Scheme existing = new Scheme();
         existing.setName("Test");
 
@@ -79,13 +78,13 @@ public class SchemeServiceImplTest {
     }
 
     @Test
-    public void testDelete_Success() {
+    void testDelete_Success() {
         schemeService.delete(1);
         verify(schemeRepository, times(1)).deleteById(1);
     }
 
     @Test
-    public void testDelete_ForeignKeyViolation_ThrowsForeignKeyConstraintException() {
+    void testDelete_ForeignKeyViolation_ThrowsForeignKeyConstraintException() {
         // Simulate FK constraint violation
         doThrow(new DataIntegrityViolationException("FK constraint")).when(schemeRepository).deleteById(1);
 

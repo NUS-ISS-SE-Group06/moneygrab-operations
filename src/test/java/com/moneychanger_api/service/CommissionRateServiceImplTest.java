@@ -7,7 +7,6 @@ import com.moneychanger_api.repository.CommissionRateRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @SpringBootTest
-public class CommissionRateServiceImplTest {
+class CommissionRateServiceImplTest {
 
     @Mock
     private CommissionRateRepository repository;
@@ -35,7 +34,7 @@ public class CommissionRateServiceImplTest {
     }
 
     @Test
-    public void testListAll() {
+    void testListAll() {
         CommissionRate item = new CommissionRate();
         item.setIsDeleted(false); // Simulate active record
         when(repository.findAll()).thenReturn(List.of(item));
@@ -45,7 +44,7 @@ public class CommissionRateServiceImplTest {
     }
 
     @Test
-    public void testGet_Found() {
+    void testGet_Found() {
         CommissionRate item = new CommissionRate();
         item.setId(1);
         when(repository.findById(1)).thenReturn(Optional.of(item));
@@ -53,13 +52,13 @@ public class CommissionRateServiceImplTest {
     }
 
     @Test
-    public void testGet_NotFound() {
+    void testGet_NotFound() {
         when(repository.findById(1)).thenReturn(Optional.empty());
         Assertions.assertThrows(ResourceNotFoundException.class, () -> service.get(1));
     }
 
     @Test
-    public void testSave_New() {
+    void testSave_New() {
         CommissionRate item = new CommissionRate();
         item.setDescription("Retail");
         item.setRate(new BigDecimal("5.0"));
@@ -73,7 +72,7 @@ public class CommissionRateServiceImplTest {
     }
 
     @Test
-    public void testSave_Duplicate() {
+    void testSave_Duplicate() {
         CommissionRate duplicateItem = new CommissionRate();
         duplicateItem.setDescription("retail"); // Same as "Retail" (case-insensitive)
 
@@ -88,7 +87,7 @@ public class CommissionRateServiceImplTest {
     }
 
     @Test
-    public void testDelete_Success() {
+    void testDelete_Success() {
         CommissionRate existing = new CommissionRate();
         existing.setId(1);
         existing.setIsDeleted(false);
@@ -102,7 +101,7 @@ public class CommissionRateServiceImplTest {
     }
 
     @Test
-    public void testDelete_NotFound() {
+    void testDelete_NotFound() {
         when(repository.findById(1)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> service.delete(1));
