@@ -3,6 +3,8 @@ package com.moneychanger_api.controller;
 import com.moneychanger_api.exception.DuplicateResourceException;
 import com.moneychanger_api.exception.ResourceNotFoundException;
 import com.moneychanger_api.model.CommissionRate;
+import com.moneychanger_api.model.CurrencyCode;
+import com.moneychanger_api.model.Scheme;
 import com.moneychanger_api.service.CommissionRateService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -69,28 +71,46 @@ class CommissionRateControllerTest {
         CommissionRate item = new CommissionRate();
         item.setId(1);
         item.setRate(new BigDecimal("3.00"));
-        item.setDescription("VIP1");
+
+        CurrencyCode currency = new CurrencyCode();
+        currency.setId(100);
+        item.setCurrencyId(currency);
+
+        Scheme scheme = new Scheme();
+        scheme.setId(200);
+        item.setSchemeId(scheme);
 
         Mockito.when(commissionRateService.save(Mockito.any())).thenReturn(item);
 
         mockMvc.perform(post("/v1/commission-rates")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"rate\":3.00,\"description\":\"VIP1\"}"))
+                        .content("""
+                            {
+                              "rate": 3.00,
+                              "currencyId": { "id": 100 },
+                              "schemeId": { "id": 200 }
+                            }
+                        """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.rate").value(3.00))
-                .andExpect(jsonPath("$.description").value("VIP1"));
+                .andExpect(jsonPath("$.rate").value(3.00));
     }
 
     @Test
     void testCreateDuplicateCommissionRate() throws Exception {
         Mockito.when(commissionRateService.save(Mockito.any()))
-                .thenThrow(new DuplicateResourceException("Commission rate with description 'VIP1' already exists"));
+                .thenThrow(new DuplicateResourceException("Commission rate for the same currency and scheme already exists."));
 
         mockMvc.perform(post("/v1/commission-rates")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"rate\":3.00,\"description\":\"VIP1\"}"))
-                //.andExpect(status().isConflict())
-                .andExpect(content().string("Commission rate with description 'VIP1' already exists"));
+                        .content("""
+                            {
+                              "rate": 3.00,
+                              "currencyId": { "id": 100 },
+                              "schemeId": { "id": 200 }
+                            }
+                        """))
+                .andExpect(status().isConflict())
+                .andExpect(content().string("Commission rate for the same currency and scheme already exists."));
     }
 
     @Test
@@ -103,7 +123,13 @@ class CommissionRateControllerTest {
 
         mockMvc.perform(put("/v1/commission-rates/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"rate\":4.50}"))
+                        .content("""
+                            {
+                              "rate": 4.50,
+                              "currencyId": { "id": 100 },
+                              "schemeId": { "id": 200 }
+                            }
+                        """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rate").value(4.50));
     }

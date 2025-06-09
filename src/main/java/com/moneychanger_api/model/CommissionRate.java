@@ -8,17 +8,24 @@ import java.sql.Timestamp;
 
 @Data
 @Entity
-@Table(name = "commission_rate")
+@Table(name = "commission_rate", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"currency_id", "scheme_id"})
+})
 public class CommissionRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, precision = 5, scale = 2)
-    private BigDecimal rate;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "currency_id", nullable = false)
+    private CurrencyCode currencyId;
 
-    @Column(length = 255, unique = true)
-    private String description;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "scheme_id", nullable = false)
+    private Scheme schemeId;
+
+    @Column(nullable = false, precision = 5, scale = 4)
+    private BigDecimal rate;
 
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp createdAt;

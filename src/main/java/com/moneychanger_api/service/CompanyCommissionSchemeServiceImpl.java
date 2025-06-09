@@ -52,29 +52,31 @@ public class CompanyCommissionSchemeServiceImpl implements CompanyCommissionSche
 
     @Override
     public CompanyCommissionScheme save(CompanyCommissionScheme item) {
-        // Validate non-null references
         if (item.getMoneyChangerId() == null || item.getCommissionRateId() == null) {
             throw new IllegalArgumentException("moneyChangerId and commissionRateId must not be null");
         }
 
-        // Validate that referenced money changer exists
         if (!moneyChangerRepo.existsById(item.getMoneyChangerId().getId())) {
-            throw new ResourceNotFoundException("MoneyChanger with ID " + item.getMoneyChangerId() + " not found");
+            throw new ResourceNotFoundException("MoneyChanger with ID " + item.getMoneyChangerId().getId() + " not found");
         }
 
-        // Validate that referenced commission rate exists
         if (!commissionRateRepo.existsById(item.getCommissionRateId().getId())) {
-            throw new ResourceNotFoundException("CommissionRate with ID " + item.getCommissionRateId() + " not found");
+            throw new ResourceNotFoundException("CommissionRate with ID " + item.getCommissionRateId().getId() + " not found");
         }
 
-        // Prevent multiple configurations per money_changer_id
-        boolean exists = repo.findAll().stream()
-                .anyMatch(s -> s.getMoneyChangerId().equals(item.getMoneyChangerId()));
+        // Duplicate check for (moneyChangerId, commissionRateId) pair
+        boolean exists = repo.existsByMoneyChangerId_IdAndCommissionRateId_Id(
+                item.getMoneyChangerId().getId(),
+                item.getCommissionRateId().getId()
+        );
+
 
         if (exists) {
-            throw new DuplicateResourceException("Company Commission Scheme for money_changer_id '"
-                    + item.getMoneyChangerId() + "' already exists");
+            throw new DuplicateResourceException("Company Commission Scheme for moneyChangerId '"
+                    + item.getMoneyChangerId().getId() + "' and commissionRateId '"
+                    + item.getCommissionRateId().getId() + "' already exists");
         }
+
         return repo.save(item);
     }
 

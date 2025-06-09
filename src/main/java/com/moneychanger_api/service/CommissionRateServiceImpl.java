@@ -27,15 +27,16 @@ public class CommissionRateServiceImpl implements CommissionRateService {
     }
 
     @Override
-    public CommissionRate get(Integer id) { return repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Commission Rate with ID " + id + " not found")); }
+    public CommissionRate get(Integer id) {
+        return repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Commission Rate with ID " + id + " not found"));
+    }
 
     @Override
     public CommissionRate save(CommissionRate item) {
-        String normalizedName = item.getDescription().trim();
-
-        // Check for existing commission rate with the same description
-        if (repo.existsByDescriptionIgnoreCase(normalizedName)) {
-            throw new DuplicateResourceException("Commission rate with description '" + normalizedName + "' already exists");
+        // Check for duplicate based on currency + scheme
+        boolean exists = repo.existsByCurrencyIdAndSchemeId(item.getCurrencyId(), item.getSchemeId());
+        if (exists) {
+            throw new DuplicateResourceException("Commission rate for the same currency and scheme already exists.");
         }
         return repo.save(item);
     }

@@ -165,26 +165,26 @@ class CompanyCommissionSchemeServiceImplTest {
 
     @Test
     void testSaveDuplicateThrowsException() {
-        CompanyCommissionScheme existing = new CompanyCommissionScheme();
-
         MoneyChanger mc = new MoneyChanger();
         mc.setId(10L);
-        existing.setMoneyChangerId(mc);
-
-        CompanyCommissionScheme newItem = new CompanyCommissionScheme();
-        newItem.setMoneyChangerId(mc);
 
         CommissionRate cr = new CommissionRate();
         cr.setId(20);
+
+        CompanyCommissionScheme newItem = new CompanyCommissionScheme();
+        newItem.setMoneyChangerId(mc);
         newItem.setCommissionRateId(cr);
 
         when(moneyChangerRepository.existsById(10L)).thenReturn(true);
         when(commissionRateRepository.existsById(20)).thenReturn(true);
 
-        when(repository.findAll()).thenReturn(List.of(existing));
+        // Updated method call here
+        when(repository.existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20)).thenReturn(true);
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> service.save(newItem));
     }
+
+
 
     @Test
     void testDeleteSuccess() {

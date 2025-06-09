@@ -28,7 +28,9 @@ public class CompanyCommissionSchemeController {
     }
 
     @PostMapping
-    public CompanyCommissionScheme create(@RequestBody CompanyCommissionScheme item) { return service.save(item); }
+    public CompanyCommissionScheme create(@RequestBody CompanyCommissionScheme item) {
+        return service.save(item);
+    }
 
     @PutMapping("/{id}")
     public CompanyCommissionScheme update(@PathVariable Integer id, @RequestBody CompanyCommissionScheme item) {
