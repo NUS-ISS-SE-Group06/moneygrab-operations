@@ -129,12 +129,33 @@ class SchemeControllerTest {
 
     }
 
+
     @Test
-    void testDeleteScheme() throws Exception {
+    void testDeleteSchemeSuccess() throws Exception {
+        // No exception means successful deletion
+        Mockito.doNothing().when(schemeService).delete(1, 1);
+
         mockMvc.perform(delete("/v1/schemes/1"))
                 .andExpect(status().isOk());
 
-        Mockito.verify(schemeService, times(1)).delete(1);
+        Mockito.verify(schemeService, times(1)).delete(1, 1);
     }
+
+    @Test
+    void testDeleteSchemeNotFound() throws Exception {
+        // Simulate service throwing not found exception
+        Mockito.doThrow(new ResourceNotFoundException("Scheme with ID 999 not found"))
+                .when(schemeService).delete(999, 1);
+
+        mockMvc.perform(delete("/v1/schemes/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Scheme with ID 999 not found"));
+
+        Mockito.verify(schemeService, times(1)).delete(999, 1);
+    }
+
+
+
+
 
 }

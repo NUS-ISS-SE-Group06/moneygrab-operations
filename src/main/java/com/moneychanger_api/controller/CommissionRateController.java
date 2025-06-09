@@ -1,5 +1,7 @@
 package com.moneychanger_api.controller;
 
+import com.moneychanger_api.dto.CommissionRateDTO;
+import com.moneychanger_api.mapper.CommissionRateMapper;
 import com.moneychanger_api.model.CommissionRate;
 import com.moneychanger_api.service.CommissionRateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/commission-rates")
@@ -19,7 +22,11 @@ public class CommissionRateController {
     }
 
     @GetMapping
-    public List<CommissionRate> list() { return service.listAll(); }
+    public List<CommissionRateDTO> list() {
+        return service.listAll().stream()
+                .map(CommissionRateMapper::toDTO)
+                .collect(Collectors.toList());
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<CommissionRate> get(@PathVariable Integer id) {

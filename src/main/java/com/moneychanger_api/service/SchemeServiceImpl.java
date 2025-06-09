@@ -1,12 +1,10 @@
 package com.moneychanger_api.service;
 
 import com.moneychanger_api.exception.DuplicateResourceException;
-import com.moneychanger_api.exception.ForeignKeyConstraintException;
 import com.moneychanger_api.exception.ResourceNotFoundException;
 import com.moneychanger_api.model.Scheme;
 import com.moneychanger_api.repository.SchemeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -67,16 +65,16 @@ public class SchemeServiceImpl implements SchemeService {
     }
 
     @Override
-    public void delete(Integer id) {
-        try {
-            Scheme scheme = repo.findById(id)
-                    .orElseThrow(() -> new ResourceNotFoundException("Scheme with ID " + id + " not found"));
-
-            scheme.setIsDeleted(true);
-
-            repo.save(scheme);
-        } catch (DataIntegrityViolationException e) {
-            throw new ForeignKeyConstraintException("Scheme is in use and cannot be deleted.");
+    public void delete(Integer id, Integer who) {
+        int updated = repo.markDeletedById(id, who);
+        if (updated == 0) {
+            throw new ResourceNotFoundException("Scheme with ID " + id + " not found");
         }
+
     }
+
+
+
+
+
 }

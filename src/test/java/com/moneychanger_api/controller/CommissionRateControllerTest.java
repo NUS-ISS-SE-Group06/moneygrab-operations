@@ -35,13 +35,43 @@ class CommissionRateControllerTest {
 
     @Test
     void testListCommissionRates() throws Exception {
-        List<CommissionRate> list = List.of(new CommissionRate());
-        Mockito.when(commissionRateService.listAll()).thenReturn(list);
+        CurrencyCode currency = new CurrencyCode();
+        currency.setId(100);
+        currency.setCurrency("USD");
+        currency.setDescription("US Dollar");
+
+        Scheme scheme = new Scheme();
+        scheme.setId(200);
+        scheme.setNameTag("Basic Plan");
+
+        CommissionRate entity = new CommissionRate();
+        entity.setId(1);
+        entity.setCurrencyId(currency);
+        entity.setSchemeId(scheme);
+        entity.setRate(new BigDecimal("0.0250"));
+        entity.setCreatedBy(1);
+        entity.setUpdatedBy(1);
+        entity.setIsDeleted(false);
+
+        List<CommissionRate> entityList = List.of(entity);
+
+        // Mock the service to return entity list
+        Mockito.when(commissionRateService.listAll()).thenReturn(entityList);
 
         mockMvc.perform(get("/v1/commission-rates"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)));
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].currencyId").value(100))
+                .andExpect(jsonPath("$[0].currency").value("USD"))
+                .andExpect(jsonPath("$[0].schemeId").value(200))
+                .andExpect(jsonPath("$[0].nameTag").value("Basic Plan"))
+                .andExpect(jsonPath("$[0].rate").value(0.0250))
+                .andExpect(jsonPath("$[0].createdBy").value(1))
+                .andExpect(jsonPath("$[0].updatedBy").value(1))
+                .andExpect(jsonPath("$[0].isDeleted").value(false));
     }
+
 
     @Test
     void testGetCommissionRateFound() throws Exception {

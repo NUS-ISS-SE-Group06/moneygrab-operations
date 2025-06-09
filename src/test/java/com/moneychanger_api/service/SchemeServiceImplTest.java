@@ -1,7 +1,6 @@
 package com.moneychanger_api.service;
 
 import com.moneychanger_api.exception.DuplicateResourceException;
-import com.moneychanger_api.exception.ForeignKeyConstraintException;
 import com.moneychanger_api.exception.ResourceNotFoundException;
 import com.moneychanger_api.model.Scheme;
 import com.moneychanger_api.repository.SchemeRepository;
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,7 +27,6 @@ class SchemeServiceImplTest {
 
     @BeforeEach
     public void setup() {
-
         MockitoAnnotations.openMocks(this);
         schemeService = new SchemeServiceImpl(schemeRepository);
     }
@@ -163,44 +160,34 @@ class SchemeServiceImplTest {
 
     @Test
     void testDelete_Success() {
-        Scheme scheme = new Scheme();
-        scheme.setId(1);
-        scheme.setIsDeleted(false);
+        int schemeId = 1;
+        int updatedBy = 99;
 
-        when(schemeRepository.findById(1)).thenReturn(Optional.of(scheme));
-        when(schemeRepository.save(any(Scheme.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(schemeRepository.markDeletedById(schemeId, updatedBy)).thenReturn(1);
 
-        schemeService.delete(1);
+        // Should not throw any exception
+        Assertions.assertDoesNotThrow(() -> {
+            schemeService.delete(schemeId, updatedBy);
+        });
 
-        Assertions.assertTrue(scheme.getIsDeleted());
-        verify(schemeRepository, times(1)).save(scheme);
+        verify(schemeRepository, times(1)).markDeletedById(schemeId, updatedBy);
     }
 
+
     @Test
-    void testDelete_NotFound_ThrowsResourceNotFound() {
-        when(schemeRepository.findById(1)).thenReturn(Optional.empty());
+    void testDelete_SchemeNotFound_ThrowsException() {
+        int schemeId = 1;
+        int updatedBy = 99;
+
+        when(schemeRepository.markDeletedById(schemeId, updatedBy)).thenReturn(0);
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            schemeService.delete(1);
-        });
-    }
-
-    @Test
-    void testDelete_ForeignKeyViolation_ThrowsForeignKeyConstraintException() {
-        Scheme scheme = new Scheme();
-        scheme.setId(1);
-        scheme.setIsDeleted(false);
-
-        when(schemeRepository.findById(1)).thenReturn(Optional.of(scheme));
-        // Simulate DataIntegrityViolationException on save
-        when(schemeRepository.save(any(Scheme.class))).thenThrow(new DataIntegrityViolationException("FK violation"));
-
-        ForeignKeyConstraintException exception = Assertions.assertThrows(ForeignKeyConstraintException.class, () -> {
-            schemeService.delete(1);
+            schemeService.delete(schemeId, updatedBy);
         });
 
-        Assertions.assertEquals("Scheme is in use and cannot be deleted.", exception.getMessage());
+        verify(schemeRepository, times(1)).markDeletedById(schemeId, updatedBy);
     }
+
 
 
 }
