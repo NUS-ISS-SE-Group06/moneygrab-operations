@@ -64,7 +64,6 @@ public class CompanyCommissionSchemeServiceImpl implements CompanyCommissionSche
             throw new ResourceNotFoundException("CommissionRate with ID " + item.getCommissionRateId().getId() + " not found");
         }
 
-        // Duplicate check for (moneyChangerId, commissionRateId) pair
         boolean exists = repo.existsByMoneyChangerId_IdAndCommissionRateId_Id(
                 item.getMoneyChangerId().getId(),
                 item.getCommissionRateId().getId()
