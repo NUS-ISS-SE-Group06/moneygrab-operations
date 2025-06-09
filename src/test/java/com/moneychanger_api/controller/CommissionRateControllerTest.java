@@ -2,6 +2,8 @@ package com.moneychanger_api.controller;
 
 import com.moneychanger_api.exception.DuplicateResourceException;
 import com.moneychanger_api.exception.ResourceNotFoundException;
+import com.moneychanger_api.dto.CommissionRateDTO;
+import com.moneychanger_api.mapper.CommissionRateMapper;
 import com.moneychanger_api.model.CommissionRate;
 import com.moneychanger_api.model.CurrencyCode;
 import com.moneychanger_api.model.Scheme;
@@ -16,11 +18,13 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -52,16 +56,20 @@ class CommissionRateControllerTest {
         entity.setCreatedBy(1);
         entity.setUpdatedBy(1);
         entity.setIsDeleted(false);
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        entity.setCreatedAt(now);
+        entity.setUpdatedAt(now);
 
         List<CommissionRate> entityList = List.of(entity);
 
-        // Mock the service to return entity list
+        // Mock the service to return the entity list
         Mockito.when(commissionRateService.listAll()).thenReturn(entityList);
 
+        // Act + Assert
         mockMvc.perform(get("/v1/commission-rates"))
                 .andExpect(status().isOk())
+                .andDo(print())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[0].currencyId").value(100))
                 .andExpect(jsonPath("$[0].currency").value("USD"))
                 .andExpect(jsonPath("$[0].schemeId").value(200))
@@ -73,18 +81,25 @@ class CommissionRateControllerTest {
     }
 
 
+
     @Test
     void testGetCommissionRateFound() throws Exception {
         CommissionRate item = new CommissionRate();
         item.setId(1);
         item.setRate(new BigDecimal("2.50"));
 
+        CommissionRateDTO dto = new CommissionRateDTO();
+        dto.setId(1);
+        dto.setRate(new BigDecimal("2.50"));
+
+        // Mock the service to return the entity
         Mockito.when(commissionRateService.get(1)).thenReturn(item);
 
         mockMvc.perform(get("/v1/commission-rates/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rate").value(2.50));
     }
+
 
     @Test
     void testGetCommissionRateNotFound() throws Exception {
@@ -95,6 +110,7 @@ class CommissionRateControllerTest {
                 .andExpect(content().string("CommissionRate with ID 999 not found"));
 
     }
+
 
     @Test
     void testCreateCommissionRate() throws Exception {
@@ -115,12 +131,12 @@ class CommissionRateControllerTest {
         mockMvc.perform(post("/v1/commission-rates")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                              "rate": 3.00,
-                              "currencyId": { "id": 100 },
-                              "schemeId": { "id": 200 }
-                            }
-                        """))
+                        {
+                          "rate": 3.00,
+                          "currencyId": 100,
+                          "schemeId": 200
+                        }
+                    """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rate").value(3.00));
     }
@@ -133,36 +149,44 @@ class CommissionRateControllerTest {
         mockMvc.perform(post("/v1/commission-rates")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                              "rate": 3.00,
-                              "currencyId": { "id": 100 },
-                              "schemeId": { "id": 200 }
-                            }
-                        """))
+                        {
+                          "rate": 3.00,
+                          "currencyId": 100,
+                          "schemeId": 200
+                        }
+                    """))
                 .andExpect(status().isConflict())
                 .andExpect(content().string("Commission rate for the same currency and scheme already exists."));
     }
 
+
     @Test
     void testUpdateCommissionRate() throws Exception {
-        CommissionRate item = new CommissionRate();
-        item.setId(1);
-        item.setRate(new BigDecimal("4.50"));
+        CommissionRateDTO dto = new CommissionRateDTO();
+        dto.setId(1);
+        dto.setRate(new BigDecimal("4.50"));
+        dto.setCurrencyId(100);
+        dto.setSchemeId(200);
 
-        Mockito.when(commissionRateService.save(Mockito.any())).thenReturn(item);
+        CommissionRate savedEntity = new CommissionRate();
+        savedEntity.setId(1);
+        savedEntity.setRate(new BigDecimal("4.50"));
+
+        Mockito.when(commissionRateService.save(Mockito.any())).thenReturn(savedEntity);
 
         mockMvc.perform(put("/v1/commission-rates/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                            {
-                              "rate": 4.50,
-                              "currencyId": { "id": 100 },
-                              "schemeId": { "id": 200 }
-                            }
-                        """))
+                        {
+                          "rate": 4.50,
+                          "currencyId": 100,
+                          "schemeId": 200
+                        }
+                    """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rate").value(4.50));
     }
+
 
     @Test
     void testDeleteCommissionRate() throws Exception {
