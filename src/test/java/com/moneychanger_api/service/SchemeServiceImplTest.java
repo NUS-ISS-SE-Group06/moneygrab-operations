@@ -51,7 +51,7 @@ class SchemeServiceImplTest {
     @Test
     void testSave_NewScheme_Success() {
         Scheme scheme = new Scheme();
-        scheme.setName("Test");
+        scheme.setNameTag("Test");
         scheme.setDescription("New scheme description");
         scheme.setIsDefault(true);
 
@@ -61,7 +61,7 @@ class SchemeServiceImplTest {
 
         Scheme result = schemeService.save(scheme);
 
-        Assertions.assertEquals("Test", result.getName());
+        Assertions.assertEquals("Test", result.getNameTag());
         Assertions.assertEquals("New scheme description", result.getDescription());
         Assertions.assertTrue(result.getIsDefault());
     }
@@ -69,12 +69,12 @@ class SchemeServiceImplTest {
     @Test
     void testSave_DuplicateScheme_ThrowsException() {
         Scheme existing = new Scheme();
-        existing.setName("Test");
+        existing.setNameTag("Test");
         existing.setDescription("Existing scheme");
         existing.setIsDefault(false);
 
         Scheme newScheme = new Scheme();
-        newScheme.setName("test"); // same name, different case
+        newScheme.setNameTag("test"); // same name, different case
         newScheme.setDescription("Duplicate scheme");
         newScheme.setIsDefault(true);
 
@@ -91,12 +91,12 @@ class SchemeServiceImplTest {
         // Existing default scheme in DB
         Scheme existingDefault = new Scheme();
         existingDefault.setId(1);
-        existingDefault.setName("Existing Default");
+        existingDefault.setNameTag("Existing Default");
         existingDefault.setIsDefault(true);
 
         // New scheme to be saved as default
         Scheme newDefault = new Scheme();
-        newDefault.setName("New Default");
+        newDefault.setNameTag("New Default");
         newDefault.setIsDefault(true);
 
         // Mock existing schemes including the default

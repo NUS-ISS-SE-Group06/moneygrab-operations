@@ -29,14 +29,14 @@ public class SchemeServiceImpl implements SchemeService {
 
     @Override
     public Scheme save(Scheme item) {
-        String normalizedName = item.getName().toLowerCase();
+        String normalizedName = item.getNameTag().toLowerCase();
 
         // Check for existing scheme with the same name
         boolean exists = repo.findAll().stream()
-                .anyMatch(s -> s.getName().trim().equalsIgnoreCase(normalizedName));
+                .anyMatch(s -> s.getNameTag().trim().equalsIgnoreCase(normalizedName));
 
         if (exists) {
-            throw new DuplicateResourceException("Scheme with name '" + item.getName().trim() + "' already exists");
+            throw new DuplicateResourceException("Scheme with name '" + item.getNameTag().trim() + "' already exists");
         }
 
         // If item is marked as default, unset all other default schemes
