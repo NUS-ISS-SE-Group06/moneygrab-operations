@@ -2,6 +2,7 @@ package com.moneychanger_api.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Timestamp;
 
@@ -25,16 +26,18 @@ public class Scheme {
     @Column(name = "is_deleted", nullable = false, columnDefinition ="TINYINT(1) DEFAULT 0" )
     private Boolean isDeleted=false;
 
-    @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
-    @Column(name = "updated_at", nullable = false, insertable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @CreationTimestamp
+    @Column(name = "updated_at", nullable = false, insertable = false)
     private Timestamp updatedAt;
 
     @Column(name = "created_by")
-    private Integer createdBy;
+    private Integer createdBy = 0;
 
     @Column(name = "updated_by")
-    private Integer updatedBy;
+    private Integer updatedBy = 0;
 
 }
