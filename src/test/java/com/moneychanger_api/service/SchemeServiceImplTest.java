@@ -87,6 +87,35 @@ class SchemeServiceImplTest {
     }
 
     @Test
+    void testSave_NewDefaultScheme_UnsetsPreviousDefaults() {
+        // Existing default scheme in DB
+        Scheme existingDefault = new Scheme();
+        existingDefault.setId(1);
+        existingDefault.setName("Existing Default");
+        existingDefault.setIsDefault(true);
+
+        // New scheme to be saved as default
+        Scheme newDefault = new Scheme();
+        newDefault.setName("New Default");
+        newDefault.setIsDefault(true);
+
+        // Mock existing schemes including the default
+        when(schemeRepository.findAll()).thenReturn(List.of(existingDefault));
+
+        // Mock save for both updated old and new scheme
+        when(schemeRepository.save(any(Scheme.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // Call save method
+        Scheme result = schemeService.save(newDefault);
+
+        // Verify old default was updated to false
+        verify(schemeRepository, times(2)).save(any(Scheme.class)); // old + new
+
+        Assertions.assertTrue(result.getIsDefault());
+    }
+
+
+    @Test
     void testDelete_Success() {
         schemeService.delete(1);
         verify(schemeRepository, times(1)).deleteById(1);

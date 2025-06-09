@@ -39,6 +39,17 @@ public class SchemeServiceImpl implements SchemeService {
             throw new DuplicateResourceException("Scheme with name '" + item.getName().trim() + "' already exists");
         }
 
+        // If item is marked as default, unset all other default schemes
+        if (item.getIsDefault() != null && item.getIsDefault()) {
+            List<Scheme> allSchemes = repo.findAll();
+            for (Scheme scheme : allSchemes) {
+                if (scheme.getIsDefault() != null && scheme.getIsDefault()) {
+                    scheme.setIsDefault(false);
+                    repo.save(scheme);  // update existing default to false
+                }
+            }
+        }
+
         return repo.save(item);
     }
 
