@@ -22,8 +22,6 @@ public class Scheme {
     @Column(name = "is_default", nullable = false)
     private Boolean isDefault = false;
 
-    private Integer updatedBy;
-
     @Column(name = "is_deleted", nullable = false, columnDefinition ="TINYINT(1) DEFAULT 0" )
     private Boolean isDeleted=false;
 
