@@ -2,6 +2,7 @@ package com.moneychanger_api.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.sql.Timestamp;
 
 @Data
@@ -34,5 +35,5 @@ public class Scheme {
     private Integer updatedBy;
 
     @Column(name = "is_deleted", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 0")
-    private Boolean isDeleted = false;
+    private Boolean isDeleted = false; 
 }
