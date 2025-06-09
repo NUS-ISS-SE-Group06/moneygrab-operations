@@ -1,7 +1,7 @@
 package com.moneychanger_api.model;
 
-import lombok.Data;
 import jakarta.persistence.*;
+import lombok.Data;
 import java.sql.Timestamp;
 
 @Data
