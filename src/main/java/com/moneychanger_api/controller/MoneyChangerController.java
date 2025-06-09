@@ -10,9 +10,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/moneychanger_api/moneychangers")
 public class MoneyChangerController {
+    private final MoneyChangerService service;
 
     @Autowired
-    private MoneyChangerService service;
+    public MoneyChangerController(MoneyChangerService service) {
+        this.service = service;
+    }
 
     @GetMapping
     public List<MoneyChanger> getAll() {

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Properties>
+        <Property name="LOG_PATTERN">[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1} - %m%n</Property>
+        <Property name="LOG_PATH">/var/log/moneychanger_api</Property>
+        <Property name="LOG_FILE_NAME">moneychanger_api.log</Property>
+        <Property name="LOG_ARCHIVE_FILE_NAME">moneychanger_api-%d{yyyy-MM-dd}-%i.log</Property>
+        <Property name="LOG_ROOT_LEVEL">debug</Property>
+        <Property name="LOG_APP_LEVEL">debug</Property>
+        <Property name="LOG_APPENDER">fileLoggerDebug</Property>
+    </Properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <RollingFile name="fileLoggerDebug"
+                     fileName="${LOG_PATH}/${LOG_FILE_NAME}"
+                     filePattern="${LOG_PATH}/${LOG_ARCHIVE_FILE_NAME}">
+            <LevelRangeFilter minLevel="DEBUG" maxLevel="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="10MB" />
+            </Policies>
+            <!-- Max 10 files will be created everyday -->
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_PATH}" maxDepth="1">
+                    <!-- Delete all files older than 30 days -->
+                    <IfLastModified age="30d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+        <RollingFile name="fileLoggerInfo"
+                     fileName="${LOG_PATH}/${LOG_FILE_NAME}"
+                     filePattern="${LOG_PATH}/${LOG_ARCHIVE_FILE_NAME}">
+            <LevelRangeFilter minLevel="INFO" maxLevel="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+                <SizeBasedTriggeringPolicy size="10MB" />
+            </Policies>
+            <!-- Max 10 files will be created everyday -->
+            <DefaultRolloverStrategy max="10">
+                <Delete basePath="${LOG_PATH}" maxDepth="1">
+                    <!-- Delete all files older than 30 days -->
+                    <IfLastModified age="30d" />
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <Root level="${LOG_ROOT_LEVEL}">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="${LOG_APPENDER}"/>
+        </Root>
+
+        <Logger name="com.moneychanger_api" additivity="false" level="${LOG_APP_LEVEL}">
+            <AppenderRef ref="console"/>
+            <!-- Suitable for Local & UAT -->
+            <AppenderRef ref="${LOG_APPENDER}" />
+            <!-- Suitable for Prod -->
+        </Logger>
+    </Loggers>
+</Configuration>

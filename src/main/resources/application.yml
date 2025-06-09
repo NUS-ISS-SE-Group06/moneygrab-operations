@@ -1,0 +1,11 @@
+server:
+  port: 8688
+  servlet:
+    contextPath: /api
+
+spring:
+  profiles:
+    default: dev
+
+cors:
+  allowed-origins: http://localhost:3000,http://yourdomain.com
