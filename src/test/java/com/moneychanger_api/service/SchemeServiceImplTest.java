@@ -52,22 +52,31 @@ class SchemeServiceImplTest {
     void testSave_NewScheme_Success() {
         Scheme scheme = new Scheme();
         scheme.setName("Test");
+        scheme.setDescription("New scheme description");
+        scheme.setIsDefault(true);
 
         // Simulate no existing schemes with the same name
         when(schemeRepository.findAll()).thenReturn(List.of());
-        when(schemeRepository.save(any(Scheme.class))).thenReturn(scheme);
+        when(schemeRepository.save(any(Scheme.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Scheme result = schemeService.save(scheme);
+
         Assertions.assertEquals("Test", result.getName());
+        Assertions.assertEquals("New scheme description", result.getDescription());
+        Assertions.assertTrue(result.getIsDefault());
     }
 
     @Test
     void testSave_DuplicateScheme_ThrowsException() {
         Scheme existing = new Scheme();
         existing.setName("Test");
+        existing.setDescription("Existing scheme");
+        existing.setIsDefault(false);
 
         Scheme newScheme = new Scheme();
         newScheme.setName("test"); // same name, different case
+        newScheme.setDescription("Duplicate scheme");
+        newScheme.setIsDefault(true);
 
         // Simulate existing scheme with the same normalized name
         when(schemeRepository.findAll()).thenReturn(List.of(existing));
