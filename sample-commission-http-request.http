@@ -13,8 +13,9 @@ POST http://localhost:8688/api/v1/schemes
 Content-Type: application/json
 
 {
-  "id": 11,
-  "name": "test"
+    "nameTag": "test",
+    "description": "test",
+    "isDefault": false
 }
 
 ### Update

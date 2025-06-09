@@ -2,7 +2,7 @@
 -- STEP 1: Create scheme table
 CREATE TABLE scheme (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL UNIQUE,
+    name_tag VARCHAR(100) NOT NULL UNIQUE,
     description VARCHAR(500),
     is_default BOOLEAN DEFAULT FALSE
 );

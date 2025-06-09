@@ -9,17 +9,17 @@ TRUNCATE TABLE scheme;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Insert schemes
-INSERT INTO scheme (id, name) VALUES
-(1, 'Scheme 1'),
-(2, 'Scheme 2'),
-(3, 'Scheme 3'),
-(4, 'Scheme 4'),
-(5, 'Scheme 5'),
-(6, 'Scheme 6'),
-(7, 'Scheme 7'),
-(8, 'Scheme 8'),
-(9, 'Scheme 9'),
-(10, 'Scheme 10');
+INSERT INTO scheme (id, name_tag, description, is_default) VALUES
+(1, 'Scheme 1', '',0),
+(2, 'Scheme 2','',0),
+(3, 'Scheme 3','',0),
+(4, 'Scheme 4','',0),
+(5, 'Scheme 5','',0),
+(6, 'Scheme 6','',0),
+(7, 'Scheme 7','',0),
+(8, 'Scheme 8','',0),
+(9, 'Scheme 9','',0),
+(10, 'Scheme 10','',0);
 
 -- Insert money_changer
 INSERT INTO money_changer (id, company_name, email, date_of_incorporation, address, country, postal_code, notes, uen, scheme_id, created_by, updated_by) VALUES

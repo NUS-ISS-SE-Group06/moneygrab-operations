@@ -11,7 +11,7 @@ public class Scheme {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name="name",nullable = false, unique = true, length = 100)
+    @Column(name="name_tag",nullable = false, unique = true, length = 100)
     private String nameTag;
 
     @Column(length = 500)
