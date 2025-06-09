@@ -7,3 +7,5 @@ spring:
   profiles:
     default: dev
 
+cors:
+  allowed-origins: http://localhost:3000,http://yourdomain.com
