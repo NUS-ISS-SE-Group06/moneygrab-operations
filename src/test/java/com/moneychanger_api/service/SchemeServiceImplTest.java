@@ -67,21 +67,40 @@ class SchemeServiceImplTest {
     }
 
     @Test
-    void testSave_DuplicateScheme_ThrowsException() {
+    void testSave_DuplicateSchemeWithDifferentId_ThrowsException() {
         Scheme existing = new Scheme();
+        existing.setId(1);
         existing.setNameTag("Test");
         existing.setDescription("Existing scheme");
         existing.setIsDefault(false);
 
         Scheme newScheme = new Scheme();
+        newScheme.setId(2); // New scheme has a different ID
         newScheme.setNameTag("test"); // same name, different case
         newScheme.setDescription("Duplicate scheme");
         newScheme.setIsDefault(true);
 
-        // Simulate existing scheme with the same normalized name
+        // Simulate existing scheme with the same normalized name but different ID
         when(schemeRepository.findAll()).thenReturn(List.of(existing));
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> {
+            schemeService.save(newScheme);
+        });
+    }
+
+    @Test
+    void testSave_SameNameSameId_DoesNotThrowException() {
+        Scheme existing = new Scheme();
+        existing.setId(2);
+        existing.setNameTag("Test");
+
+        Scheme newScheme = new Scheme();
+        newScheme.setId(2); // same ID
+        newScheme.setNameTag("test"); // same name, different case
+
+        when(schemeRepository.findAll()).thenReturn(List.of(existing));
+
+        Assertions.assertDoesNotThrow(() -> {
             schemeService.save(newScheme);
         });
     }

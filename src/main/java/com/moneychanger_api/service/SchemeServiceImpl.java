@@ -33,7 +33,7 @@ public class SchemeServiceImpl implements SchemeService {
 
         // Check for existing scheme with the same name
         boolean exists = repo.findAll().stream()
-                .anyMatch(s -> s.getNameTag().trim().equalsIgnoreCase(normalizedName));
+                .anyMatch(s -> !s.getId().equals(item.getId()) && s.getNameTag().trim().equalsIgnoreCase(normalizedName));
 
         if (exists) {
             throw new DuplicateResourceException("Scheme with name '" + item.getNameTag().trim() + "' already exists");
