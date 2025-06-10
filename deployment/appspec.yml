@@ -23,8 +23,13 @@ hooks:
       runas: ec2-user
 
   AfterInstall:
-    - location: scripts/start_application.sh
+    - location: scripts/after_install.sh
       timeout: 60
+      runas: ec2-user
+
+  ApplicationStart:
+    - location: scripts/start_application.sh
+      timeout: 120
       runas: ec2-user
 
   ValidateService:
