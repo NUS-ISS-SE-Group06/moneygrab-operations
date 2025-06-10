@@ -44,4 +44,3 @@ fi
 
 echo "ApplicationStop Hook completed."
 exit 0 # Always exit 0 to allow the deployment to proceed, even if app wasn't running
-

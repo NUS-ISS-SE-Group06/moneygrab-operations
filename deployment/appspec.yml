@@ -23,6 +23,6 @@ hooks:
       runas: ec2-user
 
   AfterInstall:
-    - location: scripts/start.sh
+    - location: scripts/start_application.sh
       timeout: 60
       runas: ec2-user
