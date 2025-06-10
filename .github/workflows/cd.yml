@@ -10,6 +10,8 @@ jobs:
   build-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # Still good practice to specify minimal permissions for checkout
 
     steps:
       - name: Checkout Code
@@ -20,6 +22,7 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: maven # Cache Maven dependencies for faster builds
 
       - name: Build JAR with Maven
         run: mvn clean package -DskipTests
@@ -27,6 +30,7 @@ jobs:
       - name: Prepare Deployment Package
         # If your scripts are in a different location, adjust the path above
         run: |
+          echo "Preparing deployment package moneygrab-operations"
           mkdir -p deploy-package/scripts
           mkdir -p deploy-package/build
           cp deployment/appsec.yml deploy-package/
@@ -37,26 +41,35 @@ jobs:
         run: chmod +x deploy-package/scripts/*.sh
 
       - name: Zip App for Deployment
+        id: zip_bundle
         run: |
+          # Use a unique key for the S3 bundle to avoid conflicts and ensure fresh deployments
+          ZIP_FILE_NAME="app-${{ github.sha }}.zip" # Unique based on commit SHA
           cd deploy-package
-          zip -r app.zip .
+          zip -r $ZIP_FILE_NAME .
+          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_OUTPUT # Store for later use
 
       - name: Upload to S3
         uses: jakejarvis/s3-sync-action@v0.5.1
         with:
           args: --exact-timestamps
+          SOURCE_DIR: deploy-package/${{ steps.zip_bundle.outputs.ZIP_FILE_NAME }}
+          DEST_DIR: / # Upload the zip file to the root of the S3 bucket
         env:
           AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ap-southeast-1
-          SOURCE_DIR: deploy-package
 
       - name: Deploy to EC2 via CodeDeploy
         run: |
           aws deploy create-deployment \
             --application-name MoneyGrab_Deployment \
             --deployment-group-name MoneyGrab_EC2_Operations \
-            --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=app.zip \
+            --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=${{ steps.zip_bundle.outputs.ZIP_FILE_NAME }} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --region ap-southeast-1
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-southeast-1 
