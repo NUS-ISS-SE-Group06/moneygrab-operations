@@ -7,12 +7,14 @@ on:
     paths:
       - 'src/**'
       - 'pom.xml'
+      - '.github/**'
   pull_request:
     branches:
       - main  # Run CI on PRs into main
     paths:
       - 'src/**'
       - 'pom.xml'
+      - '.github/**'
   workflow_dispatch:
 
 jobs:
