@@ -3,7 +3,7 @@ use moneychangerdb;
 -- STEP 1: Create scheme table
 CREATE TABLE scheme (
                         id INT AUTO_INCREMENT PRIMARY KEY,
-                        name_tag VARCHAR(100) NOT NULL UNIQUE,
+                        name_tag VARCHAR(100) NOT NULL,
                         description VARCHAR(500),
                         is_default BOOLEAN DEFAULT FALSE,
                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

@@ -6,6 +6,7 @@ import com.moneychanger_api.model.CommissionRate;
 import com.moneychanger_api.repository.CommissionRateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,12 +33,14 @@ public class CommissionRateServiceImpl implements CommissionRateService {
     }
 
     @Override
+    @Transactional
     public CommissionRate save(CommissionRate item) {
         // Check for duplicate based on currency + scheme
         boolean exists = repo.existsByCurrencyIdAndSchemeId(item.getCurrencyId(), item.getSchemeId());
         if (exists) {
             throw new DuplicateResourceException("Commission rate for the same currency and scheme already exists.");
         }
+
         return repo.save(item);
     }
 
@@ -49,4 +52,5 @@ public class CommissionRateServiceImpl implements CommissionRateService {
         commissionRate.setIsDeleted(true);  // Soft delete
         repo.save(commissionRate);
     }
+
 }

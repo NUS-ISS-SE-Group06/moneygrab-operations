@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,7 @@ public class CommissionRateController {
     }
 
     @GetMapping
-    public List<CommissionRateDTO> list() {
+    public List<CommissionRateDTO> list(@RequestParam(value ="schemeId", required = false ) Integer schemeId) {
         return service.listAll().stream()
                 .map(mapper::toDTO)
                 .collect(Collectors.toList());
@@ -39,6 +40,11 @@ public class CommissionRateController {
     @PostMapping
     public ResponseEntity<CommissionRateDTO> create(@RequestBody CommissionRateDTO item) {
         CommissionRate commissionRate = mapper.toEntity(item);
+        commissionRate.setUpdatedBy(item.getCreatedBy());
+        commissionRate.setIsDeleted(false);
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        commissionRate.setCreatedAt(now);
+        commissionRate.setUpdatedAt(now);
         CommissionRate saved = service.save(commissionRate);
         return ResponseEntity.ok(mapper.toDTO(saved));
     }
