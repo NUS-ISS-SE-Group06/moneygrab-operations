@@ -26,3 +26,8 @@ hooks:
     - location: scripts/start_application.sh
       timeout: 60
       runas: ec2-user
+
+  ValidateService:
+    - location: scripts/validate_service.sh # Script to perform health checks on your running application
+      timeout: 300 # Give plenty of time for health checks
+      runas: ec2-user
