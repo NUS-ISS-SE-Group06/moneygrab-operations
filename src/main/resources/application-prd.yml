@@ -13,10 +13,6 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
 
-  devtools:
-    restart:
-      enabled: true
-
 logging:
   config: classpath:log4j2-dev.xml
 
