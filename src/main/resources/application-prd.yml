@@ -14,5 +14,7 @@ spring:
     show-sql: true
 
 logging:
-  config: classpath:log4j2-dev.xml
+  config: classpath:log4j2-prd.xml
 
+cors:
+  enabled: false
