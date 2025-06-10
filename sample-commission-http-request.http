@@ -174,3 +174,7 @@ Content-Type: application/json
   "updatedBy": 1,
   "isDeleted": false
 }
+
+### Get
+GET http://localhost:8688/api/actuator/health
+Content-Type: application/json

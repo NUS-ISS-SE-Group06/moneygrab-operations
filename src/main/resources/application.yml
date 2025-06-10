@@ -7,3 +7,9 @@ spring:
   profiles:
     default: dev
 
+management:
+  endpoints:
+    web:
+      base-path=/actuator:
+      exposure:
+        include: "*"
