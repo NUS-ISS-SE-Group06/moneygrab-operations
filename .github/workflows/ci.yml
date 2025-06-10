@@ -8,6 +8,7 @@ on:
       - 'src/**'
       - 'pom.xml'
       - '.github/**'
+      - 'deployment/**'
   pull_request:
     branches:
       - main  # Run CI on PRs into main
@@ -15,6 +16,7 @@ on:
       - 'src/**'
       - 'pom.xml'
       - '.github/**'
+      - 'deployment/**'
   workflow_dispatch:
 
 jobs:
