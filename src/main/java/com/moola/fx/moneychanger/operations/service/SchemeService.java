@@ -9,6 +9,4 @@ public interface SchemeService {
     Scheme get(Integer id);
     Scheme save(Scheme item);
     void delete(Integer id, Integer who);
-
-
 }

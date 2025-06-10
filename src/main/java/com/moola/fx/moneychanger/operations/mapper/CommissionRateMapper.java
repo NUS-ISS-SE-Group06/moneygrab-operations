@@ -34,7 +34,6 @@ public class CommissionRateMapper {
         return dto;
     }
 
-
     public CommissionRate toEntity(CommissionRateDTO dto) {
         if (dto == null) return null;
 
@@ -62,6 +61,5 @@ public class CommissionRateMapper {
 
         return entity;
     }
-
 
 }
