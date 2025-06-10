@@ -1,12 +1,10 @@
 package com.moneychanger_api.service;
 
 import com.moneychanger_api.exception.DuplicateResourceException;
-import com.moneychanger_api.exception.ForeignKeyConstraintException;
 import com.moneychanger_api.exception.ResourceNotFoundException;
 import com.moneychanger_api.model.Scheme;
 import com.moneychanger_api.repository.SchemeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,44 +20,61 @@ public class SchemeServiceImpl implements SchemeService {
     }
 
     @Override
-    public List<Scheme> listAll() { return repo.findAll(); }
+    public List<Scheme> listAll() {
+        return repo.findAll().stream()
+                .filter(s -> !Boolean.TRUE.equals(s.getIsDeleted()))
+                .toList();
+    }
 
     @Override
-    public Scheme get(Integer id) { return repo.findById(id).orElseThrow(() -> new ResourceNotFoundException("Scheme with ID " + id + " not found")); }
+    public Scheme get(Integer id) {
+        Scheme scheme = repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Scheme with ID " + id + " not found"));
+
+        if (Boolean.TRUE.equals(scheme.getIsDeleted())) {
+            throw new ResourceNotFoundException("Scheme with ID " + id + " is marked as deleted.");
+        }
+
+        return scheme;
+    }
 
     @Override
     public Scheme save(Scheme item) {
-        String normalizedName = item.getName().toLowerCase();
+        String normalizedName = item.getNameTag().toLowerCase();
 
-        // Check for existing scheme with the same name
         boolean exists = repo.findAll().stream()
-                .anyMatch(s -> s.getName().trim().equalsIgnoreCase(normalizedName));
+                .filter(s -> !Boolean.TRUE.equals(s.getIsDeleted()))
+                .anyMatch(s -> !s.getId().equals(item.getId())
+                        && s.getNameTag().trim().equalsIgnoreCase(normalizedName));
 
         if (exists) {
-            throw new DuplicateResourceException("Scheme with name '" + item.getName().trim() + "' already exists");
+            throw new DuplicateResourceException("Scheme with name '" + item.getNameTag().trim() + "' already exists");
         }
 
-        // If item is marked as default, unset all other default schemes
-        if (item.getIsDefault() != null && item.getIsDefault()) {
-            List<Scheme> allSchemes = repo.findAll();
-            for (Scheme scheme : allSchemes) {
-                if (scheme.getIsDefault() != null && scheme.getIsDefault()) {
-                    scheme.setIsDefault(false);
-                    repo.save(scheme);  // update existing default to false
-                }
-            }
+        if (Boolean.TRUE.equals(item.getIsDefault())) {
+            repo.findAll().stream()
+                    .filter(s -> Boolean.TRUE.equals(s.getIsDefault()) && !s.getId().equals(item.getId()))
+                    .forEach(s -> {
+                        s.setIsDefault(false);
+                        repo.save(s);
+                    });
         }
 
         return repo.save(item);
+
     }
 
     @Override
-    public void delete(Integer id) {
-        try {
-            repo.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new ForeignKeyConstraintException("Scheme is in use and cannot be deleted.");
-
+    public void delete(Integer id, Integer who) {
+        int updated = repo.markDeletedById(id, who);
+        if (updated == 0) {
+            throw new ResourceNotFoundException("Scheme with ID " + id + " not found");
         }
+
     }
+
+
+
+
+
 }

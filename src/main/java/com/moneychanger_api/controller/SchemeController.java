@@ -29,14 +29,21 @@ public class SchemeController {
     }
 
     @PostMapping
-    public Scheme create(@RequestBody Scheme item) { return service.save(item); }
+    public Scheme create(@RequestBody Scheme item) {
+        item.setCreatedBy(1);
+        item.setUpdatedBy(1);
+        return service.save(item);
+    }
 
     @PutMapping("/{id}")
     public Scheme update(@PathVariable Integer id, @RequestBody Scheme item) {
         item.setId(id);
+        item.setUpdatedBy(1);
         return service.save(item);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) { service.delete(id); }
+    public void delete(@PathVariable Integer id) {
+        service.delete(id,1);
+    }
 }

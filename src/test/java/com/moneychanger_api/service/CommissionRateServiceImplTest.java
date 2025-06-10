@@ -3,6 +3,8 @@ package com.moneychanger_api.service;
 import com.moneychanger_api.exception.DuplicateResourceException;
 import com.moneychanger_api.exception.ResourceNotFoundException;
 import com.moneychanger_api.model.CommissionRate;
+import com.moneychanger_api.model.CurrencyCode;
+import com.moneychanger_api.model.Scheme;
 import com.moneychanger_api.repository.CommissionRateRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,29 +62,38 @@ class CommissionRateServiceImplTest {
     @Test
     void testSave_New() {
         CommissionRate item = new CommissionRate();
-        item.setDescription("Retail");
         item.setRate(new BigDecimal("5.0"));
 
-        when(repository.findAll()).thenReturn(List.of());
+        CurrencyCode currency = new CurrencyCode();
+        currency.setId(1);
+        item.setCurrencyId(currency);
+
+        Scheme scheme = new Scheme();
+        scheme.setId(2);
+        item.setSchemeId(scheme);
+
+        when(repository.existsByCurrencyIdAndSchemeId(currency, scheme)).thenReturn(false);
         when(repository.save(item)).thenReturn(item);
 
         CommissionRate saved = service.save(item);
-        assertEquals("Retail", saved.getDescription());
         assertEquals(new BigDecimal("5.0"), saved.getRate());
     }
 
     @Test
     void testSave_Duplicate() {
-        CommissionRate duplicateItem = new CommissionRate();
-        duplicateItem.setDescription("retail"); // Same as "Retail" (case-insensitive)
+        CommissionRate item = new CommissionRate();
 
-        // Mock the repository method to return true for duplicate description
-        when(repository.existsByDescriptionIgnoreCase("retail")).thenReturn(true);
+        CurrencyCode currency = new CurrencyCode();
+        currency.setId(1);
+        item.setCurrencyId(currency);
 
-        // Expect the DuplicateResourceException to be thrown
-        Assertions.assertThrows(DuplicateResourceException.class, () -> service.save(duplicateItem));
+        Scheme scheme = new Scheme();
+        scheme.setId(2);
+        item.setSchemeId(scheme);
 
-        // Ensure that save is never called
+        when(repository.existsByCurrencyIdAndSchemeId(currency, scheme)).thenReturn(true);
+
+        Assertions.assertThrows(DuplicateResourceException.class, () -> service.save(item));
         verify(repository, never()).save(any());
     }
 

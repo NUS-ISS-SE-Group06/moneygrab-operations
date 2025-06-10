@@ -1,5 +1,7 @@
 package com.moneychanger_api.controller;
 
+import com.moneychanger_api.dto.CommissionRateDTO;
+import com.moneychanger_api.mapper.CommissionRateMapper;
 import com.moneychanger_api.model.CommissionRate;
 import com.moneychanger_api.service.CommissionRateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,33 +9,46 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/commission-rates")
 public class CommissionRateController {
     private final CommissionRateService service;
+    private final CommissionRateMapper mapper;
 
     @Autowired
-    public CommissionRateController(CommissionRateService service) {
+    public CommissionRateController(CommissionRateService service, CommissionRateMapper mapper) {
         this.service = service;
+        this.mapper = mapper;
     }
 
     @GetMapping
-    public List<CommissionRate> list() { return service.listAll(); }
+    public List<CommissionRateDTO> list() {
+        return service.listAll().stream()
+                .map(mapper::toDTO)
+                .collect(Collectors.toList());
+    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CommissionRate> get(@PathVariable Integer id) {
-        CommissionRate item = service.get(id);
-        return ResponseEntity.ok(item);
+    public ResponseEntity<CommissionRateDTO> get(@PathVariable Integer id) {
+        CommissionRateDTO dto = mapper.toDTO(service.get(id));
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
-    public CommissionRate create(@RequestBody CommissionRate item) { return service.save(item); }
+    public ResponseEntity<CommissionRateDTO> create(@RequestBody CommissionRateDTO item) {
+        CommissionRate commissionRate = mapper.toEntity(item);
+        CommissionRate saved = service.save(commissionRate);
+        return ResponseEntity.ok(mapper.toDTO(saved));
+    }
 
     @PutMapping("/{id}")
-    public CommissionRate update(@PathVariable Integer id, @RequestBody CommissionRate item) {
+    public ResponseEntity<CommissionRateDTO> update(@PathVariable Integer id, @RequestBody CommissionRateDTO item) {
+        CommissionRate commissionRate = mapper.toEntity(item);
         item.setId(id);
-        return service.save(item);
+        CommissionRate saved = service.save(commissionRate);
+        return ResponseEntity.ok(mapper.toDTO(saved));
     }
 
     @DeleteMapping("/{id}")

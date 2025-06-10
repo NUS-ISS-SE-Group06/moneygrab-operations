@@ -36,7 +36,7 @@ class SchemeControllerTest {
     void testListSchemes() throws Exception {
         Scheme scheme = new Scheme();
         scheme.setId(1);
-        scheme.setName("Basic");
+        scheme.setNameTag("Basic");
         scheme.setDescription("Basic plan");
         scheme.setIsDefault(false);
 
@@ -46,7 +46,7 @@ class SchemeControllerTest {
         mockMvc.perform(get("/v1/schemes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is("Basic")))
+                .andExpect(jsonPath("$[0].nameTag", is("Basic")))
                 .andExpect(jsonPath("$[0].description", is("Basic plan")))
                 .andExpect(jsonPath("$[0].isDefault", is(false)));
     }
@@ -55,7 +55,7 @@ class SchemeControllerTest {
     void testGetSchemeFound() throws Exception {
         Scheme scheme = new Scheme();
         scheme.setId(1);
-        scheme.setName("Standard");
+        scheme.setNameTag("Standard");
         scheme.setDescription("Standard scheme");
         scheme.setIsDefault(true);
 
@@ -63,7 +63,7 @@ class SchemeControllerTest {
 
         mockMvc.perform(get("/v1/schemes/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Standard"))
+                .andExpect(jsonPath("$.nameTag").value("Standard"))
                 .andExpect(jsonPath("$.description").value("Standard scheme"))
                 .andExpect(jsonPath("$.isDefault").value(true));
     }
@@ -81,7 +81,7 @@ class SchemeControllerTest {
     void testCreateScheme() throws Exception {
         Scheme scheme = new Scheme();
         scheme.setId(1);
-        scheme.setName("Gold");
+        scheme.setNameTag("Gold");
         scheme.setDescription("Gold plan");
         scheme.setIsDefault(true);
 
@@ -91,13 +91,13 @@ class SchemeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "name": "Gold",
+                                    "nameTag": "Gold",
                                     "description": "Gold plan",
                                     "isDefault": true
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Gold"))
+                .andExpect(jsonPath("$.nameTag").value("Gold"))
                 .andExpect(jsonPath("$.description").value("Gold plan"))
                 .andExpect(jsonPath("$.isDefault").value(true));
 
@@ -107,7 +107,7 @@ class SchemeControllerTest {
     void testUpdateScheme() throws Exception {
         Scheme scheme = new Scheme();
         scheme.setId(1);
-        scheme.setName("Updated");
+        scheme.setNameTag("Updated");
         scheme.setDescription("Updated description");
         scheme.setIsDefault(false);
 
@@ -117,24 +117,45 @@ class SchemeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {
-                                    "name": "Updated",
+                                    "nameTag": "Updated",
                                     "description": "Updated description",
                                     "isDefault": false
                                 }
                                 """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Updated"))
+                .andExpect(jsonPath("$.nameTag").value("Updated"))
                 .andExpect(jsonPath("$.description").value("Updated description"))
                 .andExpect(jsonPath("$.isDefault").value(false));
 
     }
 
+
     @Test
-    void testDeleteScheme() throws Exception {
+    void testDeleteSchemeSuccess() throws Exception {
+        // No exception means successful deletion
+        Mockito.doNothing().when(schemeService).delete(1, 1);
+
         mockMvc.perform(delete("/v1/schemes/1"))
                 .andExpect(status().isOk());
 
-        Mockito.verify(schemeService, times(1)).delete(1);
+        Mockito.verify(schemeService, times(1)).delete(1, 1);
     }
+
+    @Test
+    void testDeleteSchemeNotFound() throws Exception {
+        // Simulate service throwing not found exception
+        Mockito.doThrow(new ResourceNotFoundException("Scheme with ID 999 not found"))
+                .when(schemeService).delete(999, 1);
+
+        mockMvc.perform(delete("/v1/schemes/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(content().string("Scheme with ID 999 not found"));
+
+        Mockito.verify(schemeService, times(1)).delete(999, 1);
+    }
+
+
+
+
 
 }
