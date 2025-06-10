@@ -18,8 +18,8 @@ hooks:
       runas: ec2-user
 
   BeforeInstall:
-    - location: scripts/install.sh
-      timeout: 60
+    - location: scripts/install_dependencies.sh
+      timeout: 120
       runas: ec2-user
 
   AfterInstall:
