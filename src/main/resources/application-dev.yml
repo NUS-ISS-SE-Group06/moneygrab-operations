@@ -21,4 +21,5 @@ logging:
   config: classpath:log4j2-dev.xml
 
 cors:
+  enabled: true
   allowed-origins: http://localhost:3000,http://yourdomain.com
