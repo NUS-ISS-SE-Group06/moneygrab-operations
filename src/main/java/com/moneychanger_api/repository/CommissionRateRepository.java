@@ -6,6 +6,6 @@ import com.moneychanger_api.model.Scheme;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CommissionRateRepository extends JpaRepository<CommissionRate, Integer> {
-    boolean existsByCurrencyIdAndSchemeId(CurrencyCode currencyId, Scheme schemeId);
+    boolean existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(CurrencyCode currencyId, Scheme schemeId);
 
 }

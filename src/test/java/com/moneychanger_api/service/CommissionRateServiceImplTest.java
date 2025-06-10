@@ -72,7 +72,7 @@ class CommissionRateServiceImplTest {
         scheme.setId(2);
         item.setSchemeId(scheme);
 
-        when(repository.existsByCurrencyIdAndSchemeId(currency, scheme)).thenReturn(false);
+        when(repository.existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(currency, scheme)).thenReturn(false);
         when(repository.save(item)).thenReturn(item);
 
         CommissionRate saved = service.save(item);
@@ -91,7 +91,7 @@ class CommissionRateServiceImplTest {
         scheme.setId(2);
         item.setSchemeId(scheme);
 
-        when(repository.existsByCurrencyIdAndSchemeId(currency, scheme)).thenReturn(true);
+        when(repository.existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(currency, scheme)).thenReturn(true);
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> service.save(item));
         verify(repository, never()).save(any());
