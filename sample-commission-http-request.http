@@ -13,17 +13,20 @@ POST http://localhost:8688/api/v1/schemes
 Content-Type: application/json
 
 {
-  "id": 11,
-  "name": "test"
+    "nameTag": "test",
+    "description": "test",
+    "isDefault": false
 }
 
 ### Update
-PUT http://localhost:8688/api/v1/schemes/10
+PUT http://localhost:8688/api/v1/schemes/12
 Content-Type: application/json
 
 {
-  "id": 9,
-  "name": "Schema 10"
+  "id": 12,
+  "nameTag": "test",
+  "description": "test",
+  "isDefault": false
 }
 
 ###
