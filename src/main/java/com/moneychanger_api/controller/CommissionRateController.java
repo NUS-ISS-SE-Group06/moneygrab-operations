@@ -26,7 +26,11 @@ public class CommissionRateController {
 
     @GetMapping
     public List<CommissionRateDTO> list(@RequestParam(value ="schemeId", required = false ) Integer schemeId) {
-        return service.listAll().stream()
+        List<CommissionRate> rates = (schemeId != null)
+                ? service.findBySchemeId(schemeId)
+                : service.listAll();
+
+        return rates.stream()
                 .map(mapper::toDTO)
                 .collect(Collectors.toList());
     }
@@ -52,7 +56,11 @@ public class CommissionRateController {
     @PutMapping("/{id}")
     public ResponseEntity<CommissionRateDTO> update(@PathVariable Integer id, @RequestBody CommissionRateDTO item) {
         CommissionRate commissionRate = mapper.toEntity(item);
-        item.setId(id);
+        commissionRate.setUpdatedBy(item.getCreatedBy());
+        //item.setId(id);
+        //item.setUpdatedBy(item.getCreatedBy());
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        commissionRate.setUpdatedAt(now);
         CommissionRate saved = service.save(commissionRate);
         return ResponseEntity.ok(mapper.toDTO(saved));
     }

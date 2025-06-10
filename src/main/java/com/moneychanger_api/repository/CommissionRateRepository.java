@@ -5,7 +5,10 @@ import com.moneychanger_api.model.CurrencyCode;
 import com.moneychanger_api.model.Scheme;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CommissionRateRepository extends JpaRepository<CommissionRate, Integer> {
-    boolean existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(CurrencyCode currencyId, Scheme schemeId);
+import java.util.List;
 
+public interface CommissionRateRepository extends JpaRepository<CommissionRate, Integer> {
+    //boolean existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(CurrencyCode currencyId, Scheme schemeId);
+    boolean existsByCurrencyIdAndSchemeIdAndIdNotAndIsDeletedFalse(CurrencyCode currencyId, Scheme schemeId, Integer id);
+    List<CommissionRate> findBySchemeIdIdAndIsDeletedFalse(Integer schemeId);
 }

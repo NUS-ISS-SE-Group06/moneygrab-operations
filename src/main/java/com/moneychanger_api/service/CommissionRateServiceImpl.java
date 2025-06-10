@@ -36,7 +36,7 @@ public class CommissionRateServiceImpl implements CommissionRateService {
     @Transactional
     public CommissionRate save(CommissionRate item) {
         // Check for duplicate based on currency + scheme
-        boolean exists = repo.existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(item.getCurrencyId(), item.getSchemeId());
+        boolean exists = repo.existsByCurrencyIdAndSchemeIdAndIdNotAndIsDeletedFalse(item.getCurrencyId(), item.getSchemeId(), item.getId());
         if (exists) {
             throw new DuplicateResourceException("Commission rate for the same currency and scheme already exists.");
         }
@@ -53,4 +53,8 @@ public class CommissionRateServiceImpl implements CommissionRateService {
         repo.save(commissionRate);
     }
 
+    @Override
+    public List<CommissionRate> findBySchemeId(Integer schemeId) {
+        return repo.findBySchemeIdIdAndIsDeletedFalse(schemeId);
+    }
 }

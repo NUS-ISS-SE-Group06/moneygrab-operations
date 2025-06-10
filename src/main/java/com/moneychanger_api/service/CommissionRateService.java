@@ -9,4 +9,5 @@ public interface CommissionRateService {
     CommissionRate get(Integer id);
     CommissionRate save(CommissionRate item);
     void delete(Integer id);
+    List<CommissionRate> findBySchemeId(Integer schemeId);
 }

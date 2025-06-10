@@ -72,7 +72,7 @@ class CommissionRateServiceImplTest {
         scheme.setId(2);
         item.setSchemeId(scheme);
 
-        when(repository.existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(currency, scheme)).thenReturn(false);
+        when(repository.existsByCurrencyIdAndSchemeIdAndIdNotAndIsDeletedFalse(currency, scheme, 1)).thenReturn(false);
         when(repository.save(item)).thenReturn(item);
 
         CommissionRate saved = service.save(item);
@@ -82,6 +82,7 @@ class CommissionRateServiceImplTest {
     @Test
     void testSave_Duplicate() {
         CommissionRate item = new CommissionRate();
+        item.setId(1); // Important: Set the ID for the duplicate check
 
         CurrencyCode currency = new CurrencyCode();
         currency.setId(1);
@@ -91,11 +92,12 @@ class CommissionRateServiceImplTest {
         scheme.setId(2);
         item.setSchemeId(scheme);
 
-        when(repository.existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(currency, scheme)).thenReturn(true);
+        when(repository.existsByCurrencyIdAndSchemeIdAndIdNotAndIsDeletedFalse(currency, scheme, 1)).thenReturn(true);
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> service.save(item));
         verify(repository, never()).save(any());
     }
+
 
     @Test
     void testDelete_Success() {
@@ -117,6 +119,31 @@ class CommissionRateServiceImplTest {
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> service.delete(1));
     }
+
+    @Test
+    void testFindBySchemeId_ReturnsActiveCommissionRates() {
+        int schemeId = 200;
+
+        CommissionRate activeRate1 = new CommissionRate();
+        activeRate1.setId(1);
+        activeRate1.setIsDeleted(false);
+
+        CommissionRate activeRate2 = new CommissionRate();
+        activeRate2.setId(2);
+        activeRate2.setIsDeleted(false);
+
+        List<CommissionRate> mockRates = List.of(activeRate1, activeRate2);
+
+        when(repository.findBySchemeIdIdAndIsDeletedFalse(schemeId)).thenReturn(mockRates);
+
+        List<CommissionRate> result = service.findBySchemeId(schemeId);
+
+        Assertions.assertEquals(2, result.size());
+        Assertions.assertFalse(result.get(0).getIsDeleted());
+        Assertions.assertFalse(result.get(1).getIsDeleted());
+        verify(repository, times(1)).findBySchemeIdIdAndIsDeletedFalse(schemeId);
+    }
+
 
 
 
