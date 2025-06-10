@@ -1,0 +1,61 @@
+name: Deploy to EC2 using CodeDeploy
+
+on:
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+
+jobs:
+  build-and-deploy:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Build JAR with Maven
+        run: mvn clean package -DskipTests
+
+      - name: Prepare Deployment Package
+        # If your scripts are in a different location, adjust the path above
+        run: |
+          mkdir -p deploy-package/scripts
+          mkdir -p deploy-package/build
+          cp deployment/appspec.yml deploy-package/
+          cp deployment/scripts/*.sh deploy-package/scripts/
+          cp target/moneychanger-operations-1.0.0-SNAPSHOT.jar deploy-package/build/moneychanger-operations-1.0.0-SNAPSHOT.jar
+
+      - name: Set Executable Permissions
+        run: chmod +x deploy-package/scripts/*.sh
+
+      - name: Zip App for Deployment
+        run: |
+          cd deploy-package
+          zip -r app.zip .
+
+      - name: Upload to S3
+        uses: jakejarvis/s3-sync-action@v0.5.1
+        with:
+          args: --exact-timestamps
+        env:
+          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ap-southeast-1
+          SOURCE_DIR: deploy-package
+
+      - name: Deploy to EC2 via CodeDeploy
+        run: |
+          aws deploy create-deployment \
+            --application-name MoneyGrab_Deployment \
+            --deployment-group-name MoneyGrab_EC2_Operations \
+            --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=app.zip \
+            --deployment-config-name CodeDeployDefault.AllAtOnce

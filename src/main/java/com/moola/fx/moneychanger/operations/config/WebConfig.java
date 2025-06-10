@@ -1,6 +1,7 @@
 package com.moola.fx.moneychanger.operations.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -13,6 +14,11 @@ public class WebConfig {
     private String allowedOriginsCsv;
 
     @Bean
+    @ConditionalOnProperty(
+            name = "cors.enabled",
+            havingValue = "true",
+            matchIfMissing = false
+    )
     public WebMvcConfigurer corsConfigurer() {
         String[] origins = allowedOriginsCsv.split(",");
 

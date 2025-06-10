@@ -2,9 +2,9 @@
 <Configuration status="WARN" monitorInterval="30">
     <Properties>
         <Property name="LOG_PATTERN">[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1} - %m%n</Property>
-        <Property name="LOG_PATH">/var/log/moneychanger_api</Property>
-        <Property name="LOG_FILE_NAME">moneychanger_api.log</Property>
-        <Property name="LOG_ARCHIVE_FILE_NAME">moneychanger_api-%d{yyyy-MM-dd}-%i.log</Property>
+        <Property name="LOG_PATH">/home/ec2-user/app</Property>
+        <Property name="LOG_FILE_NAME">moneychanger_operations.log</Property>
+        <Property name="LOG_ARCHIVE_FILE_NAME">moneychanger_operations-%d{yyyy-MM-dd}-%i.log</Property>
         <Property name="LOG_ROOT_LEVEL">debug</Property>
         <Property name="LOG_APP_LEVEL">debug</Property>
         <Property name="LOG_APPENDER">fileLoggerDebug</Property>
@@ -58,7 +58,7 @@
             <AppenderRef ref="${LOG_APPENDER}"/>
         </Root>
 
-        <Logger name="com.moneychanger_api" additivity="false" level="${LOG_APP_LEVEL}">
+        <Logger name="com.moola.fx.moneychanger.operations" additivity="false" level="${LOG_APP_LEVEL}">
             <AppenderRef ref="console"/>
             <!-- Suitable for Local & UAT -->
             <AppenderRef ref="${LOG_APPENDER}" />
