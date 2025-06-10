@@ -74,7 +74,7 @@ jobs:
           aws deploy create-deployment \
             --application-name MoneyGrab_Deployment \
             --deployment-group-name MoneyGrab_EC2_Operations \
-            --s3-location bucket=${{ secrets.S3_BUCKET }}/moneygrab-operations,bundleType=zip,key=${{ steps.zip_bundle.outputs.ZIP_FILE_NAME }} \
+            --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=moneygrab-operations/${{ steps.zip_bundle.outputs.ZIP_FILE_NAME }} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --region ap-southeast-1
         env:
