@@ -20,3 +20,5 @@ spring:
 logging:
   config: classpath:log4j2-dev.xml
 
+cors:
+  allowed-origins: http://localhost:3000,http://yourdomain.com
