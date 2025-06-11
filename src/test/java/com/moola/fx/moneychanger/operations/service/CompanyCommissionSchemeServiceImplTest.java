@@ -5,22 +5,23 @@ import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
 import com.moola.fx.moneychanger.operations.model.CommissionRate;
 import com.moola.fx.moneychanger.operations.model.CompanyCommissionScheme;
 import com.moola.fx.moneychanger.operations.model.MoneyChanger;
-import com.moola.fx.moneychanger.operations.repository.CommissionRateRepository;
 import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
+import com.moola.fx.moneychanger.operations.repository.CommissionRateRepository;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class CompanyCommissionSchemeServiceImplTest {
 
     @Mock
@@ -32,185 +33,164 @@ class CompanyCommissionSchemeServiceImplTest {
     @Mock
     private CommissionRateRepository commissionRateRepository;
 
+    @InjectMocks
     private CompanyCommissionSchemeServiceImpl service;
 
+    private CompanyCommissionScheme makeScheme(Integer id, boolean deleted) {
+        var s = new CompanyCommissionScheme();
+        s.setId(id);
+        s.setIsDeleted(deleted);
+        return s;
+    }
+
     @BeforeEach
-    public void init() {
-
-        MockitoAnnotations.openMocks(this);
-        service = new CompanyCommissionSchemeServiceImpl(repository, commissionRateRepository, moneyChangerRepository);
+    void setUp() {
+        // MockitoExtension handles init
     }
 
     @Test
-    void testListAll() {
-        CompanyCommissionScheme activeScheme = new CompanyCommissionScheme();
-        activeScheme.setIsDeleted(false);
+    void listAll_filtersDeleted() {
+        var a = makeScheme(1, false);
+        var b = makeScheme(2, true);
+        when(repository.findAll()).thenReturn(List.of(a, b));
 
-        CompanyCommissionScheme deletedScheme = new CompanyCommissionScheme();
-        deletedScheme.setIsDeleted(true);
-
-        // The repository returns both active and deleted records
-        when(repository.findAll()).thenReturn(List.of(activeScheme, deletedScheme));
-
-        // The service should return only the non-deleted ones
-        List<CompanyCommissionScheme> result = service.listAll();
-
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertFalse(result.get(0).getIsDeleted());
+        var out = service.listAll();
+        assertEquals(1, out.size());
+        assertFalse(out.get(0).getIsDeleted());
+        verify(repository).findAll();
     }
 
     @Test
-    void testGet_Success() {
-        CompanyCommissionScheme item = new CompanyCommissionScheme();
-        item.setId(1);
-        item.setIsDeleted(false);  // important to set not deleted
+    void get_success() {
+        var item = makeScheme(1, false);
         when(repository.findById(1)).thenReturn(Optional.of(item));
 
-        CompanyCommissionScheme result = service.get(1);
-        Assertions.assertEquals(1, result.getId());
+        var out = service.get(1);
+        assertEquals(1, out.getId());
+        verify(repository).findById(1);
     }
 
     @Test
-    void testGet_Deleted_ThrowsException() {
-        CompanyCommissionScheme deletedItem = new CompanyCommissionScheme();
-        deletedItem.setId(1);
-        deletedItem.setIsDeleted(true);  // marked as deleted
-        when(repository.findById(1)).thenReturn(Optional.of(deletedItem));
+    void get_deleted_throws() {
+        var item = makeScheme(1, true);
+        when(repository.findById(1)).thenReturn(Optional.of(item));
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.get(1));
+        assertThrows(ResourceNotFoundException.class, () -> service.get(1));
+        verify(repository).findById(1);
     }
 
     @Test
-    void testGet_NotFound_ThrowsException() {
+    void get_notFound_throws() {
         when(repository.findById(1)).thenReturn(Optional.empty());
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.get(1));
+        assertThrows(ResourceNotFoundException.class, () -> service.get(1));
+        verify(repository).findById(1);
     }
 
-
     @Test
-    void testSaveSuccess() {
-        CompanyCommissionScheme item = new CompanyCommissionScheme();
+    void save_success() {
+        var scheme = new CompanyCommissionScheme();
 
-        MoneyChanger mc = new MoneyChanger();
+        var mc = new MoneyChanger();
         mc.setId(10L);
-        item.setMoneyChangerId(mc);
+        scheme.setMoneyChangerId(mc);
 
-        CommissionRate cr = new CommissionRate();
+        var cr = new CommissionRate();
         cr.setId(20);
-        item.setCommissionRateId(cr);
+        scheme.setCommissionRateId(cr);
 
-        // Mock the existence checks
+        // both exist
         when(moneyChangerRepository.existsById(10L)).thenReturn(true);
         when(commissionRateRepository.existsById(20)).thenReturn(true);
+        // no duplicate
+        when(repository.existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20)).thenReturn(false);
+        when(repository.save(scheme)).thenReturn(scheme);
 
-        // No existing record with same moneyChangerId
-        when(repository.findAll()).thenReturn(List.of());
-        when(repository.save(item)).thenReturn(item);
-
-        CompanyCommissionScheme saved = service.save(item);
-        Assertions.assertEquals(10L, saved.getMoneyChangerId().getId());
-        Assertions.assertEquals(20, saved.getCommissionRateId().getId());
+        var saved = service.save(scheme);
+        assertSame(scheme, saved);
+        verify(moneyChangerRepository).existsById(10L);
+        verify(commissionRateRepository).existsById(20);
+        verify(repository).existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20);
+        verify(repository).save(scheme);
     }
 
     @Test
-    void testSaveThrowsIllegalArgumentExceptionWhenNullIds() {
-        CompanyCommissionScheme item = new CompanyCommissionScheme();
-
+    void save_nullIds_throwsIllegalArgument() {
+        var scheme = new CompanyCommissionScheme();
         // moneyChangerId null
-        item.setMoneyChangerId(null);
-        item.setCommissionRateId(new CommissionRate());
-        Assertions.assertThrows(IllegalArgumentException.class, () -> service.save(item));
+        scheme.setMoneyChangerId(null);
+        scheme.setCommissionRateId(new CommissionRate());
+        assertThrows(IllegalArgumentException.class, () -> service.save(scheme));
 
         // commissionRateId null
-        item.setMoneyChangerId(new MoneyChanger());
-        item.setCommissionRateId(null);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> service.save(item));
+        scheme.setMoneyChangerId(new MoneyChanger());
+        scheme.setCommissionRateId(null);
+        assertThrows(IllegalArgumentException.class, () -> service.save(scheme));
     }
 
     @Test
-    void testSaveThrowsResourceNotFoundWhenMoneyChangerNotFound() {
-        CompanyCommissionScheme item = new CompanyCommissionScheme();
-
-        MoneyChanger mc = new MoneyChanger();
-        mc.setId(10L);
-        item.setMoneyChangerId(mc);
-
-        CommissionRate cr = new CommissionRate();
-        cr.setId(20);
-        item.setCommissionRateId(cr);
+    void save_moneyChangerNotFound_throws() {
+        var scheme = new CompanyCommissionScheme();
+        var mc = new MoneyChanger(); mc.setId(10L);
+        scheme.setMoneyChangerId(mc);
+        scheme.setCommissionRateId(new CommissionRate());
 
         when(moneyChangerRepository.existsById(10L)).thenReturn(false);
-
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.save(item));
+        assertThrows(ResourceNotFoundException.class, () -> service.save(scheme));
+        verify(moneyChangerRepository).existsById(10L);
     }
 
     @Test
-    void testSaveThrowsResourceNotFoundWhenCommissionRateNotFound() {
-        CompanyCommissionScheme item = new CompanyCommissionScheme();
-
-        MoneyChanger mc = new MoneyChanger();
-        mc.setId(10L);
-        item.setMoneyChangerId(mc);
-
-        CommissionRate cr = new CommissionRate();
-        cr.setId(20);
-        item.setCommissionRateId(cr);
+    void save_commissionRateNotFound_throws() {
+        var scheme = new CompanyCommissionScheme();
+        var mc = new MoneyChanger(); mc.setId(10L);
+        var cr = new CommissionRate(); cr.setId(20);
+        scheme.setMoneyChangerId(mc);
+        scheme.setCommissionRateId(cr);
 
         when(moneyChangerRepository.existsById(10L)).thenReturn(true);
         when(commissionRateRepository.existsById(20)).thenReturn(false);
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.save(item));
+        assertThrows(ResourceNotFoundException.class, () -> service.save(scheme));
+        verify(moneyChangerRepository).existsById(10L);
+        verify(commissionRateRepository).existsById(20);
     }
 
     @Test
-    void testSaveDuplicateThrowsException() {
-        MoneyChanger mc = new MoneyChanger();
-        mc.setId(10L);
-
-        CommissionRate cr = new CommissionRate();
-        cr.setId(20);
-
-        CompanyCommissionScheme newItem = new CompanyCommissionScheme();
-        newItem.setMoneyChangerId(mc);
-        newItem.setCommissionRateId(cr);
+    void save_duplicate_throws() {
+        var scheme = new CompanyCommissionScheme();
+        var mc = new MoneyChanger(); mc.setId(10L);
+        var cr = new CommissionRate(); cr.setId(20);
+        scheme.setMoneyChangerId(mc);
+        scheme.setCommissionRateId(cr);
 
         when(moneyChangerRepository.existsById(10L)).thenReturn(true);
         when(commissionRateRepository.existsById(20)).thenReturn(true);
-
-        // Updated method call here
         when(repository.existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20)).thenReturn(true);
 
-        Assertions.assertThrows(DuplicateResourceException.class, () -> service.save(newItem));
-    }
-
-
-
-    @Test
-    void testDeleteSuccess() {
-        CompanyCommissionScheme item = new CompanyCommissionScheme();
-        item.setId(1);
-        item.setIsDeleted(false);
-
-        when(repository.findById(1)).thenReturn(Optional.of(item));
-        when(repository.save(any())).thenAnswer(i -> i.getArgument(0)); // Return saved entity
-
-        service.delete(1);
-
-        verify(repository).findById(1);
-        verify(repository).save(argThat(saved -> saved.getIsDeleted() != null && saved.getIsDeleted()));
-
-        // Assert the original object's isDeleted is set
-        Assertions.assertTrue(item.getIsDeleted());
-    }
-
-    @Test
-    void testDeleteThrowsResourceNotFound() {
-        when(repository.findById(1)).thenReturn(Optional.empty());
-
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.delete(1));
-
+        assertThrows(DuplicateResourceException.class, () -> service.save(scheme));
+        verify(repository).existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20);
         verify(repository, never()).save(any());
     }
 
+    @Test
+    void delete_success() {
+        var item = makeScheme(1, false);
+        when(repository.findById(1)).thenReturn(Optional.of(item));
+        when(repository.save(item)).thenReturn(item);
+
+        service.delete(1);
+
+        assertTrue(item.getIsDeleted());
+        verify(repository).findById(1);
+        verify(repository).save(item);
+    }
+
+    @Test
+    void delete_notFound_throws() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> service.delete(1));
+        verify(repository).findById(1);
+        verify(repository, never()).save(any());
+    }
 }
