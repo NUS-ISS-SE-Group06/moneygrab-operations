@@ -10,6 +10,6 @@ spring:
 management:
   endpoints:
     web:
-      base-path=/actuator:
+      base-path: /actuator
       exposure:
         include: "*"
