@@ -212,7 +212,7 @@ class CommissionRateControllerTest {
                         .param("userId", "1"))
                 .andExpect(status().isNoContent());
 
-        Mockito.verify(commissionRateService).delete(eq(1), eq(1));
+        Mockito.verify(commissionRateService).delete(1, 1);
     }
 
     @Test
