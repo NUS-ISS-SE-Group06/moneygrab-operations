@@ -5,7 +5,7 @@
         <Property name="LOG_PATH">/home/ec2-user/app/log</Property>
         <Property name="LOG_FILE_NAME">moneychanger_operations.log</Property>
         <Property name="LOG_ARCHIVE_FILE_NAME">moneychanger_operations-%d{yyyy-MM-dd}-%i.log</Property>
-        <Property name="LOG_ROOT_LEVEL">debug</Property>
+        <Property name="LOG_ROOT_LEVEL">info</Property>
         <Property name="LOG_APP_LEVEL">debug</Property>
         <Property name="LOG_APPENDER">fileLoggerDebug</Property>
     </Properties>
@@ -65,20 +65,22 @@
             <!-- Suitable for Prod -->
         </Logger>
 
-        <Logger name="sun.rmi.transport.tcp" level="INFO" additivity="false">
-            <AppenderRef ref="console"/>
-            <AppenderRef ref="${LOG_APPENDER}"/> </Logger>
-
-        <Logger name="sun.rmi.loader" level="INFO" additivity="false">
-            <AppenderRef ref="console"/>
-            <AppenderRef ref="${LOG_APPENDER}"/> </Logger>
-
-        <Logger name="java.rmi" level="INFO" additivity="false">
+        <Logger name="org.springframework" level="${LOG_APP_LEVEL}" additivity="false">
             <AppenderRef ref="console"/>
             <AppenderRef ref="${LOG_APPENDER}"/>
         </Logger>
 
-        <Logger name="sun.rmi.transport" level="INFO" additivity="false">
+        <Logger name="org.hibernate" level="${LOG_APP_LEVEL}" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="${LOG_APPENDER}"/>
+        </Logger>
+
+        <Logger name="org.apache" level="${LOG_ROOT_LEVEL}" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="${LOG_APPENDER}"/>
+        </Logger>
+
+        <Logger name="javax.management" level="${LOG_ROOT_LEVEL}" additivity="false">
             <AppenderRef ref="console"/>
             <AppenderRef ref="${LOG_APPENDER}"/>
         </Logger>
