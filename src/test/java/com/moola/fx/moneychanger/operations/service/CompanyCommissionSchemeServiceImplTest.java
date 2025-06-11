@@ -1,0 +1,216 @@
+package com.moola.fx.moneychanger.operations.service;
+
+import com.moola.fx.moneychanger.operations.exception.DuplicateResourceException;
+import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
+import com.moola.fx.moneychanger.operations.model.CommissionRate;
+import com.moola.fx.moneychanger.operations.model.CompanyCommissionScheme;
+import com.moola.fx.moneychanger.operations.model.MoneyChanger;
+import com.moola.fx.moneychanger.operations.repository.CommissionRateRepository;
+import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
+import com.moola.fx.moneychanger.operations.repository.MoneyChangerRepository;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+
+import java.util.List;
+import java.util.Optional;
+
+import static org.mockito.Mockito.*;
+
+@SpringBootTest
+class CompanyCommissionSchemeServiceImplTest {
+
+    @Mock
+    private CompanyCommissionSchemeRepository repository;
+
+    @Mock
+    private MoneyChangerRepository moneyChangerRepository;
+
+    @Mock
+    private CommissionRateRepository commissionRateRepository;
+
+    private CompanyCommissionSchemeServiceImpl service;
+
+    @BeforeEach
+    public void init() {
+
+        MockitoAnnotations.openMocks(this);
+        service = new CompanyCommissionSchemeServiceImpl(repository, commissionRateRepository, moneyChangerRepository);
+    }
+
+    @Test
+    void testListAll() {
+        CompanyCommissionScheme activeScheme = new CompanyCommissionScheme();
+        activeScheme.setIsDeleted(false);
+
+        CompanyCommissionScheme deletedScheme = new CompanyCommissionScheme();
+        deletedScheme.setIsDeleted(true);
+
+        // The repository returns both active and deleted records
+        when(repository.findAll()).thenReturn(List.of(activeScheme, deletedScheme));
+
+        // The service should return only the non-deleted ones
+        List<CompanyCommissionScheme> result = service.listAll();
+
+        Assertions.assertEquals(1, result.size());
+        Assertions.assertFalse(result.get(0).getIsDeleted());
+    }
+
+    @Test
+    void testGet_Success() {
+        CompanyCommissionScheme item = new CompanyCommissionScheme();
+        item.setId(1);
+        item.setIsDeleted(false);  // important to set not deleted
+        when(repository.findById(1)).thenReturn(Optional.of(item));
+
+        CompanyCommissionScheme result = service.get(1);
+        Assertions.assertEquals(1, result.getId());
+    }
+
+    @Test
+    void testGet_Deleted_ThrowsException() {
+        CompanyCommissionScheme deletedItem = new CompanyCommissionScheme();
+        deletedItem.setId(1);
+        deletedItem.setIsDeleted(true);  // marked as deleted
+        when(repository.findById(1)).thenReturn(Optional.of(deletedItem));
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.get(1));
+    }
+
+    @Test
+    void testGet_NotFound_ThrowsException() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.get(1));
+    }
+
+
+    @Test
+    void testSaveSuccess() {
+        CompanyCommissionScheme item = new CompanyCommissionScheme();
+
+        MoneyChanger mc = new MoneyChanger();
+        mc.setId(10L);
+        item.setMoneyChangerId(mc);
+
+        CommissionRate cr = new CommissionRate();
+        cr.setId(20);
+        item.setCommissionRateId(cr);
+
+        // Mock the existence checks
+        when(moneyChangerRepository.existsById(10L)).thenReturn(true);
+        when(commissionRateRepository.existsById(20)).thenReturn(true);
+
+        // No existing record with same moneyChangerId
+        when(repository.findAll()).thenReturn(List.of());
+        when(repository.save(item)).thenReturn(item);
+
+        CompanyCommissionScheme saved = service.save(item);
+        Assertions.assertEquals(10L, saved.getMoneyChangerId().getId());
+        Assertions.assertEquals(20, saved.getCommissionRateId().getId());
+    }
+
+    @Test
+    void testSaveThrowsIllegalArgumentExceptionWhenNullIds() {
+        CompanyCommissionScheme item = new CompanyCommissionScheme();
+
+        // moneyChangerId null
+        item.setMoneyChangerId(null);
+        item.setCommissionRateId(new CommissionRate());
+        Assertions.assertThrows(IllegalArgumentException.class, () -> service.save(item));
+
+        // commissionRateId null
+        item.setMoneyChangerId(new MoneyChanger());
+        item.setCommissionRateId(null);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> service.save(item));
+    }
+
+    @Test
+    void testSaveThrowsResourceNotFoundWhenMoneyChangerNotFound() {
+        CompanyCommissionScheme item = new CompanyCommissionScheme();
+
+        MoneyChanger mc = new MoneyChanger();
+        mc.setId(10L);
+        item.setMoneyChangerId(mc);
+
+        CommissionRate cr = new CommissionRate();
+        cr.setId(20);
+        item.setCommissionRateId(cr);
+
+        when(moneyChangerRepository.existsById(10L)).thenReturn(false);
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.save(item));
+    }
+
+    @Test
+    void testSaveThrowsResourceNotFoundWhenCommissionRateNotFound() {
+        CompanyCommissionScheme item = new CompanyCommissionScheme();
+
+        MoneyChanger mc = new MoneyChanger();
+        mc.setId(10L);
+        item.setMoneyChangerId(mc);
+
+        CommissionRate cr = new CommissionRate();
+        cr.setId(20);
+        item.setCommissionRateId(cr);
+
+        when(moneyChangerRepository.existsById(10L)).thenReturn(true);
+        when(commissionRateRepository.existsById(20)).thenReturn(false);
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.save(item));
+    }
+
+    @Test
+    void testSaveDuplicateThrowsException() {
+        MoneyChanger mc = new MoneyChanger();
+        mc.setId(10L);
+
+        CommissionRate cr = new CommissionRate();
+        cr.setId(20);
+
+        CompanyCommissionScheme newItem = new CompanyCommissionScheme();
+        newItem.setMoneyChangerId(mc);
+        newItem.setCommissionRateId(cr);
+
+        when(moneyChangerRepository.existsById(10L)).thenReturn(true);
+        when(commissionRateRepository.existsById(20)).thenReturn(true);
+
+        // Updated method call here
+        when(repository.existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20)).thenReturn(true);
+
+        Assertions.assertThrows(DuplicateResourceException.class, () -> service.save(newItem));
+    }
+
+
+
+    @Test
+    void testDeleteSuccess() {
+        CompanyCommissionScheme item = new CompanyCommissionScheme();
+        item.setId(1);
+        item.setIsDeleted(false);
+
+        when(repository.findById(1)).thenReturn(Optional.of(item));
+        when(repository.save(any())).thenAnswer(i -> i.getArgument(0)); // Return saved entity
+
+        service.delete(1);
+
+        verify(repository).findById(1);
+        verify(repository).save(argThat(saved -> saved.getIsDeleted() != null && saved.getIsDeleted()));
+
+        // Assert the original object's isDeleted is set
+        Assertions.assertTrue(item.getIsDeleted());
+    }
+
+    @Test
+    void testDeleteThrowsResourceNotFound() {
+        when(repository.findById(1)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.delete(1));
+
+        verify(repository, never()).save(any());
+    }
+
+}
