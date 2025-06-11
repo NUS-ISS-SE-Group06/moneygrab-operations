@@ -10,6 +10,16 @@ permissions:
     owner: ec2-user
     group: ec2-user
     mode: 755 # Read, write, execute for owner; read, execute for group and others
+  - object: /home/ec2-user/app/build/
+    pattern: "**"
+    owner: ec2-user
+    group: ec2-user
+    mode: 755 # Read, write, execute for owner; read, execute for group and others
+  - object: /home/ec2-user/app/log/
+    pattern: "**"
+    owner: ec2-user
+    group: ec2-user
+    mode: 777 # Read, write, execute for owner; read, execute for group and others
 
 hooks:
   ApplicationStop:
