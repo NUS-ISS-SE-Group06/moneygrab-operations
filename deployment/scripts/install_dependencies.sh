@@ -11,6 +11,7 @@ echo "Running system-level installation tasks..."
 # For Amazon Linux:
 sudo yum update -y
 sudo yum install -y java-21-amazon-corretto-devel
+sudo yum install -y mariadb1011-client-utils
 
 # Example: Install other necessary packages (e.g., unzip, git, etc.)
 sudo yum install -y unzip # For Amazon Linux
