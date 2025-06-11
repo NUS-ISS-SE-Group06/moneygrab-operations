@@ -18,3 +18,4 @@ logging:
 
 cors:
   enabled: false
+  allowed-origins: '*'
