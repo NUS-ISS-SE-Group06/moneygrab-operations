@@ -1,16 +1,14 @@
 package com.moneychanger_api.model;
 
-import lombok.Data;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
 @Data
 @Entity
-@Table(name = "commission_rate", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"currency_id", "scheme_id"})
-})
+@Table(name = "commission_rate")
 public class CommissionRate {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,4 +41,18 @@ public class CommissionRate {
     private Boolean isDeleted=false;
 
     // Getters and Setters
+
+    @PrePersist
+    protected void onCreate() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        this.createdAt = now;
+        this.updatedAt = now;
+        this.isDeleted = false;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
+    }
+
 }

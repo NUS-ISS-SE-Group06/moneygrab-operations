@@ -49,9 +49,14 @@ class CommissionRateServiceImplTest {
     void testGet_Found() {
         CommissionRate item = new CommissionRate();
         item.setId(1);
-        when(repository.findById(1)).thenReturn(Optional.of(item));
-        assertEquals(1, service.get(1).getId());
+        item.setIsDeleted(false); // Simulate non-deleted record
+
+        when(repository.findByIdAndIsDeletedFalse(1)).thenReturn(Optional.of(item));
+
+        CommissionRate result = service.get(1);
+        assertEquals(1, result.getId());
     }
+
 
     @Test
     void testGet_NotFound() {
@@ -101,24 +106,32 @@ class CommissionRateServiceImplTest {
 
     @Test
     void testDelete_Success() {
+        int id = 1;
+        int userId = 42;
+
         CommissionRate existing = new CommissionRate();
-        existing.setId(1);
+        existing.setId(id);
         existing.setIsDeleted(false);
 
-        when(repository.findById(1)).thenReturn(Optional.of(existing));
+        when(repository.findById(id)).thenReturn(Optional.of(existing));
 
-        service.delete(1);
+        service.delete(id, userId);
 
         Assertions.assertTrue(existing.getIsDeleted());
+        Assertions.assertEquals(userId, existing.getUpdatedBy());
         verify(repository).save(existing);
     }
 
     @Test
     void testDelete_NotFound() {
-        when(repository.findById(1)).thenReturn(Optional.empty());
+        int id = 1;
+        int userId = 42;
 
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.delete(1));
+        when(repository.findById(id)).thenReturn(Optional.empty());
+
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> service.delete(id, userId));
     }
+
 
     @Test
     void testFindBySchemeId_ReturnsActiveCommissionRates() {

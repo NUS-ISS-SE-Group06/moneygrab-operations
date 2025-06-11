@@ -202,11 +202,14 @@ class CommissionRateControllerTest {
 
     @Test
     void testDeleteCommissionRate() throws Exception {
-        mockMvc.perform(delete("/v1/commission-rates/1"))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/v1/commission-rates/1")
+                        .param("userId", "1"))
+                .andExpect(status().isNoContent());
 
-        Mockito.verify(commissionRateService, times(1)).delete(1);
+        Mockito.verify(commissionRateService, times(1)).delete(1, 1);
     }
+
+
 
 
     @Test
@@ -271,37 +274,39 @@ class CommissionRateControllerTest {
         requestDto.setCurrencyId(100);
         requestDto.setSchemeId(200);
 
-        // Mocked entity (mapped from DTO)
-        CommissionRate entityToSave = new CommissionRate();
-        entityToSave.setId(1);
-        entityToSave.setRate(new BigDecimal("4.50"));
-        entityToSave.setCurrencyId(new CurrencyCode());
-        entityToSave.setSchemeId(new Scheme());
+        // Mock existing entity from service.get(id)
+        CommissionRate existing = new CommissionRate();
+        existing.setId(1);
+        existing.setRate(new BigDecimal("2.00")); // initial value
+        existing.setCurrencyId(new CurrencyCode());
+        existing.getCurrencyId().setId(100);
+        existing.setSchemeId(new Scheme());
+        existing.getSchemeId().setId(200);
 
-        // Mocked saved entity
-        CommissionRate savedEntity = new CommissionRate();
-        savedEntity.setId(1);
-        savedEntity.setRate(new BigDecimal("4.50"));
+        // Mock saved result
+        CommissionRate saved = new CommissionRate();
+        saved.setId(1);
+        saved.setRate(new BigDecimal("4.50"));
 
-        // Mocked DTO response
+        // Mock response DTO
         CommissionRateDTO responseDto = new CommissionRateDTO();
         responseDto.setId(1);
         responseDto.setRate(new BigDecimal("4.50"));
 
         // Set up mocks
-        Mockito.when(mapper.toEntity(any(CommissionRateDTO.class))).thenReturn(entityToSave);
-        Mockito.when(commissionRateService.save(any())).thenReturn(savedEntity);
-        Mockito.when(mapper.toDTO(savedEntity)).thenReturn(responseDto);
+        Mockito.when(commissionRateService.get(1)).thenReturn(existing);
+        Mockito.when(commissionRateService.save(any())).thenReturn(saved);
+        Mockito.when(mapper.toDTO(saved)).thenReturn(responseDto);
 
         // Act + Assert
         mockMvc.perform(put("/v1/commission-rates/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                    {
-                      "rate": 4.50,
-                      "currencyId": 100,
-                      "schemeId": 200
-                    }
+                        {
+                          "rate": 4.50,
+                          "currencyId": 100,
+                          "schemeId": 200
+                        }
                     """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rate").value(4.50));

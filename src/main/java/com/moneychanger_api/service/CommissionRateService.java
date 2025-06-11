@@ -8,6 +8,6 @@ public interface CommissionRateService {
     List<CommissionRate> listAll();
     CommissionRate get(Integer id);
     CommissionRate save(CommissionRate item);
-    void delete(Integer id);
+    void delete(Integer id, Integer userId);
     List<CommissionRate> findBySchemeId(Integer schemeId);
 }

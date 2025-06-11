@@ -49,7 +49,8 @@ class SchemeServiceImplTest {
         scheme.setId(1);
         scheme.setIsDeleted(false);
 
-        when(schemeRepository.findById(1)).thenReturn(Optional.of(scheme));
+        // Correct mock to match updated repo method
+        when(schemeRepository.findByIdAndIsDeletedFalse(1)).thenReturn(Optional.of(scheme));
 
         Scheme result = schemeService.get(1);
 
@@ -101,22 +102,20 @@ class SchemeServiceImplTest {
 
     @Test
     void testSave_DuplicateSchemeWithDifferentId_ThrowsException() {
-        Scheme existing = new Scheme();
-        existing.setId(1);
-        existing.setNameTag("Test");
-        existing.setIsDeleted(false);
-
         Scheme newScheme = new Scheme();
         newScheme.setId(2);
-        newScheme.setNameTag("test"); // same name different case
+        newScheme.setNameTag("test"); // same as existing name, case-insensitive
         newScheme.setIsDefault(true);
 
-        when(schemeRepository.findAll()).thenReturn(List.of(existing));
+        // Simulate a duplicate existing scheme in DB
+        when(schemeRepository.existsByNameTagIgnoreCaseAndIdNotAndIsDeletedFalse("test", 2))
+                .thenReturn(true);
 
         Assertions.assertThrows(DuplicateResourceException.class, () -> {
             schemeService.save(newScheme);
         });
     }
+
 
     @Test
     void testSave_SameNameSameId_DoesNotThrowException() {
@@ -163,30 +162,40 @@ class SchemeServiceImplTest {
         int schemeId = 1;
         int updatedBy = 99;
 
-        when(schemeRepository.markDeletedById(schemeId, updatedBy)).thenReturn(1);
+        Scheme existing = new Scheme();
+        existing.setId(schemeId);
+        existing.setIsDeleted(false);
 
-        // Should not throw any exception
+        when(schemeRepository.findById(schemeId)).thenReturn(Optional.of(existing));
+
+        // Run
         Assertions.assertDoesNotThrow(() -> {
             schemeService.delete(schemeId, updatedBy);
         });
 
-        verify(schemeRepository, times(1)).markDeletedById(schemeId, updatedBy);
-    }
+        // Assert
+        Assertions.assertTrue(existing.getIsDeleted());
+        Assertions.assertEquals(updatedBy, existing.getUpdatedBy());
 
+        verify(schemeRepository).findById(schemeId);
+        verify(schemeRepository).save(existing);
+    }
 
     @Test
     void testDelete_SchemeNotFound_ThrowsException() {
         int schemeId = 1;
         int updatedBy = 99;
 
-        when(schemeRepository.markDeletedById(schemeId, updatedBy)).thenReturn(0);
+        when(schemeRepository.findById(schemeId)).thenReturn(Optional.empty());
 
         Assertions.assertThrows(ResourceNotFoundException.class, () -> {
             schemeService.delete(schemeId, updatedBy);
         });
 
-        verify(schemeRepository, times(1)).markDeletedById(schemeId, updatedBy);
+        verify(schemeRepository).findById(schemeId);
+        verify(schemeRepository, never()).save(any());
     }
+
 
 
 

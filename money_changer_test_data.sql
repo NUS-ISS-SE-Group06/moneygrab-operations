@@ -6,6 +6,7 @@ TRUNCATE TABLE money_changer_photo;
 TRUNCATE TABLE accounts;
 TRUNCATE TABLE money_changer;
 TRUNCATE TABLE scheme;
+TRUNCATE TABLE currency_code;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Insert schemes
@@ -59,3 +60,9 @@ INSERT INTO money_changer_photo (id, money_changer_id, photo_url, created_by, up
                                                                                               (8, 8, 'https://example.com/photo8.jpg', NULL, NULL),
                                                                                               (9, 9, 'https://example.com/photo9.jpg', NULL, NULL),
                                                                                               (10, 10, 'https://example.com/photo10.jpg', NULL, NULL);
+INSERT INTO currency_code(id,currency,description) VALUES
+                                                       (1,'SGD', ''),
+                                                       (2,'USD', ''),
+                                                       (3,'EUR', ''),
+                                                       (4,'MYR', ''),
+                                                       (5,'IDR', '');

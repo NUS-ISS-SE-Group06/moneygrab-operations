@@ -105,28 +105,39 @@ class SchemeControllerTest {
 
     @Test
     void testUpdateScheme() throws Exception {
-        Scheme scheme = new Scheme();
-        scheme.setId(1);
-        scheme.setNameTag("Updated");
-        scheme.setDescription("Updated description");
-        scheme.setIsDefault(false);
+        // Arrange - existing scheme returned by service.get(id)
+        Scheme existing = new Scheme();
+        existing.setId(1);
+        existing.setNameTag("Old Name");
+        existing.setDescription("Old description");
+        existing.setIsDefault(false);
+        existing.setIsDeleted(false);
 
-        Mockito.when(schemeService.save(Mockito.any(Scheme.class))).thenReturn(scheme);
+        // Final saved scheme after update
+        Scheme updated = new Scheme();
+        updated.setId(1);
+        updated.setNameTag("Updated");
+        updated.setDescription("Updated description");
+        updated.setIsDefault(false);
 
+        // Mocks
+        Mockito.when(schemeService.get(1)).thenReturn(existing);
+        Mockito.when(schemeService.save(Mockito.any(Scheme.class))).thenReturn(updated);
+
+        // Act + Assert
         mockMvc.perform(put("/v1/schemes/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {
-                                    "nameTag": "Updated",
-                                    "description": "Updated description",
-                                    "isDefault": false
-                                }
-                                """))
+                            {
+                                "nameTag": "Updated",
+                                "description": "Updated description",
+                                "isDefault": false
+                            }
+                            """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.nameTag").value("Updated"))
                 .andExpect(jsonPath("$.description").value("Updated description"))
                 .andExpect(jsonPath("$.isDefault").value(false));
-
     }
 
 
@@ -135,11 +146,13 @@ class SchemeControllerTest {
         // No exception means successful deletion
         Mockito.doNothing().when(schemeService).delete(1, 1);
 
-        mockMvc.perform(delete("/v1/schemes/1"))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/v1/schemes/1")
+                        .param("userId", "1"))
+                .andExpect(status().isNoContent());
 
         Mockito.verify(schemeService, times(1)).delete(1, 1);
     }
+
 
     @Test
     void testDeleteSchemeNotFound() throws Exception {
@@ -147,14 +160,13 @@ class SchemeControllerTest {
         Mockito.doThrow(new ResourceNotFoundException("Scheme with ID 999 not found"))
                 .when(schemeService).delete(999, 1);
 
-        mockMvc.perform(delete("/v1/schemes/999"))
+        mockMvc.perform(delete("/v1/schemes/999")
+                        .param("userId", "1"))
                 .andExpect(status().isNotFound())
                 .andExpect(content().string("Scheme with ID 999 not found"));
 
         Mockito.verify(schemeService, times(1)).delete(999, 1);
     }
-
-
 
 
 

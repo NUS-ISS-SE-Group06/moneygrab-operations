@@ -20,7 +20,10 @@ public class SchemeController {
     }
 
     @GetMapping
-    public List<Scheme> list() { return service.listAll(); }
+    public ResponseEntity<List<Scheme>> list() {
+        List<Scheme> schemes = service.listAll();
+        return ResponseEntity.ok(schemes);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<Scheme> get(@PathVariable Integer id) {
@@ -29,21 +32,27 @@ public class SchemeController {
     }
 
     @PostMapping
-    public Scheme create(@RequestBody Scheme item) {
-        item.setCreatedBy(1);
-        item.setUpdatedBy(1);
-        return service.save(item);
+    public ResponseEntity<Scheme>  create(@RequestBody Scheme item) {
+        Scheme saved = service.save(item);
+        return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
-    public Scheme update(@PathVariable Integer id, @RequestBody Scheme item) {
-        item.setId(id);
-        item.setUpdatedBy(1);
-        return service.save(item);
+    public ResponseEntity<Scheme>  update(@PathVariable Integer id, @RequestBody Scheme item) {
+        Scheme existing = service.get(id);
+
+        existing.setUpdatedBy(item.getUpdatedBy());
+        existing.setDescription(item.getDescription());
+        existing.setIsDefault(item.getIsDefault());
+
+        Scheme updated = service.save(existing);
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
-        service.delete(id,1);
+    public ResponseEntity<Void> delete(@PathVariable Integer id, @RequestParam("userId") Integer userId) {
+        service.delete(id,userId);
+        return ResponseEntity.noContent().build();
     }
+
 }
