@@ -64,5 +64,23 @@
             <AppenderRef ref="${LOG_APPENDER}" />
             <!-- Suitable for Prod -->
         </Logger>
+
+        <Logger name="sun.rmi.transport.tcp" level="INFO" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="${LOG_APPENDER}"/> </Logger>
+
+        <Logger name="sun.rmi.loader" level="INFO" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="${LOG_APPENDER}"/> </Logger>
+
+        <Logger name="java.rmi" level="INFO" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="${LOG_APPENDER}"/>
+        </Logger>
+
+        <Logger name="sun.rmi.transport" level="INFO" additivity="false">
+            <AppenderRef ref="console"/>
+            <AppenderRef ref="${LOG_APPENDER}"/>
+        </Logger>
     </Loggers>
 </Configuration>
