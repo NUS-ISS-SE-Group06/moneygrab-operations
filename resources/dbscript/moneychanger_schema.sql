@@ -3,7 +3,7 @@ use moneychangerdb;
 -- STEP 1: Create scheme table
 CREATE TABLE scheme (
                         id INT AUTO_INCREMENT PRIMARY KEY,
-                        name_tag VARCHAR(100) NOT NULL UNIQUE,
+                        name_tag VARCHAR(100) NOT NULL,
                         description VARCHAR(500),
                         is_default BOOLEAN DEFAULT FALSE,
                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -66,8 +66,7 @@ CREATE TABLE commission_rate (
                                  CONSTRAINT fk_commission_rate_currency FOREIGN KEY (currency_id) REFERENCES currency_code(id),
                                  CONSTRAINT fk_commission_rate_scheme FOREIGN KEY (scheme_id) REFERENCES scheme(id),
                                  CONSTRAINT fk_commission_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
-                                 CONSTRAINT fk_commission_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id),
-                                 UNIQUE (currency_id, scheme_id)
+                                 CONSTRAINT fk_commission_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
 
 -- STEP 6: Create company_commission_scheme table
@@ -83,8 +82,7 @@ CREATE TABLE company_commission_scheme (
                                            CONSTRAINT fk_company_commission_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id),
                                            CONSTRAINT fk_company_commission_rate FOREIGN KEY (commission_rate_id) REFERENCES commission_rate(id),
                                            CONSTRAINT fk_company_commission_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
-                                           CONSTRAINT fk_company_commission_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id),
-                                           UNIQUE (money_changer_id, commission_rate_id)
+                                           CONSTRAINT fk_company_commission_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
 
 

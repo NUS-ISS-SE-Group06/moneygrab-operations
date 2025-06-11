@@ -1,14 +1,13 @@
 package com.moola.fx.moneychanger.operations.model;
 
-import lombok.Data;
 import jakarta.persistence.*;
+import lombok.Data;
+
 import java.sql.Timestamp;
 
 @Data
 @Entity
-@Table(name = "company_commission_scheme", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"money_changer_id", "commission_rate_id"})
-})
+@Table(name = "company_commission_scheme")
 public class CompanyCommissionScheme {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,4 +37,16 @@ public class CompanyCommissionScheme {
     private Boolean isDeleted=false;
 
     // Getters and Setters
+
+    @PrePersist
+    protected void onCreate() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
+    }
 }

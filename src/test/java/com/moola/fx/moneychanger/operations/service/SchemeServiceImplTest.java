@@ -4,190 +4,175 @@ import com.moola.fx.moneychanger.operations.exception.DuplicateResourceException
 import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
 import com.moola.fx.moneychanger.operations.model.Scheme;
 import com.moola.fx.moneychanger.operations.repository.SchemeRepository;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-
-@SpringBootTest
+@ExtendWith(MockitoExtension.class)
 class SchemeServiceImplTest {
 
     @Mock
     private SchemeRepository schemeRepository;
 
+    @InjectMocks
     private SchemeServiceImpl schemeService;
 
+    private Scheme makeScheme(Integer id, boolean deleted) {
+        Scheme s = new Scheme();
+        s.setId(id);
+        s.setIsDeleted(deleted);
+        return s;
+    }
+
     @BeforeEach
-    public void setup() {
-        MockitoAnnotations.openMocks(this);
-        schemeService = new SchemeServiceImpl(schemeRepository);
+    void setUp() {
+        // MockitoExtension does the initialization
     }
 
     @Test
-    void testListAll() {
-        Scheme scheme = new Scheme();
-        scheme.setIsDeleted(false);
-        List<Scheme> list = List.of(scheme);
-        when(schemeRepository.findAll()).thenReturn(list);
+    void listAll_filtersDeleted() {
+        Scheme a = makeScheme(1, false);
+        Scheme b = makeScheme(2, true);
+        when(schemeRepository.findAll()).thenReturn(List.of(a, b));
 
-        List<Scheme> result = schemeService.listAll();
-        Assertions.assertEquals(1, result.size());
-        Assertions.assertFalse(result.get(0).getIsDeleted());
+        var out = schemeService.listAll();
+        assertEquals(1, out.size());
+        assertFalse(out.get(0).getIsDeleted());
+        verify(schemeRepository).findAll();
     }
 
     @Test
-    void testGet_Success() {
-        Scheme scheme = new Scheme();
-        scheme.setId(1);
-        scheme.setIsDeleted(false);
+    void get_success() {
+        Scheme s = new Scheme();
+        s.setId(1);
+        s.setIsDeleted(false);
+        when(schemeRepository.findByIdAndIsDeletedFalse(1)).thenReturn(Optional.of(s));
 
-        when(schemeRepository.findById(1)).thenReturn(Optional.of(scheme));
-
-        Scheme result = schemeService.get(1);
-
-        Assertions.assertEquals(1, result.getId());
-        Assertions.assertFalse(result.getIsDeleted());
-    }
-
-
-    @Test
-    void testGet_Deleted_ThrowsException() {
-        Scheme scheme = new Scheme();
-        scheme.setId(1);
-        scheme.setIsDeleted(true);
-
-        when(schemeRepository.findById(1)).thenReturn(Optional.of(scheme));
-
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            schemeService.get(1);
-        });
+        var out = schemeService.get(1);
+        assertEquals(1, out.getId());
+        verify(schemeRepository).findByIdAndIsDeletedFalse(1);
     }
 
     @Test
-    void testGet_NotFound_ThrowsException() {
-        when(schemeRepository.findById(1)).thenReturn(Optional.empty());
-
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            schemeService.get(1);
-        });
+    void get_deletedOrNotFound_throws() {
+        // Deleted case
+        when(schemeRepository.findByIdAndIsDeletedFalse(1)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> schemeService.get(1));
+        verify(schemeRepository).findByIdAndIsDeletedFalse(1);
     }
 
-
     @Test
-    void testSave_NewScheme_Success() {
-        Scheme scheme = new Scheme();
-        scheme.setNameTag("Test");
-        scheme.setDescription("New scheme description");
-        scheme.setIsDefault(true);
-
-        when(schemeRepository.findAll()).thenReturn(List.of());
-        when(schemeRepository.save(any(Scheme.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        Scheme result = schemeService.save(scheme);
-
-        Assertions.assertEquals("Test", result.getNameTag());
-        Assertions.assertEquals("New scheme description", result.getDescription());
-        Assertions.assertTrue(result.getIsDefault());
-    }
-
-
-    @Test
-    void testSave_DuplicateSchemeWithDifferentId_ThrowsException() {
-        Scheme existing = new Scheme();
-        existing.setId(1);
-        existing.setNameTag("Test");
-        existing.setIsDeleted(false);
-
+    void save_newScheme_success() {
         Scheme newScheme = new Scheme();
-        newScheme.setId(2);
-        newScheme.setNameTag("test"); // same name different case
+        newScheme.setId(null);
+        newScheme.setNameTag("Test");
+        newScheme.setDescription("Desc");
         newScheme.setIsDefault(true);
 
-        when(schemeRepository.findAll()).thenReturn(List.of(existing));
+        when(schemeRepository.findAll()).thenReturn(List.of());
+        when(schemeRepository.save(newScheme)).thenAnswer(i -> i.getArgument(0));
 
-        Assertions.assertThrows(DuplicateResourceException.class, () -> {
-            schemeService.save(newScheme);
-        });
+        var out = schemeService.save(newScheme);
+        assertEquals("Test", out.getNameTag());
+        assertTrue(out.getIsDefault());
+        verify(schemeRepository).findAll();
+        verify(schemeRepository).save(newScheme);
     }
 
-    @Test
-    void testSave_SameNameSameId_DoesNotThrowException() {
-        Scheme existing = new Scheme();
-        existing.setId(2);
-        existing.setNameTag("Test");
-        existing.setIsDeleted(false);
-
-        Scheme newScheme = new Scheme();
-        newScheme.setId(2);
-        newScheme.setNameTag("test");
-
-        when(schemeRepository.findAll()).thenReturn(List.of(existing));
-        when(schemeRepository.save(any(Scheme.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-        Assertions.assertDoesNotThrow(() -> {
-            schemeService.save(newScheme);
-        });
-    }
 
     @Test
-    void testSave_NewDefaultScheme_UnsetsPreviousDefaults() {
-        Scheme existingDefault = new Scheme();
-        existingDefault.setId(1);
-        existingDefault.setNameTag("Existing Default");
+    void save_newDefault_unsetsPreviousDefault() {
+        Scheme existingDefault = makeScheme(1, false);
+        existingDefault.setNameTag("Old");
         existingDefault.setIsDefault(true);
-        existingDefault.setIsDeleted(false);
 
         Scheme newDefault = new Scheme();
-        newDefault.setNameTag("New Default");
+        newDefault.setNameTag("New");
         newDefault.setIsDefault(true);
 
         when(schemeRepository.findAll()).thenReturn(List.of(existingDefault));
-        when(schemeRepository.save(any(Scheme.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        // .save(...) called twice: once to unset, once to save new
+        when(schemeRepository.save(any(Scheme.class))).thenAnswer(i -> i.getArgument(0));
 
-        Scheme result = schemeService.save(newDefault);
-
-        verify(schemeRepository, times(2)).save(any(Scheme.class)); // once to unset old default, once to save new
-        Assertions.assertTrue(result.getIsDefault());
+        var out = schemeService.save(newDefault);
+        assertTrue(out.getIsDefault());
+        verify(schemeRepository, times(2)).save(any(Scheme.class));
     }
 
     @Test
-    void testDelete_Success() {
-        int schemeId = 1;
-        int updatedBy = 99;
+    void delete_success() {
+        int id = 1, userId = 99;
+        Scheme s = makeScheme(id, false);
+        when(schemeRepository.findById(id)).thenReturn(Optional.of(s));
+        when(schemeRepository.save(s)).thenReturn(s);
 
-        when(schemeRepository.markDeletedById(schemeId, updatedBy)).thenReturn(1);
-
-        // Should not throw any exception
-        Assertions.assertDoesNotThrow(() -> {
-            schemeService.delete(schemeId, updatedBy);
-        });
-
-        verify(schemeRepository, times(1)).markDeletedById(schemeId, updatedBy);
+        assertDoesNotThrow(() -> schemeService.delete(id, userId));
+        assertTrue(s.getIsDeleted());
+        assertEquals(userId, s.getUpdatedBy());
+        verify(schemeRepository).findById(id);
+        verify(schemeRepository).save(s);
     }
-
 
     @Test
-    void testDelete_SchemeNotFound_ThrowsException() {
-        int schemeId = 1;
-        int updatedBy = 99;
-
-        when(schemeRepository.markDeletedById(schemeId, updatedBy)).thenReturn(0);
-
-        Assertions.assertThrows(ResourceNotFoundException.class, () -> {
-            schemeService.delete(schemeId, updatedBy);
-        });
-
-        verify(schemeRepository, times(1)).markDeletedById(schemeId, updatedBy);
+    void delete_notFound_throws() {
+        when(schemeRepository.findById(1)).thenReturn(Optional.empty());
+        assertThrows(ResourceNotFoundException.class, () -> schemeService.delete(1, 99));
+        verify(schemeRepository).findById(1);
+        verify(schemeRepository, never()).save(any());
     }
 
+    @Test
+    void save_duplicateWithDifferentId_throws() {
+        Scheme duplicate = new Scheme();
+        duplicate.setId(2);
+        duplicate.setNameTag(" SameName ");   // any casing/whitespace
+        duplicate.setIsDefault(false);
+
+        // Service will normalize to "samename"
+        when(schemeRepository.existsByNameTagIgnoreCaseAndIdNotAndIsDeletedFalse("samename", 2))
+                .thenReturn(true);
+
+        assertThrows(DuplicateResourceException.class, () -> schemeService.save(duplicate));
+
+        verify(schemeRepository).existsByNameTagIgnoreCaseAndIdNotAndIsDeletedFalse("samename", 2);
+        verify(schemeRepository, never()).save(any());
+    }
+
+    @Test
+    void save_sameNameSameId_doesNotThrow() {
+        // Given an existing, non-deleted scheme
+        Scheme existing = makeScheme(2, false);
+        existing.setNameTag("Match");
+
+        // And an "update" DTO with the same ID and name (with whitespace/case variation)
+        Scheme update = new Scheme();
+        update.setId(2);
+        update.setNameTag("  match  ");
+
+        // The service normalizes to "match", so stub the exists-check to return false
+        when(schemeRepository.existsByNameTagIgnoreCaseAndIdNotAndIsDeletedFalse("match", 2))
+                .thenReturn(false);
+
+        // Stub save(...) to simply return the passed entity
+        when(schemeRepository.save(update)).thenAnswer(invocation -> invocation.getArgument(0));
+
+        // When & Then: no exception should be thrown
+        assertDoesNotThrow(() -> schemeService.save(update));
+
+        // Verify only the methods actually called in this path:
+        verify(schemeRepository).existsByNameTagIgnoreCaseAndIdNotAndIsDeletedFalse("match", 2);
+        verify(schemeRepository).save(update);
+        // Note: we do NOT verify findAll(), since isDefault != true, so it's never called.
+    }
 
 
 }

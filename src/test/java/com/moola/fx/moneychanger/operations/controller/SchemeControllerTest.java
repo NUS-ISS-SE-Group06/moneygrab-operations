@@ -1,36 +1,68 @@
 package com.moola.fx.moneychanger.operations.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
 import com.moola.fx.moneychanger.operations.model.Scheme;
 import com.moola.fx.moneychanger.operations.service.SchemeService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-
-
-@SpringBootTest
-@AutoConfigureMockMvc
+@ExtendWith(MockitoExtension.class)
 class SchemeControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @MockBean
+    @Mock
     private SchemeService schemeService;
+
+    @InjectMocks
+    private SchemeController schemeController;
+
+    /**
+     * Advice to convert ResourceNotFoundException into JSON { "message": "…" } with 404 status
+     */
+    @RestControllerAdvice
+    static class TestExceptionAdvice {
+        @ExceptionHandler(ResourceNotFoundException.class)
+        @ResponseStatus(HttpStatus.NOT_FOUND)
+        public Map<String,String> handleNotFound(ResourceNotFoundException ex) {
+            return Map.of("message", ex.getMessage());
+        }
+    }
+
+    @BeforeEach
+    void setup() {
+        mockMvc = MockMvcBuilders
+                .standaloneSetup(schemeController)
+                .setControllerAdvice(new TestExceptionAdvice())
+                .build();
+    }
 
     @Test
     void testListSchemes() throws Exception {
@@ -40,8 +72,7 @@ class SchemeControllerTest {
         scheme.setDescription("Basic plan");
         scheme.setIsDefault(false);
 
-        List<Scheme> schemes = List.of(scheme);
-        Mockito.when(schemeService.listAll()).thenReturn(schemes);
+        Mockito.when(schemeService.listAll()).thenReturn(List.of(scheme));
 
         mockMvc.perform(get("/v1/schemes"))
                 .andExpect(status().isOk())
@@ -49,6 +80,8 @@ class SchemeControllerTest {
                 .andExpect(jsonPath("$[0].nameTag", is("Basic")))
                 .andExpect(jsonPath("$[0].description", is("Basic plan")))
                 .andExpect(jsonPath("$[0].isDefault", is(false)));
+
+        Mockito.verify(schemeService, times(1)).listAll();
     }
 
     @Test
@@ -63,18 +96,24 @@ class SchemeControllerTest {
 
         mockMvc.perform(get("/v1/schemes/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nameTag").value("Standard"))
-                .andExpect(jsonPath("$.description").value("Standard scheme"))
-                .andExpect(jsonPath("$.isDefault").value(true));
+                .andExpect(jsonPath("$.nameTag", is("Standard")))
+                .andExpect(jsonPath("$.description", is("Standard scheme")))
+                .andExpect(jsonPath("$.isDefault", is(true)));
+
+        Mockito.verify(schemeService, times(1)).get(1);
     }
 
     @Test
     void testGetSchemeNotFound() throws Exception {
-        Mockito.when(schemeService.get(999)).thenThrow(new ResourceNotFoundException("Scheme with ID 999 not found"));
+        Mockito.when(schemeService.get(999))
+                .thenThrow(new ResourceNotFoundException("Scheme with ID 999 not found"));
 
         mockMvc.perform(get("/v1/schemes/999"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Scheme with ID 999 not found"));
+                .andExpect(jsonPath("$.message")
+                        .value("Scheme with ID 999 not found"));
+
+        Mockito.verify(schemeService, times(1)).get(999);
     }
 
     @Test
@@ -85,77 +124,82 @@ class SchemeControllerTest {
         scheme.setDescription("Gold plan");
         scheme.setIsDefault(true);
 
-        Mockito.when(schemeService.save(Mockito.any(Scheme.class))).thenReturn(scheme);
+        Mockito.when(schemeService.save(any(Scheme.class))).thenReturn(scheme);
 
         mockMvc.perform(post("/v1/schemes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {
-                                    "nameTag": "Gold",
-                                    "description": "Gold plan",
-                                    "isDefault": true
-                                }
-                                """))
+                    {
+                      "nameTag": "Gold",
+                      "description": "Gold plan",
+                      "isDefault": true
+                    }
+                    """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nameTag").value("Gold"))
-                .andExpect(jsonPath("$.description").value("Gold plan"))
-                .andExpect(jsonPath("$.isDefault").value(true));
+                .andExpect(jsonPath("$.nameTag", is("Gold")))
+                .andExpect(jsonPath("$.description", is("Gold plan")))
+                .andExpect(jsonPath("$.isDefault", is(true)));
 
+        Mockito.verify(schemeService, times(1)).save(any(Scheme.class));
     }
 
     @Test
     void testUpdateScheme() throws Exception {
-        Scheme scheme = new Scheme();
-        scheme.setId(1);
-        scheme.setNameTag("Updated");
-        scheme.setDescription("Updated description");
-        scheme.setIsDefault(false);
+        Scheme existing = new Scheme();
+        existing.setId(1);
+        existing.setNameTag("Old Name");
+        existing.setDescription("Old description");
+        existing.setIsDefault(false);
 
-        Mockito.when(schemeService.save(Mockito.any(Scheme.class))).thenReturn(scheme);
+        Scheme updated = new Scheme();
+        updated.setId(1);
+        updated.setNameTag("Updated");
+        updated.setDescription("Updated description");
+        updated.setIsDefault(false);
+
+        Mockito.when(schemeService.get(1)).thenReturn(existing);
+        Mockito.when(schemeService.save(any(Scheme.class))).thenReturn(updated);
 
         mockMvc.perform(put("/v1/schemes/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {
-                                    "nameTag": "Updated",
-                                    "description": "Updated description",
-                                    "isDefault": false
-                                }
-                                """))
+                    {
+                      "nameTag": "Updated",
+                      "description": "Updated description",
+                      "isDefault": false
+                    }
+                    """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nameTag").value("Updated"))
-                .andExpect(jsonPath("$.description").value("Updated description"))
-                .andExpect(jsonPath("$.isDefault").value(false));
+                .andExpect(jsonPath("$.nameTag", is("Updated")))
+                .andExpect(jsonPath("$.description", is("Updated description")))
+                .andExpect(jsonPath("$.isDefault", is(false)));
 
+        Mockito.verify(schemeService, times(1)).get(1);
+        Mockito.verify(schemeService, times(1)).save(any(Scheme.class));
     }
-
 
     @Test
     void testDeleteSchemeSuccess() throws Exception {
-        // No exception means successful deletion
         Mockito.doNothing().when(schemeService).delete(1, 1);
 
-        mockMvc.perform(delete("/v1/schemes/1"))
-                .andExpect(status().isOk());
+        mockMvc.perform(delete("/v1/schemes/1")
+                        .param("userId", "1"))
+                .andExpect(status().isNoContent());
 
         Mockito.verify(schemeService, times(1)).delete(1, 1);
     }
 
     @Test
     void testDeleteSchemeNotFound() throws Exception {
-        // Simulate service throwing not found exception
         Mockito.doThrow(new ResourceNotFoundException("Scheme with ID 999 not found"))
                 .when(schemeService).delete(999, 1);
 
-        mockMvc.perform(delete("/v1/schemes/999"))
+        mockMvc.perform(delete("/v1/schemes/999")
+                        .param("userId", "1"))
                 .andExpect(status().isNotFound())
-                .andExpect(content().string("Scheme with ID 999 not found"));
+                .andExpect(jsonPath("$.message")
+                        .value("Scheme with ID 999 not found"));
 
         Mockito.verify(schemeService, times(1)).delete(999, 1);
     }
-
-
-
-
-
 }

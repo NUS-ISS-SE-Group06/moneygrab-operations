@@ -8,5 +8,7 @@ public interface SchemeService {
     List<Scheme> listAll();
     Scheme get(Integer id);
     Scheme save(Scheme item);
-    void delete(Integer id, Integer who);
+    void delete(Integer id, Integer userId);
+
+
 }

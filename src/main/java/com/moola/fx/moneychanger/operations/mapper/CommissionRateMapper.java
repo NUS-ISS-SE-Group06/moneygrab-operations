@@ -1,5 +1,6 @@
 package com.moola.fx.moneychanger.operations.mapper;
 
+
 import com.moola.fx.moneychanger.operations.dto.CommissionRateDTO;
 import com.moola.fx.moneychanger.operations.model.CurrencyCode;
 import com.moola.fx.moneychanger.operations.model.Scheme;
@@ -13,6 +14,7 @@ public class CommissionRateMapper {
         if (entity == null) return null;
 
         CommissionRateDTO dto = new CommissionRateDTO();
+
         dto.setId(entity.getId());
 
         if (entity.getCurrencyId() != null) {
@@ -31,6 +33,7 @@ public class CommissionRateMapper {
         dto.setCreatedBy(entity.getCreatedBy());
         dto.setUpdatedBy(entity.getUpdatedBy());
         dto.setIsDeleted(entity.getIsDeleted());
+
         return dto;
     }
 
@@ -38,6 +41,7 @@ public class CommissionRateMapper {
         if (dto == null) return null;
 
         CommissionRate entity = new CommissionRate();
+
         entity.setId(dto.getId());
 
         if (dto.getCurrencyId() != null) {

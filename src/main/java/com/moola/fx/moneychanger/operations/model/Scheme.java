@@ -15,7 +15,7 @@ public class Scheme {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name="name_tag",nullable = false, unique = true, length = 100)
+    @Column(name="name_tag",nullable = false, length = 100)
     private String nameTag;
 
     @Column(length = 500)
@@ -40,5 +40,19 @@ public class Scheme {
 
     @Column(name = "updated_by")
     private Integer updatedBy = 0;
+
+    // Getters and Setters
+
+    @PrePersist
+    protected void onCreate() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        this.createdAt = now;
+        this.updatedAt = now;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
+    }
 
 }
