@@ -33,6 +33,7 @@ jobs:
           echo "Preparing deployment package moneygrab-operations"
           mkdir -p deploy-package/scripts
           mkdir -p deploy-package/build
+          mkdir -p deploy-package/log
           cp deployment/appspec.yml deploy-package/
           cp deployment/scripts/*.sh deploy-package/scripts/
           cp target/moneychanger-operations-1.0.0-SNAPSHOT.jar deploy-package/build/moneychanger-operations-1.0.0-SNAPSHOT.jar
