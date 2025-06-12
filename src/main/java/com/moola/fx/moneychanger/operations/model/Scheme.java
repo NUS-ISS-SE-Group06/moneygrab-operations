@@ -48,6 +48,7 @@ public class Scheme {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         this.createdAt = now;
         this.updatedAt = now;
+        this.isDeleted = false;
     }
 
     @PreUpdate

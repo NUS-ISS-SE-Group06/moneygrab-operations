@@ -7,9 +7,9 @@ CREATE TABLE scheme (
                         description VARCHAR(500),
                         is_default BOOLEAN DEFAULT FALSE,
                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                        updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         created_by INT,
-                        updated_by INT,
+                        updated_by INT NULL,
                         is_deleted TINYINT(1) DEFAULT 0
 );
 
@@ -26,9 +26,9 @@ CREATE TABLE money_changer (
                                uen VARCHAR(100),
                                scheme_id INT,
                                created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                               updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                               updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                created_by INT,
-                               updated_by INT,
+                               updated_by INT NULL,
                                is_deleted TINYINT(1) DEFAULT 0
 );
 
@@ -39,16 +39,16 @@ CREATE TABLE accounts (
                           role VARCHAR(100) NOT NULL,
                           email VARCHAR(255) NOT NULL UNIQUE,
                           created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                          updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                          updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                           created_by INT,
-                          updated_by INT,
+                          updated_by INT NULL,
                           is_deleted TINYINT(1) DEFAULT 0
 );
 
 -- STEP 4: Create currency_code table
 CREATE TABLE currency_code (
                                id INT AUTO_INCREMENT PRIMARY KEY,
-                               currency VARCHAR(10) NOT NULL UNIQUE,
+                               currency VARCHAR(10) NOT NULL,
                                description VARCHAR(255)
 );
 
@@ -57,30 +57,30 @@ CREATE TABLE commission_rate (
                                  id INT AUTO_INCREMENT PRIMARY KEY,
                                  currency_id INT NOT NULL,
                                  scheme_id   INT NOT NULL,
-                                 rate DECIMAL(5,4) NOT NULL,
+                                 rate DECIMAL(20,10) NOT NULL,
                                  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                 updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                 updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                  created_by INT,
-                                 updated_by INT,
+                                 updated_by INT NULL,
                                  is_deleted TINYINT(1) DEFAULT 0,
                                  CONSTRAINT fk_commission_rate_currency FOREIGN KEY (currency_id) REFERENCES currency_code(id),
                                  CONSTRAINT fk_commission_rate_scheme FOREIGN KEY (scheme_id) REFERENCES scheme(id),
-                                 CONSTRAINT fk_commission_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
-                                 CONSTRAINT fk_commission_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
+                                 CONSTRAINT fk_commission_rate_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
+                                 CONSTRAINT fk_commission_rate_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
 
 -- STEP 6: Create company_commission_scheme table
 CREATE TABLE company_commission_scheme (
                                            id INT AUTO_INCREMENT PRIMARY KEY,
                                            money_changer_id INT NOT NULL,
-                                           commission_rate_id INT NOT NULL,
+                                           scheme_id INT NOT NULL,
                                            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                           updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                           updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                            created_by INT,
-                                           updated_by INT,
+                                           updated_by INT NULL,
                                            is_deleted TINYINT(1) DEFAULT 0,
                                            CONSTRAINT fk_company_commission_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id),
-                                           CONSTRAINT fk_company_commission_rate FOREIGN KEY (commission_rate_id) REFERENCES commission_rate(id),
+                                           CONSTRAINT fk_company_commission_scheme FOREIGN KEY (scheme_id) REFERENCES scheme(id),
                                            CONSTRAINT fk_company_commission_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
                                            CONSTRAINT fk_company_commission_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
@@ -92,9 +92,9 @@ CREATE TABLE money_changer_photo (
                                      money_changer_id INT NOT NULL,
                                      photo_url TEXT NOT NULL,
                                      created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                                     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                     updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                      created_by INT,
-                                     updated_by INT,
+                                     updated_by INT NULL,
                                      is_deleted TINYINT(1) DEFAULT 0,
                                      CONSTRAINT fk_photo_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id),
                                      CONSTRAINT fk_photo_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
@@ -110,9 +110,9 @@ CREATE TABLE fx_upload (
                            ask DECIMAL(18,8) NOT NULL,
                            spread DECIMAL(18,8) NOT NULL,
                            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                           updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                           updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                            created_by INT,
-                           updated_by INT,
+                           updated_by INT NULL,
                            is_deleted TINYINT(1) DEFAULT 0
 );
 

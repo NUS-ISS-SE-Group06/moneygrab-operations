@@ -66,3 +66,9 @@ INSERT INTO currency_code(id,currency,description) VALUES
                                                        (3,'EUR', ''),
                                                        (4,'MYR', ''),
                                                        (5,'IDR', '');
+
+INSERT INTO company_commission_scheme(id,money_changer_id,scheme_id,is_deleted) VALUES
+                                                                                    (1,1,1,0),
+                                                                                    (2,2,2,0),
+                                                                                    (3,3,3,0),
+                                                                                    (4,4,1,0);

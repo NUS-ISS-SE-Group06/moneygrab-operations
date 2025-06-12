@@ -35,16 +35,16 @@ public class CommissionRateServiceImpl implements CommissionRateService {
 
     @Override
     @Transactional
-    public CommissionRate save(CommissionRate item) {
-        boolean exists=(item.getId() == null)
-                ? repo.existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(item.getCurrencyId(), item.getSchemeId())
-                : repo.existsByCurrencyIdAndSchemeIdAndIdNotAndIsDeletedFalse(item.getCurrencyId(), item.getSchemeId(), item.getId());
+    public CommissionRate save(CommissionRate entity) {
+        boolean exists=(entity.getId() == null)
+                ? repo.existsByCurrencyIdAndSchemeIdAndIsDeletedFalse(entity.getCurrencyId(), entity.getSchemeId())
+                : repo.existsByCurrencyIdAndSchemeIdAndIdNotAndIsDeletedFalse(entity.getCurrencyId(), entity.getSchemeId(), entity.getId());
 
         if (exists) {
             throw new DuplicateResourceException("Commission rate for the same currency and scheme already exists.");
         }
 
-        return repo.save(item);
+        return repo.save(entity);
     }
 
     @Override
@@ -58,8 +58,8 @@ public class CommissionRateServiceImpl implements CommissionRateService {
     }
 
     @Override
-    public List<CommissionRate> findBySchemeId(Integer schemeId) {
-        return repo.findBySchemeIdIdAndIsDeletedFalse(schemeId);
+    public List<CommissionRate> findBySchemeId(Integer id) {
+        return repo.findBySchemeIdIdAndIsDeletedFalse(id);
     }
 
 
