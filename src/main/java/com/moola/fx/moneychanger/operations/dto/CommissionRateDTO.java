@@ -11,7 +11,7 @@ public class CommissionRateDTO {
     private Integer currencyId;
     private String currency;
     private Integer schemeId;
-    private String NameTag;
+    private String nameTag;
     private BigDecimal rate;
     private Timestamp createdAt;
     private Timestamp updatedAt;
