@@ -6,6 +6,7 @@ import com.moola.fx.moneychanger.operations.model.Scheme;
 import com.moola.fx.moneychanger.operations.repository.SchemeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -32,30 +33,31 @@ public class SchemeServiceImpl implements SchemeService {
     }
 
     @Override
-    public Scheme save(Scheme item) {
-        String normalizedName = (item.getNameTag() == null)
+    @Transactional
+    public Scheme save(Scheme entity) {
+        String normalizedName = (entity.getNameTag() == null)
                 ? ""
-                : item.getNameTag().trim().toLowerCase();
+                : entity.getNameTag().trim().toLowerCase();
 
-        boolean exists = (item.getId() == null)
+        boolean exists = (entity.getId() == null)
                 ? repo.existsByNameTagIgnoreCaseAndIsDeletedFalse(normalizedName)
-                : repo.existsByNameTagIgnoreCaseAndIdNotAndIsDeletedFalse(normalizedName, item.getId());
+                : repo.existsByNameTagIgnoreCaseAndIdNotAndIsDeletedFalse(normalizedName, entity.getId());
 
         if (exists) {
-            throw new DuplicateResourceException("Scheme with name '" + item.getNameTag().trim() + "' already exists");
+            throw new DuplicateResourceException("Scheme with name '" + entity.getNameTag().trim() + "' already exists");
         }
 
         // Ensure only one default scheme
-        if (Boolean.TRUE.equals(item.getIsDefault())) {
+        if (Boolean.TRUE.equals(entity.getIsDefault())) {
             repo.findAll().stream()
-                    .filter(s -> Boolean.TRUE.equals(s.getIsDefault()) && !s.getId().equals(item.getId()))
+                    .filter(s -> Boolean.TRUE.equals(s.getIsDefault()) && !s.getId().equals(entity.getId()))
                     .forEach(s -> {
                         s.setIsDefault(false);
                         repo.save(s);
                     });
         }
 
-        return repo.save(item);
+        return repo.save(entity);
     }
 
     @Override

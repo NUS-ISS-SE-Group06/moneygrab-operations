@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/commission-rates")
@@ -25,35 +24,33 @@ public class CommissionRateController {
 
     @GetMapping
     public ResponseEntity<List<CommissionRateDTO>> list(@RequestParam(value ="schemeId", required = false ) Integer schemeId) {
-        List<CommissionRate> rates = (schemeId != null)
+        List<CommissionRate> list = (schemeId != null)
                 ? service.findBySchemeId(schemeId)
                 : service.listAll();
 
-        List<CommissionRateDTO> result= rates.stream()
-                .map(mapper::toDTO)
-                .collect(Collectors.toList());
+        List<CommissionRateDTO> result= list.stream().map(mapper::toDTO).toList();
 
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CommissionRateDTO> get(@PathVariable Integer id) {
+    public ResponseEntity<CommissionRateDTO> get(@PathVariable("id") Integer id) {
         CommissionRateDTO dto = mapper.toDTO(service.get(id));
         return ResponseEntity.ok(dto);
     }
 
     @PostMapping
     public ResponseEntity<CommissionRateDTO> create(@RequestBody CommissionRateDTO dto) {
-        CommissionRate commissionRate = mapper.toEntity(dto);
+        CommissionRate entity = mapper.toEntity(dto);
 
-        commissionRate.setUpdatedBy(dto.getCreatedBy());
+        entity.setUpdatedBy(dto.getCreatedBy());
 
-        CommissionRate saved = service.save(commissionRate);
+        CommissionRate saved = service.save(entity);
         return ResponseEntity.ok(mapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CommissionRateDTO> update(@PathVariable Integer id, @RequestBody CommissionRateDTO dto) {
+    public ResponseEntity<CommissionRateDTO> update(@PathVariable("id") Integer id, @RequestBody CommissionRateDTO dto) {
         CommissionRate existing = service.get(id);
 
         if (dto.getRate() != null) {
@@ -62,12 +59,12 @@ public class CommissionRateController {
 
         existing.setUpdatedBy(dto.getUpdatedBy());
 
-        CommissionRate saved = service.save(existing);
-        return ResponseEntity.ok(mapper.toDTO(saved));
+        CommissionRate updated = service.save(existing);
+        return ResponseEntity.ok(mapper.toDTO(updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id, @RequestParam("userId") Integer userId) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Integer id, @RequestParam("userId") Integer userId) {
         service.delete(id,userId);
         return ResponseEntity.noContent().build();
     }

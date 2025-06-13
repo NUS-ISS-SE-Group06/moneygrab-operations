@@ -25,31 +25,32 @@ public class SchemeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Scheme> get(@PathVariable Integer id) {
-        Scheme item = service.get(id);
-        return ResponseEntity.ok(item);
+    public ResponseEntity<Scheme> get(@PathVariable("id") Integer id) {
+        Scheme existing = service.get(id);
+        return ResponseEntity.ok(existing);
     }
 
     @PostMapping
-    public ResponseEntity<Scheme>  create(@RequestBody Scheme item) {
-        Scheme saved = service.save(item);
+    public ResponseEntity<Scheme>  create(@RequestBody Scheme entity) {
+        entity.setUpdatedBy(entity.getCreatedBy());
+        Scheme saved = service.save(entity);
         return ResponseEntity.ok(saved);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Scheme>  update(@PathVariable Integer id, @RequestBody Scheme item) {
+    public ResponseEntity<Scheme>  update(@PathVariable("id") Integer id, @RequestBody Scheme entity) {
         Scheme existing = service.get(id);
 
-        existing.setUpdatedBy(item.getUpdatedBy());
-        existing.setDescription(item.getDescription());
-        existing.setIsDefault(item.getIsDefault());
+        existing.setUpdatedBy(entity.getUpdatedBy());
+        existing.setDescription(entity.getDescription());
+        existing.setIsDefault(entity.getIsDefault());
 
         Scheme updated = service.save(existing);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Integer id, @RequestParam("userId") Integer userId) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Integer id, @RequestParam("userId") Integer userId) {
         service.delete(id,userId);
         return ResponseEntity.noContent().build();
     }

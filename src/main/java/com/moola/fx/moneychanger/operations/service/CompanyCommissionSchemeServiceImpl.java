@@ -1,13 +1,16 @@
 package com.moola.fx.moneychanger.operations.service;
 
+import com.moola.fx.moneychanger.operations.dto.CompanyCommissionSchemeDTO;
 import com.moola.fx.moneychanger.operations.exception.DuplicateResourceException;
 import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
+import com.moola.fx.moneychanger.operations.mapper.CompanyCommissionSchemeMapper;
 import com.moola.fx.moneychanger.operations.model.CompanyCommissionScheme;
-import com.moola.fx.moneychanger.operations.repository.CommissionRateRepository;
+import com.moola.fx.moneychanger.operations.model.MoneyChanger;
 import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -15,18 +18,15 @@ import java.util.List;
 public class CompanyCommissionSchemeServiceImpl implements CompanyCommissionSchemeService {
 
     private final CompanyCommissionSchemeRepository repo;
-    private final CommissionRateRepository commissionRateRepo;
     private final MoneyChangerRepository moneyChangerRepo;
-
 
     @Autowired
     public CompanyCommissionSchemeServiceImpl(
             CompanyCommissionSchemeRepository repo,
-            CommissionRateRepository commissionRateRepo,
-            MoneyChangerRepository moneyChangerRepo
+            MoneyChangerRepository moneyChangerRepo,
+            CompanyCommissionSchemeMapper mapper
     ) {
         this.repo = repo;
-        this.commissionRateRepo = commissionRateRepo;
         this.moneyChangerRepo = moneyChangerRepo;
     }
 
@@ -40,52 +40,47 @@ public class CompanyCommissionSchemeServiceImpl implements CompanyCommissionSche
 
     @Override
     public CompanyCommissionScheme get(Integer id) {
-        CompanyCommissionScheme scheme = repo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Company Commission Scheme with ID " + id + " not found"));
-
-        if (Boolean.TRUE.equals(scheme.getIsDeleted())) {
-            throw new ResourceNotFoundException("Company Commission Scheme with ID " + id + " not found");
-        }
-
-        return scheme;
+        return repo.findByIdAndIsDeletedFalse(id).orElseThrow(() -> new ResourceNotFoundException("Company Commission Scheme with ID " + id + " not found  or has been deleted"));
     }
 
     @Override
-    public CompanyCommissionScheme save(CompanyCommissionScheme item) {
-        if (item.getMoneyChangerId() == null || item.getCommissionRateId() == null) {
-            throw new IllegalArgumentException("moneyChangerId and commissionRateId must not be null");
-        }
+    @Transactional
+    public CompanyCommissionScheme save(CompanyCommissionScheme entity) {
 
-        if (!moneyChangerRepo.existsById(item.getMoneyChangerId().getId())) {
-            throw new ResourceNotFoundException("MoneyChanger with ID " + item.getMoneyChangerId().getId() + " not found");
-        }
-
-        if (!commissionRateRepo.existsById(item.getCommissionRateId().getId())) {
-            throw new ResourceNotFoundException("CommissionRate with ID " + item.getCommissionRateId().getId() + " not found");
-        }
-
-        boolean exists = repo.existsByMoneyChangerId_IdAndCommissionRateId_Id(
-                item.getMoneyChangerId().getId(),
-                item.getCommissionRateId().getId()
-        );
-
+        boolean exists=(entity.getId() == null)
+                ? repo.existsByMoneyChangerId_idAndSchemeId_IdAndIsDeletedFalse(entity.getMoneyChangerId().getId(), entity.getSchemeId().getId())
+                : repo.existsByMoneyChangerId_IdAndSchemeId_IdAndIdNotAndIsDeletedFalse(entity.getMoneyChangerId().getId(), entity.getSchemeId().getId(), entity.getId());
 
         if (exists) {
-            throw new DuplicateResourceException("Company Commission Scheme for moneyChangerId '"
-                    + item.getMoneyChangerId().getId() + "' and commissionRateId '"
-                    + item.getCommissionRateId().getId() + "' already exists");
+            throw new DuplicateResourceException("Company Commission Scheme for the same moneyChanger and scheme already exists.");
         }
 
-        return repo.save(item);
+        return repo.save(entity);
     }
 
     @Override
-    public void delete(Integer id) {
-        CompanyCommissionScheme companyCommissionScheme = repo.findById(id)
+    @Transactional
+    public CompanyCommissionScheme save(CompanyCommissionSchemeDTO dto) {
+        CompanyCommissionScheme existing = this.get(dto.getId());
+        MoneyChanger ref = moneyChangerRepo.getReferenceById(dto.getMoneyChangerId().longValue());
+        existing.setMoneyChangerId(ref);
+        existing.setUpdatedBy(dto.getUpdatedBy());
+        return repo.save(existing);
+    }
+
+    @Override
+    public void delete(Integer id, Integer userId) {
+        CompanyCommissionScheme existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Company Commission Scheme with ID " + id + " not found"));
 
-        companyCommissionScheme.setIsDeleted(true);  // Soft delete
-        repo.save(companyCommissionScheme);
-
+        existing.setIsDeleted(true);  // Soft delete
+        existing.setUpdatedBy(userId);
+        repo.save(existing);
     }
+
+    @Override
+    public List<CompanyCommissionScheme> findBySchemeId(Integer id) {
+        return repo.findBySchemeId_idAndIsDeletedFalse(id);
+    }
+
 }

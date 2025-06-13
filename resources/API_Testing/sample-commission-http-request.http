@@ -19,6 +19,19 @@ Content-Type: application/json
 }
 
 ### Update
+PUT http://localhost:8688/api/v1/schemes/11
+Content-Type: application/json
+
+{
+  "description": "test",
+  "isDefault": false,
+  "updatedBy": 1
+}
+
+//"isDeleted": false,
+//"createdAt": "2025-06-12T10:05:40.000+00:00",
+//"updatedAt": "2025-06-12T10:05:39.000+00:00",
+//"createdBy": 1,
 PUT http://localhost:8688/api/v1/schemes/12
 Content-Type: application/json
 

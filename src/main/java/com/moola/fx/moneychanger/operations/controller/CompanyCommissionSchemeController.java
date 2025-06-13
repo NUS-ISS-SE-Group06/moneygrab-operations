@@ -1,5 +1,7 @@
 package com.moola.fx.moneychanger.operations.controller;
 
+import com.moola.fx.moneychanger.operations.dto.CompanyCommissionSchemeDTO;
+import com.moola.fx.moneychanger.operations.mapper.CompanyCommissionSchemeMapper;
 import com.moola.fx.moneychanger.operations.model.CompanyCommissionScheme;
 import com.moola.fx.moneychanger.operations.service.CompanyCommissionSchemeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,32 +14,52 @@ import java.util.List;
 @RequestMapping("/v1/company-commission-schemes")
 public class CompanyCommissionSchemeController {
     private final CompanyCommissionSchemeService service;
+    private final CompanyCommissionSchemeMapper mapper;
 
     @Autowired
-    public CompanyCommissionSchemeController(CompanyCommissionSchemeService service) {
+    public CompanyCommissionSchemeController(CompanyCommissionSchemeService service, CompanyCommissionSchemeMapper mapper) {
         this.service = service;
+        this.mapper = mapper;
     }
 
     @GetMapping
-    public List<CompanyCommissionScheme> list() { return service.listAll(); }
+    public ResponseEntity<List<CompanyCommissionSchemeDTO>> list(@RequestParam(value ="schemeId", required = false ) Integer schemeId) {
+        List<CompanyCommissionScheme> list = (schemeId != null)
+                ? service.findBySchemeId(schemeId)
+                : service.listAll();
+
+        List<CompanyCommissionSchemeDTO> result= list.stream()
+                .map(mapper::toDTO)
+                .toList();
+
+        return ResponseEntity.ok(result);
+    }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CompanyCommissionScheme> get(@PathVariable Integer id) {
-        CompanyCommissionScheme item = service.get(id);
-        return ResponseEntity.ok(item);
+    public ResponseEntity<CompanyCommissionSchemeDTO> get(@PathVariable("id") Integer id) {
+        CompanyCommissionSchemeDTO dto = mapper.toDTO(service.get(id));
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
-    public CompanyCommissionScheme create(@RequestBody CompanyCommissionScheme item) {
-        return service.save(item);
+    public ResponseEntity<CompanyCommissionSchemeDTO> create(@RequestBody CompanyCommissionSchemeDTO dto) {
+        CompanyCommissionScheme entity = mapper.toEntity(dto);
+        entity.setUpdatedBy(dto.getCreatedBy());
+        CompanyCommissionScheme saved = service.save(entity);
+        return ResponseEntity.ok(mapper.toDTO(saved));
     }
 
     @PutMapping("/{id}")
-    public CompanyCommissionScheme update(@PathVariable Integer id, @RequestBody CompanyCommissionScheme item) {
-        item.setId(id);
-        return service.save(item);
+    public ResponseEntity<CompanyCommissionSchemeDTO> update(@PathVariable("id") Integer id, @RequestBody CompanyCommissionSchemeDTO dto) {
+        CompanyCommissionScheme updated = service.save(dto);
+        return ResponseEntity.ok(mapper.toDTO(updated));
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) { service.delete(id); }
+    public ResponseEntity<Void>  delete(@PathVariable("id") Integer id, @RequestParam("userId") Integer userId) {
+        service.delete(id,userId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

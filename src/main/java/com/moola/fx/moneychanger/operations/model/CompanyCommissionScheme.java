@@ -18,8 +18,8 @@ public class CompanyCommissionScheme {
     private MoneyChanger moneyChangerId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "commission_rate_id", nullable = false)
-    private CommissionRate commissionRateId;
+    @JoinColumn(name = "scheme_id", nullable = false)
+    private Scheme schemeId;
 
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private Timestamp createdAt;
@@ -43,6 +43,7 @@ public class CompanyCommissionScheme {
         Timestamp now = new Timestamp(System.currentTimeMillis());
         this.createdAt = now;
         this.updatedAt = now;
+        this.isDeleted = false;
     }
 
     @PreUpdate
