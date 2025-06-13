@@ -29,8 +29,7 @@ public class CommissionRateController {
                 ? service.findBySchemeId(schemeId)
                 : service.listAll();
 
-        List<CommissionRateDTO> result= list.stream().map(mapper::toDTO)
-                .collect(Collectors.toList());
+        List<CommissionRateDTO> result= list.stream().map(mapper::toDTO).toList();
 
         return ResponseEntity.ok(result);
     }
