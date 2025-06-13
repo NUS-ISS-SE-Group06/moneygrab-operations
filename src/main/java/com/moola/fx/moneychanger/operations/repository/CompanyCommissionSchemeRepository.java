@@ -11,4 +11,5 @@ public interface CompanyCommissionSchemeRepository extends JpaRepository<Company
     boolean existsByMoneyChangerId_IdAndSchemeId_IdAndIdNotAndIsDeletedFalse(Long moneyChangerId, Integer schemeId, Integer id);
     List<CompanyCommissionScheme>   findBySchemeId_idAndIsDeletedFalse(Integer schemeId);
     Optional<CompanyCommissionScheme> findByIdAndIsDeletedFalse(Integer id);
+    boolean existsBySchemeId_IdAndIsDeletedFalse(Integer schemeId);
 }

@@ -77,7 +77,7 @@ class CompanyCommissionSchemeServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> service.get(1));
         verify(repository).findByIdAndIsDeletedFalse(1);
     }
-    
+
 
     @Test
     void save_success_create() {
