@@ -1,8 +1,10 @@
 package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.exception.DuplicateResourceException;
+import com.moola.fx.moneychanger.operations.exception.ForeignKeyConstraintException;
 import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
 import com.moola.fx.moneychanger.operations.model.Scheme;
+import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
 import com.moola.fx.moneychanger.operations.repository.SchemeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,11 +15,14 @@ import java.util.List;
 @Service
 public class SchemeServiceImpl implements SchemeService {
 
+    private final CompanyCommissionSchemeRepository companyCommissionSchemeRepo;
     private SchemeRepository repo;
 
+
     @Autowired
-    public SchemeServiceImpl(SchemeRepository repo) {
+    public SchemeServiceImpl(SchemeRepository repo, CompanyCommissionSchemeRepository companyCommissionSchemeRepo) {
         this.repo = repo;
+        this.companyCommissionSchemeRepo = companyCommissionSchemeRepo;
     }
 
     @Override
@@ -65,6 +70,11 @@ public class SchemeServiceImpl implements SchemeService {
         Scheme existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Scheme with ID " + id + " not found"));
 
+        boolean schemeInUse=companyCommissionSchemeRepo.existsBySchemeId_IdAndIsDeletedFalse(existing.getId());
+
+        if (schemeInUse) {
+            throw new ForeignKeyConstraintException("Cannot delete: scheme is still in use by a company commission scheme.");
+        }
         existing.setIsDeleted(true);  // Soft delete
         existing.setUpdatedBy(userId);
         repo.save(existing);

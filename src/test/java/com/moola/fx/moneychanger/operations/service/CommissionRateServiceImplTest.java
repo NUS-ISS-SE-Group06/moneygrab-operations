@@ -6,6 +6,7 @@ import com.moola.fx.moneychanger.operations.model.CommissionRate;
 import com.moola.fx.moneychanger.operations.model.CurrencyCode;
 import com.moola.fx.moneychanger.operations.model.Scheme;
 import com.moola.fx.moneychanger.operations.repository.CommissionRateRepository;
+import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,6 +26,10 @@ class CommissionRateServiceImplTest {
 
     @Mock
     private CommissionRateRepository repository;
+
+    @Mock
+    private CompanyCommissionSchemeRepository companyCommissionSchemeRepository;
+
 
     @InjectMocks
     private CommissionRateServiceImpl service;
@@ -145,15 +150,22 @@ class CommissionRateServiceImplTest {
     @Test
     void delete_success() {
         var entity = makeRate(5, false);
+
+        Scheme scheme = new Scheme();
+        scheme.setId(100);
+        entity.setSchemeId(scheme);
+
         when(repository.findById(5)).thenReturn(Optional.of(entity));
-        assertFalse(entity.getIsDeleted());
+        when(companyCommissionSchemeRepository.existsBySchemeId_IdAndIsDeletedFalse(100)).thenReturn(false);
 
         service.delete(5, 99);
 
         assertTrue(entity.getIsDeleted());
         assertEquals(99, entity.getUpdatedBy());
         verify(repository).save(entity);
+        verify(companyCommissionSchemeRepository).existsBySchemeId_IdAndIsDeletedFalse(100);
     }
+
 
     @Test
     void delete_notFound_throws() {

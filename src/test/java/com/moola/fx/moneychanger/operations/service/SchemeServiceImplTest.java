@@ -10,6 +10,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +23,9 @@ class SchemeServiceImplTest {
 
     @Mock
     private SchemeRepository schemeRepository;
+
+    @Mock
+    private CompanyCommissionSchemeRepository companyCommissionSchemeRepository;
 
     @InjectMocks
     private SchemeServiceImpl schemeService;
@@ -113,14 +117,21 @@ class SchemeServiceImplTest {
         int id = 1, userId = 99;
         Scheme s = makeScheme(id, false);
         when(schemeRepository.findById(id)).thenReturn(Optional.of(s));
+
+        // 👇 New: stub scheme usage check
+        when(companyCommissionSchemeRepository.existsBySchemeId_IdAndIsDeletedFalse(id)).thenReturn(false);
+
         when(schemeRepository.save(s)).thenReturn(s);
 
         assertDoesNotThrow(() -> schemeService.delete(id, userId));
         assertTrue(s.getIsDeleted());
         assertEquals(userId, s.getUpdatedBy());
+
         verify(schemeRepository).findById(id);
+        verify(companyCommissionSchemeRepository).existsBySchemeId_IdAndIsDeletedFalse(id); // 👈 added
         verify(schemeRepository).save(s);
     }
+
 
     @Test
     void delete_notFound_throws() {
