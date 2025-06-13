@@ -1,8 +1,10 @@
 package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.exception.DuplicateResourceException;
+import com.moola.fx.moneychanger.operations.exception.ForeignKeyConstraintException;
 import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
 import com.moola.fx.moneychanger.operations.model.Scheme;
+import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
 import com.moola.fx.moneychanger.operations.repository.SchemeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -141,6 +142,8 @@ class SchemeServiceImplTest {
         verify(schemeRepository, never()).save(any());
     }
 
+
+
     @Test
     void save_duplicateWithDifferentId_throws() {
         Scheme duplicate = new Scheme();
@@ -184,6 +187,23 @@ class SchemeServiceImplTest {
         verify(schemeRepository).save(update);
         // Note: we do NOT verify findAll(), since isDefault != true, so it's never called.
     }
+
+
+    @Test
+    void delete_fails_when_scheme_in_use() {
+        int id = 1, userId = 99;
+        Scheme s = makeScheme(id, false);
+
+        when(schemeRepository.findById(id)).thenReturn(Optional.of(s));
+        when(companyCommissionSchemeRepository.existsBySchemeId_IdAndIsDeletedFalse(id)).thenReturn(true); // simulate FK constraint
+
+        assertThrows(ForeignKeyConstraintException.class, () -> schemeService.delete(id, userId));
+
+        verify(schemeRepository).findById(id);
+        verify(companyCommissionSchemeRepository).existsBySchemeId_IdAndIsDeletedFalse(id);
+        verify(schemeRepository, never()).save(any()); // ensure it was not soft-deleted
+    }
+
 
 
 }
