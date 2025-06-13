@@ -65,7 +65,7 @@ public class CompanyCommissionSchemeServiceImpl implements CompanyCommissionSche
         MoneyChanger ref = moneyChangerRepo.getReferenceById(dto.getMoneyChangerId().longValue());
         existing.setMoneyChangerId(ref);
         existing.setUpdatedBy(dto.getUpdatedBy());
-        return save(existing);
+        return repo.save(existing);
     }
 
     @Override
