@@ -1,15 +1,13 @@
 package com.moola.fx.moneychanger.operations.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
 import com.moola.fx.moneychanger.operations.model.MoneyChanger;
-import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
 import com.moola.fx.moneychanger.operations.model.MoneyChangerKyc;
-import com.moola.fx.moneychanger.operations.service.MoneyChangerPhotoService;
+import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
 import com.moola.fx.moneychanger.operations.service.MoneyChangerKycService;
+import com.moola.fx.moneychanger.operations.service.MoneyChangerPhotoService;
 import com.moola.fx.moneychanger.operations.service.MoneyChangerService;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,17 +19,21 @@ import java.util.List;
 @RequestMapping("/v1/money-changers")
 public class MoneyChangerController {
 
-    @Autowired
-    private MoneyChangerService moneyChangerService;
+    private final MoneyChangerService moneyChangerService;
+    private final MoneyChangerPhotoService moneyChangerPhotoService;
+    private final MoneyChangerKycService moneyChangerKycService;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    private MoneyChangerPhotoService moneyChangerPhotoService;
-
-    @Autowired
-    private MoneyChangerKycService moneyChangerKycService;
-
-    @Autowired
-    private ObjectMapper objectMapper;
+    public MoneyChangerController(
+            MoneyChangerService moneyChangerService,
+            MoneyChangerPhotoService moneyChangerPhotoService,
+            MoneyChangerKycService moneyChangerKycService,
+            ObjectMapper objectMapper) {
+        this.moneyChangerService = moneyChangerService;
+        this.moneyChangerPhotoService = moneyChangerPhotoService;
+        this.moneyChangerKycService = moneyChangerKycService;
+        this.objectMapper = objectMapper;
+    }
 
     // GET ALL MoneyChangers
     @GetMapping
@@ -44,7 +46,6 @@ public class MoneyChangerController {
     @GetMapping("/{id}")
     public ResponseEntity<MoneyChangerResponseDTO> getMoneyChangerById(@PathVariable Long id) {
         MoneyChanger mc = moneyChangerService.getById(id);
-
         MoneyChangerPhoto photo = moneyChangerPhotoService.getByMoneyChangerId(id);
         MoneyChangerKyc kyc = moneyChangerKycService.getByMoneyChangerId(id);
 
@@ -84,7 +85,6 @@ public class MoneyChangerController {
     ) throws Exception {
 
         MoneyChanger moneyChanger = objectMapper.readValue(moneyChangerJson, MoneyChanger.class);
-
         MoneyChanger created = moneyChangerService.create(moneyChanger);
 
         if (photoFile != null && !photoFile.isEmpty()) {
@@ -135,7 +135,6 @@ public class MoneyChangerController {
     ) throws Exception {
 
         MoneyChanger updatedMoneyChanger = objectMapper.readValue(moneyChangerJson, MoneyChanger.class);
-
         MoneyChanger updated = moneyChangerService.update(id, updatedMoneyChanger);
 
         if (photoFile != null && !photoFile.isEmpty()) {
@@ -177,15 +176,6 @@ public class MoneyChangerController {
     }
 
     // DELETE MoneyChanger
-    /*@DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMoneyChanger(
-            @PathVariable Long id,
-            @RequestParam String deletedBy
-    ) {
-        moneyChangerService.delete(id, deletedBy);
-        return ResponseEntity.ok().build();
-    }*/
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMoneyChanger(@PathVariable Long id) {
         moneyChangerService.delete(id);
