@@ -14,6 +14,7 @@ import java.util.List;
 public class MoneyChangerServiceImpl implements MoneyChangerService {
 
     private MoneyChangerRepository repository;
+
     @Autowired
     public MoneyChangerServiceImpl(MoneyChangerRepository repository) {
         this.repository = repository;
@@ -25,8 +26,9 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
     }
 
     @Override
-    public MoneyChanger getById(Long id) {
-        return repository.findById(id).orElse(null);
+    public MoneyChanger getOne(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("MoneyChanger with ID " + id + " not found"));
     }
 
     @Override
@@ -40,21 +42,26 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
 
     @Override
     public MoneyChanger update(Long id, MoneyChanger updated) {
-        MoneyChanger existing = repository.findById(id).orElseThrow();
+        MoneyChanger existing = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("MoneyChanger with ID " + id + " not found"));
+
         existing.setCompanyName(updated.getCompanyName());
         existing.setEmail(updated.getEmail());
         existing.setAddress(updated.getAddress());
         existing.setPostalCode(updated.getPostalCode());
         existing.setNotes(updated.getNotes());
         existing.setUpdatedAt(LocalDateTime.now()); // Also update the timestamp
+
         return repository.save(existing);
     }
 
+    /*
     @Override
     public void delete(Long id, String role) {
         if (!"admin".equals(role)) {
             throw new UnauthorizedAccessException("Only admin can delete staff.");
         }
+
         MoneyChanger changer = repository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("MoneyChanger with ID " + id + " not found"));
 
@@ -62,4 +69,22 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         changer.setUpdatedAt(LocalDateTime.now());
         repository.save(changer);
     }
+*/
+
+    @Override
+    public void delete(Long id) {
+
+        MoneyChanger changer = repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("MoneyChanger with ID " + id + " not found"));
+
+        changer.setIsDeleted(true);
+        changer.setUpdatedAt(LocalDateTime.now());
+        repository.save(changer);
+    }
+    @Override
+    public MoneyChanger getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("MoneyChanger not found with id " + id));
+    }
+
 }
