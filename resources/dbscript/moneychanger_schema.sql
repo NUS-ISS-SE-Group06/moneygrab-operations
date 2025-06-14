@@ -130,3 +130,36 @@ ALTER TABLE fx_upload ADD CONSTRAINT fk_fx_upload_updated_by FOREIGN KEY (update
 
 ALTER TABLE scheme ADD CONSTRAINT fk_commission_scheme_created_by FOREIGN KEY (created_by) REFERENCES accounts(id);
 ALTER TABLE scheme ADD CONSTRAINT fk_commission_scheme_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id);
+
+
+---14June2025
+--for moneychanger_api do the following changes in tables
+
+use moneychangerdb;
+
+-- STEP 10: ALTER money_changer_photo safely (if money_changer_photo is exist)
+ALTER TABLE money_changer_photo
+    DROP COLUMN photo_url;
+
+ALTER TABLE money_changer_photo
+    ADD COLUMN photo_data LONGBLOB NOT NULL,
+    ADD COLUMN photo_filename VARCHAR(255),
+    ADD COLUMN photo_mimetype VARCHAR(100);
+
+-- STEP 11: CREATE money_changer_kyc table (if not existent)
+CREATE TABLE money_changer_kyc (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    money_changer_id INT NOT NULL,
+    document_data LONGBLOB NOT NULL,
+    document_filename VARCHAR(255),
+    document_mimetype VARCHAR(100),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT,
+    updated_by INT,
+    is_deleted TINYINT(1) DEFAULT 0,
+    CONSTRAINT fk_kyc_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id) ON DELETE CASCADE,
+    CONSTRAINT fk_kyc_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
+    CONSTRAINT fk_kyc_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
+);
+

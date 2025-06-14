@@ -48,8 +48,8 @@ INSERT INTO accounts (id, money_changer_id, role, email, created_by, updated_by)
                                                                                      (9, 9, 'staff', 'user9@example.com', NULL, NULL),
                                                                                      (10, 10, 'admin', 'user10@example.com', NULL, NULL);
 
--- Insert money_changer_photo
-INSERT INTO money_changer_photo (id, money_changer_id, photo_url, created_by, updated_by) VALUES
+-- Insert money_changer_photo (invalid because photo url is replaced by actual photo storage) modified on 14June2025
+/*INSERT INTO money_changer_photo (id, money_changer_id, photo_url, created_by, updated_by) VALUES
                                                                                               (1, 1, 'https://example.com/photo1.jpg', NULL, NULL),
                                                                                               (2, 2, 'https://example.com/photo2.jpg', NULL, NULL),
                                                                                               (3, 3, 'https://example.com/photo3.jpg', NULL, NULL),
@@ -60,6 +60,32 @@ INSERT INTO money_changer_photo (id, money_changer_id, photo_url, created_by, up
                                                                                               (8, 8, 'https://example.com/photo8.jpg', NULL, NULL),
                                                                                               (9, 9, 'https://example.com/photo9.jpg', NULL, NULL),
                                                                                               (10, 10, 'https://example.com/photo10.jpg', NULL, NULL);
+
+*/
+
+-- TEST DATA for money_changer_photo (dummy data)
+INSERT INTO money_changer_photo (money_changer_id, photo_data, photo_filename, photo_mimetype, created_by, updated_by, is_deleted)
+VALUES (1, 'test', 'test.jpg', 'image/jpeg', 1, 1, 0);
+
+--  TEST DATA for money_changer_kyc (dummy data — PDF, Word, or Image can be accepted)
+-- Example with PDF:
+INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
+VALUES (1, 'test', 'test.pdf', 'application/pdf', 1, 1, 0);
+
+-- Example with DOC:
+INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
+VALUES (1, 'test', 'test.doc', 'application/msword', 1, 1, 0);
+
+-- Example with DOCX:
+INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
+VALUES (1, 'test', 'test.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 1, 1, 0);
+
+-- Example with image KYC:
+INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
+VALUES (1, 'test', 'test.png', 'image/png', 1, 1, 0);
+
+
+
 INSERT INTO currency_code(id,currency,description) VALUES
                                                        (1,'SGD', ''),
                                                        (2,'USD', ''),
