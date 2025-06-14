@@ -7,7 +7,7 @@ import java.util.List;
 public interface CommissionRateService {
     List<CommissionRate> listAll();
     CommissionRate get(Integer id);
-    CommissionRate save(CommissionRate item);
+    CommissionRate save(CommissionRate entity);
     void delete(Integer id, Integer userId);
-    List<CommissionRate> findBySchemeId(Integer schemeId);
+    List<CommissionRate> findBySchemeId(Integer id);
 }

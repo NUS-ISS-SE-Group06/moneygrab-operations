@@ -1,213 +1,182 @@
 package com.moola.fx.moneychanger.operations.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
-import com.moola.fx.moneychanger.operations.model.CommissionRate;
+import com.moola.fx.moneychanger.operations.dto.CompanyCommissionSchemeDTO;
+import com.moola.fx.moneychanger.operations.mapper.CompanyCommissionSchemeMapper;
 import com.moola.fx.moneychanger.operations.model.CompanyCommissionScheme;
-import com.moola.fx.moneychanger.operations.model.MoneyChanger;
+import com.moola.fx.moneychanger.operations.model.Scheme;
 import com.moola.fx.moneychanger.operations.service.CompanyCommissionSchemeService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
-import java.util.Map;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CompanyCommissionSchemeControllerTest {
 
-    private MockMvc mockMvc;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
     @Mock
     private CompanyCommissionSchemeService service;
+
+    @Mock
+    private CompanyCommissionSchemeMapper mapper;
 
     @InjectMocks
     private CompanyCommissionSchemeController controller;
 
-    /**
-     * Advice to convert ResourceNotFoundException into JSON { "message": "…" } with 404 status
-     */
-    @RestControllerAdvice
-    static class TestExceptionAdvice {
-        @ExceptionHandler(ResourceNotFoundException.class)
-        @ResponseStatus(HttpStatus.NOT_FOUND)
-        public Map<String,String> handleNotFound(ResourceNotFoundException ex) {
-            return Map.of("message", ex.getMessage());
-        }
-    }
+    @Test
+    void list_withoutSchemeId_returnsAll() {
+        CompanyCommissionScheme entity1 = new CompanyCommissionScheme();
+        CompanyCommissionScheme entity2 = new CompanyCommissionScheme();
+        CompanyCommissionSchemeDTO dto1 = new CompanyCommissionSchemeDTO();
+        CompanyCommissionSchemeDTO dto2 = new CompanyCommissionSchemeDTO();
 
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(controller)
-                .setControllerAdvice(new TestExceptionAdvice())
-                .build();
+        when(service.listAll()).thenReturn(List.of(entity1, entity2));
+        when(mapper.toDTO(entity1)).thenReturn(dto1);
+        when(mapper.toDTO(entity2)).thenReturn(dto2);
+
+        ResponseEntity<List<CompanyCommissionSchemeDTO>> response = controller.list(null);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        List<CompanyCommissionSchemeDTO> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(2, body.size());
+        assertEquals(List.of(dto1, dto2), body);
+
+        verify(service).listAll();
+        verify(service, never()).findBySchemeId(any());
     }
 
     @Test
-    void testListCompanyCommissionSchemes_empty() throws Exception {
-        Mockito.when(service.listAll()).thenReturn(List.of());
+    void list_withSchemeId_returnsFiltered() {
+        int schemeId = 42;
+        CompanyCommissionScheme entity = new CompanyCommissionScheme();
+        CompanyCommissionSchemeDTO dto = new CompanyCommissionSchemeDTO();
 
-        mockMvc.perform(get("/v1/company-commission-schemes"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+        when(service.findBySchemeId(schemeId)).thenReturn(List.of(entity));
+        when(mapper.toDTO(entity)).thenReturn(dto);
 
-        Mockito.verify(service, times(1)).listAll();
+        ResponseEntity<List<CompanyCommissionSchemeDTO>> response = controller.list(schemeId);
+
+        assertEquals(200, response.getStatusCodeValue());
+        List<CompanyCommissionSchemeDTO> body = response.getBody();
+        assertNotNull(body);
+        assertEquals(1, body.size());
+        assertSame(dto, body.get(0));
+
+        verify(service).findBySchemeId(schemeId);
+        verify(service, never()).listAll();
     }
 
     @Test
-    void testListCompanyCommissionSchemes_withData() throws Exception {
-        CompanyCommissionScheme scheme = new CompanyCommissionScheme();
-        scheme.setId(1);
+    void get_existingId_returnsDto() {
+        int id = 1;
+        CompanyCommissionScheme entity = new CompanyCommissionScheme();
+        CompanyCommissionSchemeDTO dto = new CompanyCommissionSchemeDTO();
 
-        MoneyChanger mc = new MoneyChanger();
-        mc.setId(1L);
-        scheme.setMoneyChangerId(mc);
+        when(service.get(id)).thenReturn(entity);
+        when(mapper.toDTO(entity)).thenReturn(dto);
 
-        CommissionRate cr = new CommissionRate();
-        cr.setId(1);
-        scheme.setCommissionRateId(cr);
+        ResponseEntity<CompanyCommissionSchemeDTO> response = controller.get(id);
 
-        Mockito.when(service.listAll()).thenReturn(List.of(scheme));
+        assertEquals(200, response.getStatusCodeValue());
+        assertSame(dto, response.getBody());
 
-        mockMvc.perform(get("/v1/company-commission-schemes"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(1)))
-                .andExpect(jsonPath("$[0].moneyChangerId.id", is(1)))
-                .andExpect(jsonPath("$[0].commissionRateId.id", is(1)));
-
-        Mockito.verify(service, times(1)).listAll();
+        verify(service).get(id);
     }
 
     @Test
-    void testGetCompanyCommissionSchemeFound() throws Exception {
-        CompanyCommissionScheme item = new CompanyCommissionScheme();
-        item.setId(1);
+    void create_validDto_returnsSavedDto() {
+        CompanyCommissionSchemeDTO inputDto = new CompanyCommissionSchemeDTO();
+        inputDto.setCreatedBy(7);
 
-        MoneyChanger mc = new MoneyChanger();
-        mc.setId(2L);
-        item.setMoneyChangerId(mc);
-
-        CommissionRate cr = new CommissionRate();
-        cr.setId(3);
-        item.setCommissionRateId(cr);
-
-        Mockito.when(service.get(1)).thenReturn(item);
-
-        mockMvc.perform(get("/v1/company-commission-schemes/1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.moneyChangerId.id", is(2)))
-                .andExpect(jsonPath("$.commissionRateId.id", is(3)));
-
-        Mockito.verify(service, times(1)).get(1);
-    }
-
-    @Test
-    void testGetCompanyCommissionSchemeNotFound() throws Exception {
-        Mockito.when(service.get(1))
-                .thenThrow(new ResourceNotFoundException("CompanyCommissionScheme with ID 1 not found"));
-
-        mockMvc.perform(get("/v1/company-commission-schemes/1"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.message")
-                        .value("CompanyCommissionScheme with ID 1 not found"));
-
-        Mockito.verify(service, times(1)).get(1);
-    }
-
-    @Test
-    void testCreateCompanyCommissionScheme() throws Exception {
+        CompanyCommissionScheme entity = new CompanyCommissionScheme();
         CompanyCommissionScheme saved = new CompanyCommissionScheme();
-        saved.setId(1);
+        CompanyCommissionSchemeDTO outputDto = new CompanyCommissionSchemeDTO();
 
-        MoneyChanger mc = new MoneyChanger();
-        mc.setId(5L);
-        saved.setMoneyChangerId(mc);
+        when(mapper.toEntity(inputDto)).thenReturn(entity);
+        when(service.save(any(CompanyCommissionScheme.class))).thenReturn(saved);
+        when(mapper.toDTO(saved)).thenReturn(outputDto);
 
-        CommissionRate cr = new CommissionRate();
-        cr.setId(6);
-        saved.setCommissionRateId(cr);
+        ResponseEntity<CompanyCommissionSchemeDTO> response = controller.create(inputDto);
 
-        Mockito.when(service.save(any())).thenReturn(saved);
+        assertEquals(200, response.getStatusCodeValue());
+        assertSame(outputDto, response.getBody());
 
-        mockMvc.perform(post("/v1/company-commission-schemes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                    {
-                      "moneyChangerId": { "id": 5 },
-                      "commissionRateId": { "id": 6 },
-                      "isDefault": true
-                    }
-                    """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.moneyChangerId.id", is(5)))
-                .andExpect(jsonPath("$.commissionRateId.id", is(6)));
-
-        Mockito.verify(service, times(1)).save(any());
+        ArgumentCaptor<CompanyCommissionScheme> captor = ArgumentCaptor.forClass(CompanyCommissionScheme.class);
+        verify(service).save(captor.capture());
+        assertEquals(inputDto.getCreatedBy(), captor.getValue().getUpdatedBy());
     }
 
     @Test
-    void testUpdateCompanyCommissionScheme() throws Exception {
+    void update_existingDto_returnsUpdatedDto() {
+        int id = 3;
+
+        CompanyCommissionSchemeDTO inputDto = new CompanyCommissionSchemeDTO();
+        inputDto.setId(id);
+        inputDto.setSchemeId(100);
+        inputDto.setNameTag("NewTag");
+        inputDto.setUpdatedBy(8);
+
         CompanyCommissionScheme updated = new CompanyCommissionScheme();
-        updated.setId(1);
+        CompanyCommissionSchemeDTO outputDto = new CompanyCommissionSchemeDTO();
 
-        MoneyChanger mc = new MoneyChanger();
-        mc.setId(8L);
-        updated.setMoneyChangerId(mc);
+        when(service.save(inputDto)).thenReturn(updated);
+        when(mapper.toDTO(updated)).thenReturn(outputDto);
 
-        CommissionRate cr = new CommissionRate();
-        cr.setId(9);
-        updated.setCommissionRateId(cr);
+        ResponseEntity<CompanyCommissionSchemeDTO> response = controller.update(id, inputDto);
 
-        Mockito.when(service.save(any())).thenReturn(updated);
+        assertEquals(200, response.getStatusCodeValue());
+        assertSame(outputDto, response.getBody());
 
-        mockMvc.perform(put("/v1/company-commission-schemes/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                    {
-                      "moneyChangerId": { "id": 8 },
-                      "commissionRateId": { "id": 9 },
-                      "isDefault": false
-                    }
-                    """))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.moneyChangerId.id", is(8)))
-                .andExpect(jsonPath("$.commissionRateId.id", is(9)));
-
-        Mockito.verify(service, times(1)).save(any());
+        verify(service).save(inputDto);
+        verify(mapper).toDTO(updated);
     }
 
-    @Test
-    void testDeleteCompanyCommissionScheme() throws Exception {
-        mockMvc.perform(delete("/v1/company-commission-schemes/1"))
-                .andExpect(status().isOk());
 
-        Mockito.verify(service, times(1)).delete(1);
+    @Test
+    void update_withNullSchemeId_onlyUpdatesUser() {
+        int id = 4;
+
+        CompanyCommissionSchemeDTO inputDto = new CompanyCommissionSchemeDTO();
+        inputDto.setId(id);
+        inputDto.setUpdatedBy(88);  // schemeId is null
+
+        CompanyCommissionScheme updated = new CompanyCommissionScheme();
+        CompanyCommissionSchemeDTO outputDto = new CompanyCommissionSchemeDTO();
+
+        when(service.save(inputDto)).thenReturn(updated);
+        when(mapper.toDTO(updated)).thenReturn(outputDto);
+
+        ResponseEntity<CompanyCommissionSchemeDTO> response = controller.update(id, inputDto);
+
+        assertEquals(200, response.getStatusCodeValue());
+        assertSame(outputDto, response.getBody());
+
+        verify(service).save(inputDto);
+        verify(mapper).toDTO(updated);
+    }
+
+
+    @Test
+    void delete_validId_invokesServiceAndReturnsNoContent() {
+        int id = 5;
+        int userId = 9;
+
+        doNothing().when(service).delete(id, userId);
+
+        ResponseEntity<Void> response = controller.delete(id, userId);
+
+        assertEquals(204, response.getStatusCodeValue());
+        assertNull(response.getBody());
+
+        verify(service).delete(id, userId);
     }
 }

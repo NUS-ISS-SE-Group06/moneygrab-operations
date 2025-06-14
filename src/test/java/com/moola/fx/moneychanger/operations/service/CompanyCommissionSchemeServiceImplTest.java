@@ -2,11 +2,11 @@ package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.exception.DuplicateResourceException;
 import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
-import com.moola.fx.moneychanger.operations.model.CommissionRate;
 import com.moola.fx.moneychanger.operations.model.CompanyCommissionScheme;
 import com.moola.fx.moneychanger.operations.model.MoneyChanger;
-import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
+import com.moola.fx.moneychanger.operations.model.Scheme;
 import com.moola.fx.moneychanger.operations.repository.CommissionRateRepository;
+import com.moola.fx.moneychanger.operations.repository.CompanyCommissionSchemeRepository;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,134 +63,144 @@ class CompanyCommissionSchemeServiceImplTest {
     @Test
     void get_success() {
         var item = makeScheme(1, false);
-        when(repository.findById(1)).thenReturn(Optional.of(item));
+        when(repository.findByIdAndIsDeletedFalse(1)).thenReturn(Optional.of(item));
 
         var out = service.get(1);
         assertEquals(1, out.getId());
-        verify(repository).findById(1);
+        verify(repository).findByIdAndIsDeletedFalse(1);
     }
 
     @Test
     void get_deleted_throws() {
-        var item = makeScheme(1, true);
-        when(repository.findById(1)).thenReturn(Optional.of(item));
+        when(repository.findByIdAndIsDeletedFalse(1)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> service.get(1));
-        verify(repository).findById(1);
+        verify(repository).findByIdAndIsDeletedFalse(1);
     }
 
-    @Test
-    void get_notFound_throws() {
-        when(repository.findById(1)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> service.get(1));
-        verify(repository).findById(1);
-    }
 
     @Test
-    void save_success() {
+    void save_success_create() {
         var scheme = new CompanyCommissionScheme();
 
-        var mc = new MoneyChanger();
-        mc.setId(10L);
+        var mc = new MoneyChanger(); mc.setId(10L);
         scheme.setMoneyChangerId(mc);
 
-        var cr = new CommissionRate();
-        cr.setId(20);
-        scheme.setCommissionRateId(cr);
+        var schemeObj = new Scheme(); schemeObj.setId(20);
+        scheme.setSchemeId(schemeObj);
 
-        // both exist
-        when(moneyChangerRepository.existsById(10L)).thenReturn(true);
-        when(commissionRateRepository.existsById(20)).thenReturn(true);
-        // no duplicate
-        when(repository.existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20)).thenReturn(false);
+        when(repository.existsByMoneyChangerId_idAndSchemeId_IdAndIsDeletedFalse(10L, 20)).thenReturn(false);
         when(repository.save(scheme)).thenReturn(scheme);
 
         var saved = service.save(scheme);
         assertSame(scheme, saved);
-        verify(moneyChangerRepository).existsById(10L);
-        verify(commissionRateRepository).existsById(20);
-        verify(repository).existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20);
+
+        verify(repository).existsByMoneyChangerId_idAndSchemeId_IdAndIsDeletedFalse(10L, 20);
         verify(repository).save(scheme);
     }
 
     @Test
-    void save_nullIds_throwsIllegalArgument() {
+    void save_duplicate_create_throws() {
         var scheme = new CompanyCommissionScheme();
-        // moneyChangerId null
-        scheme.setMoneyChangerId(null);
-        scheme.setCommissionRateId(new CommissionRate());
-        assertThrows(IllegalArgumentException.class, () -> service.save(scheme));
 
-        // commissionRateId null
-        scheme.setMoneyChangerId(new MoneyChanger());
-        scheme.setCommissionRateId(null);
-        assertThrows(IllegalArgumentException.class, () -> service.save(scheme));
-    }
-
-    @Test
-    void save_moneyChangerNotFound_throws() {
-        var scheme = new CompanyCommissionScheme();
         var mc = new MoneyChanger(); mc.setId(10L);
         scheme.setMoneyChangerId(mc);
-        scheme.setCommissionRateId(new CommissionRate());
 
-        when(moneyChangerRepository.existsById(10L)).thenReturn(false);
-        assertThrows(ResourceNotFoundException.class, () -> service.save(scheme));
-        verify(moneyChangerRepository).existsById(10L);
-    }
+        var schemeEntity = new Scheme(); schemeEntity.setId(20);
+        scheme.setSchemeId(schemeEntity);
 
-    @Test
-    void save_commissionRateNotFound_throws() {
-        var scheme = new CompanyCommissionScheme();
-        var mc = new MoneyChanger(); mc.setId(10L);
-        var cr = new CommissionRate(); cr.setId(20);
-        scheme.setMoneyChangerId(mc);
-        scheme.setCommissionRateId(cr);
-
-        when(moneyChangerRepository.existsById(10L)).thenReturn(true);
-        when(commissionRateRepository.existsById(20)).thenReturn(false);
-
-        assertThrows(ResourceNotFoundException.class, () -> service.save(scheme));
-        verify(moneyChangerRepository).existsById(10L);
-        verify(commissionRateRepository).existsById(20);
-    }
-
-    @Test
-    void save_duplicate_throws() {
-        var scheme = new CompanyCommissionScheme();
-        var mc = new MoneyChanger(); mc.setId(10L);
-        var cr = new CommissionRate(); cr.setId(20);
-        scheme.setMoneyChangerId(mc);
-        scheme.setCommissionRateId(cr);
-
-        when(moneyChangerRepository.existsById(10L)).thenReturn(true);
-        when(commissionRateRepository.existsById(20)).thenReturn(true);
-        when(repository.existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20)).thenReturn(true);
+        when(repository.existsByMoneyChangerId_idAndSchemeId_IdAndIsDeletedFalse(10L, 20)).thenReturn(true);
 
         assertThrows(DuplicateResourceException.class, () -> service.save(scheme));
-        verify(repository).existsByMoneyChangerId_IdAndCommissionRateId_Id(10L, 20);
+
+        verify(repository).existsByMoneyChangerId_idAndSchemeId_IdAndIsDeletedFalse(10L, 20);
+        verify(repository, never()).save(any());
+    }
+
+    @Test
+    void save_success_update() {
+        var existing = new CompanyCommissionScheme();
+        existing.setId(5);
+        var mc = new MoneyChanger(); mc.setId(10L);
+        var schemeEntity = new Scheme(); schemeEntity.setId(20);
+        existing.setMoneyChangerId(mc);
+        existing.setSchemeId(schemeEntity);
+
+        when(repository.existsByMoneyChangerId_IdAndSchemeId_IdAndIdNotAndIsDeletedFalse(10L, 20, 5)).thenReturn(false);
+        when(repository.save(existing)).thenReturn(existing);
+
+        var out = service.save(existing);
+        assertSame(existing, out);
+
+        verify(repository).existsByMoneyChangerId_IdAndSchemeId_IdAndIdNotAndIsDeletedFalse(10L, 20, 5);
+        verify(repository).save(existing);
+    }
+
+    @Test
+    void save_update_duplicate_throws() {
+        var existing = new CompanyCommissionScheme();
+        existing.setId(5);
+        var mc = new MoneyChanger(); mc.setId(10L);
+        var schemeEntity = new Scheme(); schemeEntity.setId(20);
+        existing.setMoneyChangerId(mc);
+        existing.setSchemeId(schemeEntity);
+
+        when(repository.existsByMoneyChangerId_IdAndSchemeId_IdAndIdNotAndIsDeletedFalse(10L, 20, 5)).thenReturn(true);
+
+        assertThrows(DuplicateResourceException.class, () -> service.save(existing));
         verify(repository, never()).save(any());
     }
 
     @Test
     void delete_success() {
-        var item = makeScheme(1, false);
-        when(repository.findById(1)).thenReturn(Optional.of(item));
+        int schemeId = 1;
+        int userId = 99;
+
+        var item = makeScheme(schemeId, false);
+        when(repository.findById(schemeId)).thenReturn(Optional.of(item));
         when(repository.save(item)).thenReturn(item);
 
-        service.delete(1);
+        service.delete(schemeId, userId);
 
         assertTrue(item.getIsDeleted());
-        verify(repository).findById(1);
+        assertEquals(userId, item.getUpdatedBy());
+
+        verify(repository).findById(schemeId);
         verify(repository).save(item);
     }
 
     @Test
     void delete_notFound_throws() {
-        when(repository.findById(1)).thenReturn(Optional.empty());
-        assertThrows(ResourceNotFoundException.class, () -> service.delete(1));
-        verify(repository).findById(1);
+        int schemeId = 1;
+        int userId = 99;
+
+        when(repository.findById(schemeId)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.delete(schemeId, userId));
+
+        verify(repository).findById(schemeId);
         verify(repository, never()).save(any());
+    }
+
+    @Test
+    void findBySchemeId_returnsResults() {
+        var schemeId = 123;
+        var a = makeScheme(1, false);
+        when(repository.findBySchemeId_idAndIsDeletedFalse(schemeId)).thenReturn(List.of(a));
+
+        var out = service.findBySchemeId(schemeId);
+        assertEquals(1, out.size());
+        assertEquals(1, out.get(0).getId());
+        verify(repository).findBySchemeId_idAndIsDeletedFalse(schemeId);
+    }
+
+    @Test
+    void findBySchemeId_empty() {
+        var schemeId = 123;
+        when(repository.findBySchemeId_idAndIsDeletedFalse(schemeId)).thenReturn(List.of());
+
+        var out = service.findBySchemeId(schemeId);
+        assertTrue(out.isEmpty());
+        verify(repository).findBySchemeId_idAndIsDeletedFalse(schemeId);
     }
 }

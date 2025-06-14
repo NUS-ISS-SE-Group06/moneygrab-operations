@@ -11,7 +11,7 @@ public class CurrencyCode {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(nullable = false, length = 10)
     private String currency;
 
     @Column(length = 255)
