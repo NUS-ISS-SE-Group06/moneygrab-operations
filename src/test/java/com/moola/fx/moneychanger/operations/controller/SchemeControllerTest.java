@@ -4,25 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
 import com.moola.fx.moneychanger.operations.model.Scheme;
 import com.moola.fx.moneychanger.operations.service.SchemeService;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,24 +21,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@ExtendWith(MockitoExtension.class)
+@WebMvcTest(SchemeController.class)
 class SchemeControllerTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private MockMvc mockMvc;
-    @Mock
-    private SchemeService schemeService;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ObjectMapper objectMapper;
 
-    @InjectMocks
-    private SchemeController schemeController;
-
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders
-                .standaloneSetup(schemeController)
-                .setControllerAdvice(new TestExceptionAdvice())
-                .build();
-    }
+    @MockitoBean private SchemeService schemeService;
 
     @Test
     void testListSchemes() throws Exception {
@@ -62,11 +42,11 @@ class SchemeControllerTest {
         mockMvc.perform(get("/v1/schemes"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].nameTag", is("Basic")))
-                .andExpect(jsonPath("$[0].description", is("Basic plan")))
-                .andExpect(jsonPath("$[0].isDefault", is(false)));
+                .andExpect(jsonPath("$[0].nameTag").value("Basic"))
+                .andExpect(jsonPath("$[0].description").value("Basic plan"))
+                .andExpect(jsonPath("$[0].isDefault").value(false));
 
-        verify(schemeService, times(1)).listAll();
+        verify(schemeService).listAll();
     }
 
     @Test
@@ -82,31 +62,52 @@ class SchemeControllerTest {
         mockMvc.perform(post("/v1/schemes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                    {
-                      "nameTag": "Gold",
-                      "description": "Gold plan",
-                      "isDefault": true
-                    }
-                    """))
+                            {
+                              "nameTag": "Gold",
+                              "description": "Gold plan",
+                              "isDefault": true
+                            }
+                        """))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nameTag", is("Gold")))
-                .andExpect(jsonPath("$.description", is("Gold plan")))
-                .andExpect(jsonPath("$.isDefault", is(true)));
+                .andExpect(jsonPath("$.nameTag").value("Gold"))
+                .andExpect(jsonPath("$.description").value("Gold plan"))
+                .andExpect(jsonPath("$.isDefault").value(true));
 
-        verify(schemeService, times(1)).save(any(Scheme.class));
+        verify(schemeService).save(any(Scheme.class));
     }
 
-    /**
-     * Advice to convert ResourceNotFoundException into JSON { "message": "…" } with 404 status
-     */
-    @RestControllerAdvice
-    static class TestExceptionAdvice {
-        @ExceptionHandler(ResourceNotFoundException.class)
-        @ResponseStatus(HttpStatus.NOT_FOUND)
-        public Map<String,String> handleNotFound(ResourceNotFoundException ex) {
-            return Map.of("message", ex.getMessage());
-        }
+    @Test
+    void testGetById_success() throws Exception {
+        Scheme scheme = new Scheme();
+        scheme.setId(2);
+        scheme.setNameTag("Silver");
+        scheme.setDescription("Silver plan");
+        scheme.setIsDefault(false);
+
+        when(schemeService.get(2)).thenReturn(scheme);
+
+        mockMvc.perform(get("/v1/schemes/2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(2))
+                .andExpect(jsonPath("$.nameTag").value("Silver"))
+                .andExpect(jsonPath("$.description").value("Silver plan"))
+                .andExpect(jsonPath("$.isDefault").value(false));
     }
+
+    @Test
+    void testGetById_notFound_returns404() throws Exception {
+        int id = 99;
+        String errorMessage = "Commission Rate with ID " + id + " not found or has been deleted";
+
+        when(schemeService.get(id)).thenThrow(new ResourceNotFoundException(errorMessage));
+
+        mockMvc.perform(get("/v1/schemes/{id}", id))
+                .andExpect(status().isNotFound());
+
+        verify(schemeService).get(id);
+    }
+
+
 
 
 
