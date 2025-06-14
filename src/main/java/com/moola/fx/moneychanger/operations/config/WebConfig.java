@@ -15,11 +15,7 @@ public class WebConfig {
     private String allowedOriginsCsv;
 
     @Bean
-    @ConditionalOnProperty(
-            name = "cors.enabled",
-            havingValue = "true",
-            matchIfMissing = false
-    )
+    @ConditionalOnProperty(name = "cors.enabled", havingValue = "true")
     public WebMvcConfigurer corsConfigurer() {
         String[] origins = allowedOriginsCsv.split(",");
 
