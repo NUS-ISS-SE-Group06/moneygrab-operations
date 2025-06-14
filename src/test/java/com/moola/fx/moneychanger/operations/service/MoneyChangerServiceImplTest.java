@@ -3,72 +3,87 @@ package com.moola.fx.moneychanger.operations.service;
 import com.moola.fx.moneychanger.operations.model.MoneyChanger;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.*;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
-@Service
-public class MoneyChangerServiceImpl implements MoneyChangerService {
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-    private static final String NOT_FOUND_MSG = "not found";
-    private static final String MONEYCHANGER_ID_MSG = "MoneyChanger with ID ";
+class MoneyChangerServiceImplTest {
 
-    @Autowired
+    @Mock
     private MoneyChangerRepository repository;
 
-    @Override
-    public List<MoneyChanger> getAll() {
-        return repository.findByIsDeletedFalse();
+    @InjectMocks
+    private MoneyChangerServiceImpl service;
+
+    private MoneyChanger dummy;
+
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+
+        dummy = new MoneyChanger();
+        dummy.setId(1L);
+        dummy.setCompanyName("TestCo");
+        dummy.setEmail("test@example.com");
+        dummy.setIsDeleted(false);
+        dummy.setCreatedAt(LocalDateTime.now());
+        dummy.setUpdatedAt(LocalDateTime.now());
     }
 
-    @Override
-    public MoneyChanger getById(Long id) {
-        return repository.findById(id)
-                .filter(mc -> !Boolean.TRUE.equals(mc.getIsDeleted()))
-                .orElseThrow(() ->
-                        new EntityNotFoundException(MONEYCHANGER_ID_MSG + id + " " + NOT_FOUND_MSG));
+    @Test
+    void testGetAll() {
+        when(repository.findByIsDeletedFalse()).thenReturn(List.of(dummy));
+
+        List<MoneyChanger> result = service.getAll();
+        assertEquals(1, result.size());
+        assertEquals("TestCo", result.get(0).getCompanyName());
     }
 
-    @Override
-    public MoneyChanger create(MoneyChanger moneyChanger) {
-        moneyChanger.setIsDeleted(false);
-        return repository.save(moneyChanger);
+    @Test
+    void testGetOne() {
+        when(repository.findById(1L)).thenReturn(Optional.of(dummy));
+
+        MoneyChanger result = service.getOne(1L);
+        assertEquals("TestCo", result.getCompanyName());
     }
 
-    @Override
-    public MoneyChanger update(Long id, MoneyChanger updatedMoneyChanger) {
-        MoneyChanger existing = repository.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException(MONEYCHANGER_ID_MSG + id + " " + NOT_FOUND_MSG));
+    @Test
+    void testCreate() {
+        when(repository.save(any(MoneyChanger.class))).thenReturn(dummy);
 
-        existing.setCompanyName(updatedMoneyChanger.getCompanyName());
-        existing.setEmail(updatedMoneyChanger.getEmail());
-        existing.setAddress(updatedMoneyChanger.getAddress());
-        existing.setPostalCode(updatedMoneyChanger.getPostalCode());
-        existing.setNotes(updatedMoneyChanger.getNotes());
-        existing.setDateOfIncorporation(updatedMoneyChanger.getDateOfIncorporation());
-        existing.setCountry(updatedMoneyChanger.getCountry());
-        existing.setUen(updatedMoneyChanger.getUen());
-        existing.setSchemeId(updatedMoneyChanger.getSchemeId());
-
-        return repository.save(existing);
+        MoneyChanger created = service.create(dummy);
+        assertNotNull(created);
+        assertFalse(created.getIsDeleted());
+        verify(repository, times(1)).save(any());
     }
 
-    @Override
-    public void delete(Long id) {
-        MoneyChanger mc = repository.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException(MONEYCHANGER_ID_MSG + id + " " + NOT_FOUND_MSG));
+    @Test
+    void testUpdate() {
+        MoneyChanger updated = new MoneyChanger();
+        updated.setCompanyName("UpdatedCo");
+        updated.setEmail("updated@example.com");
 
-        mc.setIsDeleted(true);
-        repository.save(mc);
+        when(repository.findById(1L)).thenReturn(Optional.of(dummy));
+        when(repository.save(any(MoneyChanger.class))).thenReturn(dummy);
+
+        MoneyChanger result = service.update(1L, updated);
+        assertEquals("UpdatedCo", result.getCompanyName());
+        assertEquals("updated@example.com", result.getEmail());
     }
 
-    @Override
-    public MoneyChanger getOne(Long id) {
-        return repository.findById(id)
-                .orElseThrow(() ->
-                        new EntityNotFoundException(MONEYCHANGER_ID_MSG + id + " " + NOT_FOUND_MSG));
+    @Test
+    void testDelete() {
+        when(repository.findById(1L)).thenReturn(Optional.of(dummy));
+
+        service.delete(1L);
+
+        assertTrue(dummy.getIsDeleted());
+        verify(repository).save(dummy);
     }
 }
