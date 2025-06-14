@@ -60,8 +60,7 @@ INSERT INTO accounts (id, money_changer_id, role, email, created_by, updated_by)
                                                                                               (8, 8, 'https://example.com/photo8.jpg', NULL, NULL),
                                                                                               (9, 9, 'https://example.com/photo9.jpg', NULL, NULL),
                                                                                               (10, 10, 'https://example.com/photo10.jpg', NULL, NULL);
-
-<<<<<<< HEAD
+*/
 
 INSERT INTO company_commission_scheme(id,money_changer_id,scheme_id,is_deleted) VALUES
                                                                                     (1,1,1,0),
@@ -253,8 +252,6 @@ INSERT INTO currency_code (
       (175, 'ZMW', 'Zambian Kwacha'),
       (176, 'ZWL', 'Zimbabwean Dollar');
 
-=======
-*/
 
 -- TEST DATA for money_changer_photo (dummy data)
 INSERT INTO money_changer_photo (money_changer_id, photo_data, photo_filename, photo_mimetype, created_by, updated_by, is_deleted)
@@ -276,13 +273,3 @@ VALUES (1, 'test', 'test.docx', 'application/vnd.openxmlformats-officedocument.w
 -- Example with image KYC:
 INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
 VALUES (1, 'test', 'test.png', 'image/png', 1, 1, 0);
-
-
-
-INSERT INTO currency_code(id,currency,description) VALUES
-                                                       (1,'SGD', ''),
-                                                       (2,'USD', ''),
-                                                       (3,'EUR', ''),
-                                                       (4,'MYR', ''),
-                                                       (5,'IDR', '');
->>>>>>> 5fc473e (WIP: complete unit tests and cleanup for v3 to proceed to create v4 for merging)

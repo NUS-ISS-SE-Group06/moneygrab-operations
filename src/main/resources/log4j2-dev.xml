@@ -2,11 +2,7 @@
 <Configuration status="WARN" monitorInterval="30">
     <Properties>
         <Property name="LOG_PATTERN">[%-5level] %d{yyyy-MM-dd HH:mm:ss.SSS} %-5p %c{1} - %m%n</Property>
-<<<<<<< HEAD
         <Property name="LOG_PATH">logs</Property>
-=======
-        <Property name="LOG_PATH">D:\moneychanger_api\log</Property>
->>>>>>> 5fc473e (WIP: complete unit tests and cleanup for v3 to proceed to create v4 for merging)
         <Property name="LOG_FILE_NAME">moneygrab_operations.log</Property>
         <Property name="LOG_ARCHIVE_FILE_NAME">moneygrab_operations-%d{yyyy-MM-dd}-%i.log</Property>
         <Property name="LOG_ROOT_LEVEL">info</Property>
