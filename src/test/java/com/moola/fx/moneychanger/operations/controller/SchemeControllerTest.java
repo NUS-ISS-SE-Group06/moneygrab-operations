@@ -99,13 +99,14 @@ class SchemeControllerTest {
         int id = 99;
         String errorMessage = "Commission Rate with ID " + id + " not found or has been deleted";
 
-        when(schemeService.get(eq(id))).thenThrow(new ResourceNotFoundException(errorMessage));
+        when(schemeService.get(id)).thenThrow(new ResourceNotFoundException(errorMessage));
 
         mockMvc.perform(get("/v1/schemes/{id}", id))
                 .andExpect(status().isNotFound());
 
         verify(schemeService).get(id);
     }
+
 
 
 
