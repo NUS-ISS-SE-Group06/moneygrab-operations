@@ -9,7 +9,7 @@ public interface MoneyChangerService {
     MoneyChanger getById(Long id);
     MoneyChanger create(MoneyChanger moneyChanger);
     MoneyChanger update(Long id, MoneyChanger moneyChanger);
-   
+
     void delete(Long id);
     MoneyChanger getOne(Long id);
 }
