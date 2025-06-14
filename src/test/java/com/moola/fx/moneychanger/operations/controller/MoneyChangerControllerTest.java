@@ -1,32 +1,29 @@
 package com.moola.fx.moneychanger.operations.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
 import com.moola.fx.moneychanger.operations.model.MoneyChanger;
 import com.moola.fx.moneychanger.operations.model.MoneyChangerKyc;
 import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
 import com.moola.fx.moneychanger.operations.service.MoneyChangerKycService;
 import com.moola.fx.moneychanger.operations.service.MoneyChangerPhotoService;
 import com.moola.fx.moneychanger.operations.service.MoneyChangerService;
-
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.Collections;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MoneyChangerController.class)
 class MoneyChangerControllerTest {
@@ -34,13 +31,13 @@ class MoneyChangerControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private MoneyChangerService moneyChangerService;
 
-    @MockBean
+    @MockitoBean
     private MoneyChangerPhotoService moneyChangerPhotoService;
 
-    @MockBean
+    @MockitoBean
     private MoneyChangerKycService moneyChangerKycService;
 
     @Autowired
