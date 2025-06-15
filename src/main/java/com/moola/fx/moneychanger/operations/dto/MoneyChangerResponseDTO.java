@@ -1,5 +1,7 @@
 package com.moola.fx.moneychanger.operations.dto;
 
+import java.util.List;
+
 public class MoneyChangerResponseDTO {
 
     private Long id;
@@ -21,7 +23,11 @@ public class MoneyChangerResponseDTO {
     private String kycDocumentFilename;
     private String kycDocumentMimetype;
 
-    // AUTO-GENERATED getters and setters below
+    // === [NEW FIELDS for location] ===
+    private String location;              // For POST a single location
+    private List<String> locations;       // For GET multiple locations
+
+    // === Getters and Setters ===
 
     public Long getId() {
         return id;
@@ -149,5 +155,21 @@ public class MoneyChangerResponseDTO {
 
     public void setKycDocumentMimetype(String kycDocumentMimetype) {
         this.kycDocumentMimetype = kycDocumentMimetype;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public List<String> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<String> locations) {
+        this.locations = locations;
     }
 }
