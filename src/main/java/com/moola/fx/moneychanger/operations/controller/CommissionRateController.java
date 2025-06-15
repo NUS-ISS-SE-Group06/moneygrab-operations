@@ -1,4 +1,4 @@
-package com.moola.fx.moneychanger.operations.controller; 
+package com.moola.fx.moneychanger.operations.controller;
 
 import com.moola.fx.moneychanger.operations.dto.CommissionRateDTO;
 import com.moola.fx.moneychanger.operations.mapper.CommissionRateMapper;
