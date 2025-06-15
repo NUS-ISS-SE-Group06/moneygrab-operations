@@ -146,8 +146,7 @@ CREATE TABLE fx_upload (
                            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                            updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                            created_by INT,
-                           updated_by INT NULL,
-                           is_deleted TINYINT(1) DEFAULT 0
+                           updated_by INT NULL
 );
 
 
@@ -175,7 +174,6 @@ CREATE TABLE compute_rates (
                                updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                created_by INT,
                                updated_by INT NULL,
-                               is_deleted TINYINT(1) DEFAULT 0,
                                CONSTRAINT fk_compute_rates_currency FOREIGN KEY (currency_id) REFERENCES currency_code(id),
                                CONSTRAINT fk_compute_rates_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
                                CONSTRAINT fk_compute_rates_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
@@ -214,7 +212,6 @@ CREATE TABLE transaction (
                              updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                              created_by INT,
                              updated_by INT NULL,
-                             is_deleted TINYINT(1) DEFAULT 0,
                              CONSTRAINT fk_transaction_customer FOREIGN KEY (customer_id) REFERENCES customer(id),
                              CONSTRAINT fk_transaction_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id),
                              CONSTRAINT fk_transaction_currency FOREIGN KEY (currency_id) REFERENCES currency_code(id),
