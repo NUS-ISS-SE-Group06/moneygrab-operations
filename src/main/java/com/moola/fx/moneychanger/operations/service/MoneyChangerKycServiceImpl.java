@@ -1,58 +1,54 @@
-package com.moola.fx.moneychanger.operations.service;
+package com.moola.fx.moneychanger.operations.service.impl;
 
 import com.moola.fx.moneychanger.operations.model.MoneyChangerKyc;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerKycRepository;
+import com.moola.fx.moneychanger.operations.service.MoneyChangerKycService;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.util.Base64;
+import java.util.Optional;
 
 @Service
 public class MoneyChangerKycServiceImpl implements MoneyChangerKycService {
 
-    private final MoneyChangerKycRepository moneyChangerKycRepository;
+    private final MoneyChangerKycRepository kycRepository;
 
-    public MoneyChangerKycServiceImpl(MoneyChangerKycRepository moneyChangerKycRepository) {
-        this.moneyChangerKycRepository = moneyChangerKycRepository;
+    public MoneyChangerKycServiceImpl(MoneyChangerKycRepository kycRepository) {
+        this.kycRepository = kycRepository;
     }
 
     @Override
-    public MoneyChangerKyc getByMoneyChangerId(Long moneyChangerId) {
-        return moneyChangerKycRepository
-                .findFirstByMoneyChangerIdAndIsDeletedFalse(moneyChangerId)
-                .orElse(null);
+    public Optional<MoneyChangerKyc> getByMoneyChangerId(Long moneyChangerId) {
+        return kycRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
     }
 
     @Override
-    public void saveOrUpdate(Long moneyChangerId, MultipartFile kycFile) {
-        MoneyChangerKyc kyc = moneyChangerKycRepository
-                .findFirstByMoneyChangerIdAndIsDeletedFalse(moneyChangerId)
-                .orElse(new MoneyChangerKyc());
+    public void saveOrUpdate(Long moneyChangerId, String base64Document, String filename) {
+        if (base64Document == null || base64Document.isEmpty()) {
+            return;
+        }
 
-        kyc.setMoneyChangerId(moneyChangerId);
+        kycRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
+            existing.setIsDeleted(1);
+            kycRepository.save(existing);
+        });
 
+        byte[] decoded = Base64.getDecoder().decode(base64Document);
+        MoneyChangerKyc newKyc = new MoneyChangerKyc();
+        newKyc.setMoneyChangerId(moneyChangerId);
+        newKyc.setDocumentData(decoded);
+        newKyc.setDocumentFilename(filename);
+        newKyc.setDocumentMimetype(detectMimeType(decoded));
+        newKyc.setIsDeleted(0);
+        kycRepository.save(newKyc);
+    }
+
+    private String detectMimeType(byte[] bytes) {
         try {
-            kyc.setDocumentData(kycFile.getBytes());
+            return new Tika().detect(bytes);
         } catch (Exception e) {
-            // ✅ Use IllegalStateException (dedicated, non-generic)
-            throw new IllegalStateException("Failed to read KYC file data", e);
+            return "application/octet-stream";
         }
-
-        kyc.setDocumentFilename(kycFile.getOriginalFilename());
-        kyc.setDocumentMimetype(kycFile.getContentType());
-
-        Timestamp now = Timestamp.from(Instant.now());
-
-        if (kyc.getId() == null) {
-            kyc.setCreatedAt(now);
-            kyc.setCreatedBy(1); // adjust as needed
-        }
-
-        kyc.setUpdatedAt(now);
-        kyc.setUpdatedBy(1); // adjust as needed
-        kyc.setIsDeleted(false);
-
-        moneyChangerKycRepository.save(kyc);
     }
 }

@@ -4,121 +4,124 @@ import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
 import com.moola.fx.moneychanger.operations.model.MoneyChanger;
 import com.moola.fx.moneychanger.operations.model.MoneyChangerLocation;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerLocationRepository;
-import com.moola.fx.moneychanger.operations.repository.MoneyChangerRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationService {
 
     private final MoneyChangerLocationRepository locationRepository;
-    private final MoneyChangerRepository moneyChangerRepository;
 
-    public MoneyChangerLocationServiceImpl(
-            MoneyChangerLocationRepository locationRepository,
-            MoneyChangerRepository moneyChangerRepository
-    ) {
+    public MoneyChangerLocationServiceImpl(final MoneyChangerLocationRepository locationRepository) {
         this.locationRepository = locationRepository;
-        this.moneyChangerRepository = moneyChangerRepository;
     }
 
     @Override
-    public List<MoneyChangerResponseDTO> getLocationsByMoneyChanger(Long moneyChangerId) {
-        Optional<MoneyChanger> mcOpt = moneyChangerRepository.findById(moneyChangerId);
-        if (mcOpt.isEmpty()) {
-            return Collections.emptyList();
-        }
+    public List<MoneyChangerResponseDTO> getLocationsByMoneyChanger(final Long moneyChangerId) {
+        final List<MoneyChangerLocation> locations =
+                locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
 
-        MoneyChanger moneyChanger = mcOpt.get();
-        List<MoneyChangerLocation> locations = locationRepository.findByMoneyChangerAndIsDeletedFalse(moneyChanger);
-        List<MoneyChangerResponseDTO> dtoList = new ArrayList<>();
-
-        for (MoneyChangerLocation location : locations) {
-            MoneyChangerResponseDTO dto = new MoneyChangerResponseDTO();
-            dto.setLocation(location.getLocationName());
-            dtoList.add(dto);
-        }
-
-        return dtoList;
-    }
-
-    @Override
-    public void addLocation(MoneyChangerResponseDTO dto) {
-        if (dto.getId() == null || dto.getLocation() == null) {
-            return;
-        }
-
-        Optional<MoneyChanger> mcOpt = moneyChangerRepository.findById(dto.getId());
-        if (mcOpt.isEmpty()) {
-            return;
-        }
-
-        MoneyChangerLocation location = new MoneyChangerLocation();
-        location.setMoneyChanger(mcOpt.get());
-        location.setLocationName(dto.getLocation());
-        location.setIsDeleted(false); //  always ensure explicitly set
-
-        locationRepository.save(location);
-    }
-
-    @Override
-    public void deleteLocation(Long locationId) {
-        Optional<MoneyChangerLocation> locOpt = locationRepository.findById(locationId);
-        if (locOpt.isPresent()) {
-            MoneyChangerLocation location = locOpt.get();
-            location.setIsDeleted(true);
-            locationRepository.save(location);
-        }
+        return locations.stream().map(loc -> {
+            final MoneyChangerResponseDTO dto = new MoneyChangerResponseDTO();
+            dto.setId(loc.getMoneyChanger().getId());
+            dto.setLocations(
+                    locations.stream().map(MoneyChangerLocation::getLocationName).toList()
+            );
+            return dto;
+        }).toList();
     }
 
     @Override
     @Transactional
-    public void saveLocations(Long moneyChangerId, List<String> locations) {
-        if (moneyChangerId == null || locations == null || locations.isEmpty()) {
+    public void addLocation(
+            final Long moneyChangerId,
+            final List<String> locationNames,
+            final Long createdBy,
+            final Long updatedBy
+    ) {
+        if (locationNames == null || locationNames.isEmpty()) {
             return;
         }
 
-        locationRepository.softDeleteAllByMoneyChangerId(moneyChangerId);
+        final List<MoneyChangerLocation> newLocations = locationNames.stream()
+                .filter(Objects::nonNull)
+                .map(name -> {
+                    final MoneyChangerLocation loc = new MoneyChangerLocation();
+                    loc.setLocationName(name);
 
-        Optional<MoneyChanger> mcOpt = moneyChangerRepository.findById(moneyChangerId);
-        if (mcOpt.isEmpty()) {
-            return;
-        }
+                    final MoneyChanger moneyChanger = new MoneyChanger();
+                    moneyChanger.setId(moneyChangerId);
+                    loc.setMoneyChanger(moneyChanger);
 
-        MoneyChanger moneyChanger = mcOpt.get();
+                    loc.setIsDeleted(false);
+                    loc.setCreatedAt(LocalDateTime.now());
+                    loc.setUpdatedAt(LocalDateTime.now());
+                    loc.setCreatedBy(0L);
+                    loc.setUpdatedBy(0L);
+                    return loc;
+                })
+                .collect(Collectors.toList());
 
-        for (String locationStr : locations) {
-            if (locationStr == null || locationStr.trim().isEmpty()) {
-                continue;
-            }
-
-            MoneyChangerLocation location = new MoneyChangerLocation();
-            location.setLocationName(locationStr.trim());
-            location.setMoneyChanger(moneyChanger);
-            location.setIsDeleted(false); //  this is critical
-            location.setCreatedAt(LocalDateTime.now());
-            location.setUpdatedAt(LocalDateTime.now());
-            locationRepository.save(location);
-        }
+        locationRepository.saveAll(newLocations);
     }
 
+    @Override
+    @Transactional
+    public void deleteLocation(final Long locationId) {
+        final MoneyChangerLocation location = locationRepository.findById(locationId)
+                .orElseThrow(() -> new IllegalArgumentException("Location not found"));
+        location.setIsDeleted(true);
+        location.setUpdatedAt(LocalDateTime.now());
+        locationRepository.save(location);
+    }
 
     @Override
-    public List<String> getLocationNamesByMoneyChanger(Long moneyChangerId) {
-        Optional<MoneyChanger> mcOpt = moneyChangerRepository.findById(moneyChangerId);
-        if (mcOpt.isEmpty()) {
-            return Collections.emptyList();
+    @Transactional
+    public void saveLocations(final Long moneyChangerId, final List<String> locationNames) {
+        final List<MoneyChangerLocation> existing =
+                locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
+
+        for (MoneyChangerLocation loc : existing) {
+            loc.setIsDeleted(true);
+            loc.setUpdatedAt(LocalDateTime.now());
         }
 
-        return locationRepository.findByMoneyChangerAndIsDeletedFalse(mcOpt.get())
+        locationRepository.saveAll(existing);
+
+        final List<MoneyChangerLocation> newLocations = locationNames.stream()
+                .filter(Objects::nonNull)
+                .map(name -> {
+                    final MoneyChangerLocation loc = new MoneyChangerLocation();
+                    loc.setLocationName(name);
+
+                    final MoneyChanger mc = new MoneyChanger();
+                    mc.setId(moneyChangerId);
+                    loc.setMoneyChanger(mc);
+
+                    loc.setIsDeleted(false);
+                    loc.setCreatedAt(LocalDateTime.now());
+                    loc.setUpdatedAt(LocalDateTime.now());
+
+                    // Use system default ID (e.g. service user, audit system, or null if not applicable)
+                    loc.setCreatedBy(0L);
+                    loc.setUpdatedBy(0L);
+                    return loc;
+                })
+                .collect(Collectors.toList());
+
+        locationRepository.saveAll(newLocations);
+    }
+
+    @Override
+    public List<String> getLocationNamesByMoneyChanger(final Long moneyChangerId) {
+        return locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId)
                 .stream()
                 .map(MoneyChangerLocation::getLocationName)
-                .toList();
+                .collect(Collectors.toList());
     }
 }

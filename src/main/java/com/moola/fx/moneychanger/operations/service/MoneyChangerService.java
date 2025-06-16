@@ -8,6 +8,6 @@ public interface MoneyChangerService {
     List<MoneyChangerResponseDTO> getAllMoneyChangers();
     MoneyChangerResponseDTO getMoneyChangerById(Long id);
     MoneyChangerResponseDTO createMoneyChanger(MoneyChangerResponseDTO dto);
-    MoneyChangerResponseDTO updateMoneyChanger(MoneyChangerResponseDTO dto);
+    MoneyChangerResponseDTO updateMoneyChanger(Long id, MoneyChangerResponseDTO dto);
     void deleteMoneyChanger(Long id);
 }

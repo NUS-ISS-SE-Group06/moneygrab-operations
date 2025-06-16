@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface MoneyChangerLocationService {
     List<MoneyChangerResponseDTO> getLocationsByMoneyChanger(Long moneyChangerId);
-    void addLocation(MoneyChangerResponseDTO dto);
+    //void addLocation(MoneyChangerResponseDTO dto);
+    void addLocation(Long moneyChangerId, List<String> locationNames, Long createdBy, Long updatedBy);
+
     void deleteLocation(Long locationId);
     void saveLocations(Long moneyChangerId, List<String> locationNames);
 

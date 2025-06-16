@@ -1,5 +1,7 @@
 package com.moola.fx.moneychanger.operations.dto;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class MoneyChangerResponseDTO {
@@ -7,25 +9,31 @@ public class MoneyChangerResponseDTO {
     private Long id;
     private String companyName;
     private String email;
+    private LocalDate dateOfIncorporation;
     private String address;
+    private String country;
     private String postalCode;
     private String notes;
-    private String dateOfIncorporation;
-    private String country;
     private String uen;
     private Integer schemeId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private Integer createdBy;
+    private Integer updatedBy;
+    private Integer isDeleted;
 
-    private byte[] photoData;
+    // === Locations ===
+    private List<String> locations;
+
+    // === Photo Fields ===
     private String photoFilename;
     private String photoMimetype;
+    private String base64Image;
 
-    private byte[] kycDocumentData;
-    private String kycDocumentFilename;
-    private String kycDocumentMimetype;
-
-    // === [NEW FIELDS for location] ===
-    private String location;              // For POST a single location
-    private List<String> locations;       // For GET multiple locations
+    // === KYC Fields ===
+    private String documentFilename;
+    private String documentMimetype;
+    private String base64Document;
 
     // === Getters and Setters ===
 
@@ -53,12 +61,28 @@ public class MoneyChangerResponseDTO {
         this.email = email;
     }
 
+    public LocalDate getDateOfIncorporation() {
+        return dateOfIncorporation;
+    }
+
+    public void setDateOfIncorporation(LocalDate dateOfIncorporation) {
+        this.dateOfIncorporation = dateOfIncorporation;
+    }
+
     public String getAddress() {
         return address;
     }
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
     }
 
     public String getPostalCode() {
@@ -77,22 +101,6 @@ public class MoneyChangerResponseDTO {
         this.notes = notes;
     }
 
-    public String getDateOfIncorporation() {
-        return dateOfIncorporation;
-    }
-
-    public void setDateOfIncorporation(String dateOfIncorporation) {
-        this.dateOfIncorporation = dateOfIncorporation;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-    public void setCountry(String country) {
-        this.country = country;
-    }
-
     public String getUen() {
         return uen;
     }
@@ -109,12 +117,52 @@ public class MoneyChangerResponseDTO {
         this.schemeId = schemeId;
     }
 
-    public byte[] getPhotoData() {
-        return photoData;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setPhotoData(byte[] photoData) {
-        this.photoData = photoData;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Integer getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Integer updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Integer getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Integer isDeleted) {
+        this.isDeleted = isDeleted;
+    }
+
+    public List<String> getLocations() {
+        return locations;
+    }
+
+    public void setLocations(List<String> locations) {
+        this.locations = locations;
     }
 
     public String getPhotoFilename() {
@@ -133,43 +181,35 @@ public class MoneyChangerResponseDTO {
         this.photoMimetype = photoMimetype;
     }
 
-    public byte[] getKycDocumentData() {
-        return kycDocumentData;
+    public String getBase64Image() {
+        return base64Image;
     }
 
-    public void setKycDocumentData(byte[] kycDocumentData) {
-        this.kycDocumentData = kycDocumentData;
+    public void setBase64Image(String base64Image) {
+        this.base64Image = base64Image;
     }
 
-    public String getKycDocumentFilename() {
-        return kycDocumentFilename;
+    public String getDocumentFilename() {
+        return documentFilename;
     }
 
-    public void setKycDocumentFilename(String kycDocumentFilename) {
-        this.kycDocumentFilename = kycDocumentFilename;
+    public void setDocumentFilename(String documentFilename) {
+        this.documentFilename = documentFilename;
     }
 
-    public String getKycDocumentMimetype() {
-        return kycDocumentMimetype;
+    public String getDocumentMimetype() {
+        return documentMimetype;
     }
 
-    public void setKycDocumentMimetype(String kycDocumentMimetype) {
-        this.kycDocumentMimetype = kycDocumentMimetype;
+    public void setDocumentMimetype(String documentMimetype) {
+        this.documentMimetype = documentMimetype;
     }
 
-    public String getLocation() {
-        return location;
+    public String getBase64Document() {
+        return base64Document;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public List<String> getLocations() {
-        return locations;
-    }
-
-    public void setLocations(List<String> locations) {
-        this.locations = locations;
+    public void setBase64Document(String base64Document) {
+        this.base64Document = base64Document;
     }
 }

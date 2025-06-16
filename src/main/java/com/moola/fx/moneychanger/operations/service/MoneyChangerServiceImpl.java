@@ -1,109 +1,87 @@
 package com.moola.fx.moneychanger.operations.service;
 
+
 import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
-import com.moola.fx.moneychanger.operations.model.MoneyChanger;
-import com.moola.fx.moneychanger.operations.model.MoneyChangerLocation;
-import com.moola.fx.moneychanger.operations.repository.MoneyChangerLocationRepository;
-import com.moola.fx.moneychanger.operations.repository.MoneyChangerRepository;
+import com.moola.fx.moneychanger.operations.model.*;
+import com.moola.fx.moneychanger.operations.repository.*;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import java.time.LocalDateTime;
 
 @Service
 public class MoneyChangerServiceImpl implements MoneyChangerService {
 
     private final MoneyChangerRepository moneyChangerRepository;
     private final MoneyChangerLocationRepository locationRepository;
+    private final MoneyChangerPhotoRepository photoRepository;
+    private final MoneyChangerKycRepository kycRepository;
 
-    public MoneyChangerServiceImpl(MoneyChangerRepository moneyChangerRepository,
-                                   MoneyChangerLocationRepository locationRepository) {
+    public MoneyChangerServiceImpl(
+            MoneyChangerRepository moneyChangerRepository,
+            MoneyChangerLocationRepository locationRepository,
+            MoneyChangerPhotoRepository photoRepository,
+            MoneyChangerKycRepository kycRepository) {
         this.moneyChangerRepository = moneyChangerRepository;
         this.locationRepository = locationRepository;
+        this.photoRepository = photoRepository;
+        this.kycRepository = kycRepository;
     }
 
     @Override
     public List<MoneyChangerResponseDTO> getAllMoneyChangers() {
         return moneyChangerRepository.findAll().stream()
-                .filter(m -> Boolean.FALSE.equals(m.getIsDeleted()))
+                .filter(mc -> Boolean.FALSE.equals(mc.getIsDeleted()))
                 .map(this::mapToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
-    /*
     public MoneyChangerResponseDTO getMoneyChangerById(Long id) {
         MoneyChanger entity = moneyChangerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
-        return mapToDto(entity);
-    }
-  */
-    public MoneyChangerResponseDTO getMoneyChangerById(Long id) {
-        MoneyChanger entity = moneyChangerRepository.findByIdAndIsDeletedFalse(id)
-                .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found or deleted"));
         return mapToDto(entity);
     }
 
     @Override
     public MoneyChangerResponseDTO createMoneyChanger(MoneyChangerResponseDTO dto) {
         MoneyChanger entity = new MoneyChanger();
-        entity.setCompanyName(dto.getCompanyName());
-        entity.setEmail(dto.getEmail());
-        entity.setAddress(dto.getAddress());
-        entity.setPostalCode(dto.getPostalCode());
-        entity.setNotes(dto.getNotes());
-        entity.setDateOfIncorporation(dto.getDateOfIncorporation());
-        entity.setCountry(dto.getCountry());
-        entity.setUen(dto.getUen());
-        entity.setSchemeId(dto.getSchemeId());
-        entity.setIsDeleted(false);
-        entity.setCreatedAt(java.time.LocalDateTime.now());
-        entity.setIsDeleted(false);
-        entity.setUpdatedAt(java.time.LocalDateTime.now());
+        mapToEntity(dto, entity);
+        entity.setCreatedAt(LocalDateTime.now());
+        entity.setUpdatedAt(LocalDateTime.now());
         MoneyChanger saved = moneyChangerRepository.save(entity);
+        saveLocations(dto, saved.getId());
+        savePhoto(dto, saved.getId());
+        saveKyc(dto, saved.getId());
         return mapToDto(saved);
     }
 
     @Override
-    public MoneyChangerResponseDTO updateMoneyChanger(MoneyChangerResponseDTO dto) {
-        //MoneyChanger entity = moneyChangerRepository.findById(dto.getId())
-         //       .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
-
-        // Find the existing entity by ID
-        MoneyChanger entity = moneyChangerRepository.findById(dto.getId())
+    public MoneyChangerResponseDTO updateMoneyChanger(Long id, MoneyChangerResponseDTO dto) {
+        MoneyChanger entity = moneyChangerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
-
-        // Check if the email is used by another record (exclude current ID)
-        Optional<MoneyChanger> existingWithEmail = moneyChangerRepository.findByEmail(dto.getEmail());
-        if (existingWithEmail.isPresent() && !existingWithEmail.get().getId().equals(dto.getId())) {
-            throw new IllegalArgumentException("Email already in use by another money changer");
-        }
-
-        entity.setCompanyName(dto.getCompanyName());
-        entity.setEmail(dto.getEmail());
-        entity.setAddress(dto.getAddress());
-        entity.setPostalCode(dto.getPostalCode());
-        entity.setNotes(dto.getNotes());
-        entity.setDateOfIncorporation(dto.getDateOfIncorporation());
-        entity.setCountry(dto.getCountry());
-        entity.setUen(dto.getUen());
-        entity.setSchemeId(dto.getSchemeId());
-        entity.setUpdatedAt(java.time.LocalDateTime.now());
-
-        MoneyChanger updated = moneyChangerRepository.save(entity);
+        LocalDateTime originalCreatedAt = entity.getCreatedAt();
+        mapToEntity(dto, entity);
+        // Restore original createdAt and set updatedAt
+        // Restore original createdAt and set updatedAt
+        entity.setCreatedAt(originalCreatedAt != null ? originalCreatedAt : LocalDateTime.now());
+        entity.setUpdatedAt(LocalDateTime.now());   MoneyChanger updated = moneyChangerRepository.save(entity);
+        saveLocations(dto, updated.getId());
+        savePhoto(dto, updated.getId());
+        saveKyc(dto, updated.getId());
         return mapToDto(updated);
     }
 
     @Override
     public void deleteMoneyChanger(Long id) {
-        Optional<MoneyChanger> optional = moneyChangerRepository.findById(id);
-        if (optional.isPresent()) {
-            MoneyChanger entity = optional.get();
-            entity.setIsDeleted(true);
-            entity.setUpdatedAt(java.time.LocalDateTime.now());
-            moneyChangerRepository.save(entity);
-        }
+        moneyChangerRepository.findById(id).ifPresent(mc -> {
+            mc.setIsDeleted(true);
+            moneyChangerRepository.save(mc);
+        });
     }
 
     private MoneyChangerResponseDTO mapToDto(MoneyChanger entity) {
@@ -114,19 +92,122 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         dto.setAddress(entity.getAddress());
         dto.setPostalCode(entity.getPostalCode());
         dto.setNotes(entity.getNotes());
-        dto.setDateOfIncorporation(entity.getDateOfIncorporation());
         dto.setCountry(entity.getCountry());
         dto.setUen(entity.getUen());
         dto.setSchemeId(entity.getSchemeId());
+        dto.setIsDeleted(entity.getIsDeleted() != null && entity.getIsDeleted() ? 1 : 0);
+        dto.setCreatedAt(entity.getCreatedAt());
+        dto.setUpdatedAt(entity.getUpdatedAt());
+        entity.setCreatedBy(dto.getCreatedBy() != null ? Long.valueOf(dto.getCreatedBy()) : null);
+        entity.setUpdatedBy(dto.getUpdatedBy() != null ? Long.valueOf(dto.getUpdatedBy()) : null);
+        // Convert date string to LocalDate
+        if (entity.getDateOfIncorporation() != null && !entity.getDateOfIncorporation().isEmpty()) {
+            dto.setDateOfIncorporation(LocalDate.parse(entity.getDateOfIncorporation()));
+        }
 
-        // Load location names from repository
-        List<MoneyChangerLocation> locations = locationRepository.findByMoneyChangerAndIsDeletedFalse(entity);
-        List<String> locationNames = locations.stream()
-                .map(MoneyChangerLocation::getLocationName)
-                .collect(Collectors.toList());
-        dto.setLocations(locationNames);
+        List<MoneyChangerLocation> locations = locationRepository.findByMoneyChangerIdAndIsDeletedFalse(entity.getId());
+        dto.setLocations(locations.stream().map(MoneyChangerLocation::getLocationName).collect(Collectors.toList()));
+
+        photoRepository.findByMoneyChangerIdAndIsDeletedFalse(entity.getId()).ifPresent(photo -> {
+            dto.setPhotoFilename(photo.getPhotoFilename());
+            dto.setPhotoMimetype(photo.getPhotoMimetype());
+            dto.setBase64Image(Base64.getEncoder().encodeToString(photo.getPhotoData()));
+        });
+
+        kycRepository.findByMoneyChangerIdAndIsDeletedFalse(entity.getId()).ifPresent(kyc -> {
+            dto.setDocumentFilename(kyc.getDocumentFilename());
+            dto.setDocumentMimetype(kyc.getDocumentMimetype());
+            dto.setBase64Document(Base64.getEncoder().encodeToString(kyc.getDocumentData()));
+        });
 
         return dto;
     }
 
+    private void mapToEntity(MoneyChangerResponseDTO dto, MoneyChanger entity) {
+        entity.setCompanyName(dto.getCompanyName());
+        entity.setEmail(dto.getEmail());
+        entity.setAddress(dto.getAddress());
+        entity.setPostalCode(dto.getPostalCode());
+        entity.setNotes(dto.getNotes());
+        entity.setCountry(dto.getCountry());
+        entity.setUen(dto.getUen());
+        entity.setSchemeId(dto.getSchemeId());
+        //entity.setIsDeleted(Boolean.TRUE.equals(dto.getIsDeleted()));
+        dto.setIsDeleted(entity.getIsDeleted() != null && entity.getIsDeleted() ? 1 : 0);
+        entity.setCreatedAt(dto.getCreatedAt());
+        entity.setUpdatedAt(dto.getUpdatedAt());
+        entity.setCreatedBy(dto.getCreatedBy() != null ? Long.valueOf(dto.getCreatedBy()) : null);
+        entity.setUpdatedBy(dto.getUpdatedBy() != null ? Long.valueOf(dto.getUpdatedBy()) : null);
+
+        if (dto.getDateOfIncorporation() != null) {
+            entity.setDateOfIncorporation(dto.getDateOfIncorporation().toString());
+        }
+    }
+
+    private void saveLocations(MoneyChangerResponseDTO dto, Long moneyChangerId) {
+        List<MoneyChangerLocation> existing = locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
+        for (MoneyChangerLocation loc : existing) {
+            loc.setIsDeleted(true);
+        }
+        locationRepository.saveAll(existing);
+
+        if (dto.getLocations() != null) {
+            List<MoneyChangerLocation> newLocs = dto.getLocations().stream().map(name -> {
+                MoneyChangerLocation loc = new MoneyChangerLocation();
+                loc.setLocationName(name);
+                loc.setIsDeleted(false);
+                loc.setCreatedAt(LocalDateTime.now());
+                loc.setUpdatedAt(LocalDateTime.now());
+                MoneyChanger mcRef = new MoneyChanger();
+                mcRef.setId(moneyChangerId);
+                loc.setMoneyChanger(mcRef);
+                return loc;
+            }).collect(Collectors.toList());
+            locationRepository.saveAll(newLocs);
+        }
+    }
+
+    private void savePhoto(MoneyChangerResponseDTO dto, Long moneyChangerId) {
+        photoRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
+            existing.setIsDeleted(1);
+            photoRepository.save(existing);
+        });
+
+        if (dto.getBase64Image() != null && !dto.getBase64Image().isEmpty()) {
+            byte[] decoded = Base64.getDecoder().decode(dto.getBase64Image());
+            MoneyChangerPhoto photo = new MoneyChangerPhoto();
+            photo.setMoneyChangerId(moneyChangerId);
+            photo.setPhotoData(decoded);
+            photo.setPhotoFilename(dto.getPhotoFilename());
+            photo.setPhotoMimetype(detectMimeType(decoded));
+            photo.setIsDeleted(0);
+            photoRepository.save(photo);
+        }
+    }
+
+    private void saveKyc(MoneyChangerResponseDTO dto, Long moneyChangerId) {
+        kycRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
+            existing.setIsDeleted(1);
+            kycRepository.save(existing);
+        });
+
+        if (dto.getBase64Document() != null && !dto.getBase64Document().isEmpty()) {
+            byte[] decoded = Base64.getDecoder().decode(dto.getBase64Document());
+            MoneyChangerKyc kyc = new MoneyChangerKyc();
+            kyc.setMoneyChangerId(moneyChangerId);
+            kyc.setDocumentData(decoded);
+            kyc.setDocumentFilename(dto.getDocumentFilename());
+            kyc.setDocumentMimetype(detectMimeType(decoded));
+            kyc.setIsDeleted(0);
+            kycRepository.save(kyc);
+        }
+    }
+
+    private String detectMimeType(byte[] bytes) {
+        try {
+            return new Tika().detect(bytes);
+        } catch (Exception e) {
+            return "application/octet-stream";
+        }
+    }
 }

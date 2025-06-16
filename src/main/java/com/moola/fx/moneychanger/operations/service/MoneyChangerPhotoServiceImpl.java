@@ -1,58 +1,54 @@
-package com.moola.fx.moneychanger.operations.service;
+package com.moola.fx.moneychanger.operations.service.impl;
 
 import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerPhotoRepository;
+import com.moola.fx.moneychanger.operations.service.MoneyChangerPhotoService;
+import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.sql.Timestamp;
-import java.time.Instant;
+import java.util.Base64;
+import java.util.Optional;
 
 @Service
 public class MoneyChangerPhotoServiceImpl implements MoneyChangerPhotoService {
 
-    private final MoneyChangerPhotoRepository moneyChangerPhotoRepository;
+    private final MoneyChangerPhotoRepository photoRepository;
 
-    public MoneyChangerPhotoServiceImpl(MoneyChangerPhotoRepository moneyChangerPhotoRepository) {
-        this.moneyChangerPhotoRepository = moneyChangerPhotoRepository;
+    public MoneyChangerPhotoServiceImpl(MoneyChangerPhotoRepository photoRepository) {
+        this.photoRepository = photoRepository;
     }
 
     @Override
-    public MoneyChangerPhoto getByMoneyChangerId(Long moneyChangerId) {
-        return moneyChangerPhotoRepository
-                .findFirstByMoneyChangerIdAndIsDeletedFalse(moneyChangerId)
-                .orElse(null);
+    public Optional<MoneyChangerPhoto> getByMoneyChangerId(Long moneyChangerId) {
+        return photoRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
     }
 
     @Override
-    public void saveOrUpdate(Long moneyChangerId, MultipartFile photoFile) {
-        MoneyChangerPhoto photo = moneyChangerPhotoRepository
-                .findFirstByMoneyChangerIdAndIsDeletedFalse(moneyChangerId)
-                .orElse(new MoneyChangerPhoto());
+    public void saveOrUpdate(Long moneyChangerId, String base64Image, String filename) {
+        if (base64Image == null || base64Image.isEmpty()) {
+            return;
+        }
 
-        photo.setMoneyChangerId(moneyChangerId);
+        photoRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
+            existing.setIsDeleted(1);
+            photoRepository.save(existing);
+        });
 
+        byte[] decoded = Base64.getDecoder().decode(base64Image);
+        MoneyChangerPhoto newPhoto = new MoneyChangerPhoto();
+        newPhoto.setMoneyChangerId(moneyChangerId);
+        newPhoto.setPhotoData(decoded);
+        newPhoto.setPhotoFilename(filename);
+        newPhoto.setPhotoMimetype(detectMimeType(decoded));
+        newPhoto.setIsDeleted(0);
+        photoRepository.save(newPhoto);
+    }
+
+    private String detectMimeType(byte[] bytes) {
         try {
-            photo.setPhotoData(photoFile.getBytes());
+            return new Tika().detect(bytes);
         } catch (Exception e) {
-            // ✅ Use specific exception type — SonarQube compliant
-            throw new IllegalStateException("Failed to read photo file data", e);
+            return "application/octet-stream";
         }
-
-        photo.setPhotoFilename(photoFile.getOriginalFilename());
-        photo.setPhotoMimetype(photoFile.getContentType());
-
-        Timestamp now = Timestamp.from(Instant.now());
-
-        if (photo.getId() == null) {
-            photo.setCreatedAt(now);
-            photo.setCreatedBy(1); // adjust as needed
-        }
-
-        photo.setUpdatedAt(now);
-        photo.setUpdatedBy(1); // adjust as needed
-        photo.setIsDeleted(false);
-
-        moneyChangerPhotoRepository.save(photo);
     }
 }

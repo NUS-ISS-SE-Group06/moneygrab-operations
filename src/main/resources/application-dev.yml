@@ -5,6 +5,9 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  jackson:
+    time-zone: Asia/Singapore
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -12,11 +15,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
     show-sql: true
-    servlet:
+
+  servlet:
     multipart:
       max-file-size: 2GB
-      max-request-size: 2GB 
-
+      max-request-size: 2GB
 
   devtools:
     restart:
