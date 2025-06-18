@@ -53,6 +53,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         mapToEntity(dto, entity);
         entity.setCreatedAt(LocalDateTime.now());
         entity.setUpdatedAt(LocalDateTime.now());
+        entity.setIsDeleted(false);
         MoneyChanger saved = moneyChangerRepository.save(entity);
         saveLocations(dto, saved.getId());
         savePhoto(dto, saved.getId());
@@ -98,8 +99,8 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         dto.setIsDeleted(entity.getIsDeleted() != null && entity.getIsDeleted() ? 1 : 0);
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
-        entity.setCreatedBy(dto.getCreatedBy() != null ? Long.valueOf(dto.getCreatedBy()) : null);
-        entity.setUpdatedBy(dto.getUpdatedBy() != null ? Long.valueOf(dto.getUpdatedBy()) : null);
+        entity.setCreatedBy(dto.getCreatedBy() != null ? dto.getCreatedBy() : null);
+        entity.setUpdatedBy(dto.getUpdatedBy() != null ? dto.getUpdatedBy() : null);
         // Convert date string to LocalDate
         if (entity.getDateOfIncorporation() != null && !entity.getDateOfIncorporation().isEmpty()) {
             dto.setDateOfIncorporation(LocalDate.parse(entity.getDateOfIncorporation()));
@@ -109,15 +110,15 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         dto.setLocations(locations.stream().map(MoneyChangerLocation::getLocationName).collect(Collectors.toList()));
 
         photoRepository.findByMoneyChangerIdAndIsDeletedFalse(entity.getId()).ifPresent(photo -> {
-            dto.setPhotoFilename(photo.getPhotoFilename());
+            dto.setLogoFilename(photo.getPhotoFilename());
             dto.setPhotoMimetype(photo.getPhotoMimetype());
-            dto.setBase64Image(Base64.getEncoder().encodeToString(photo.getPhotoData()));
+            dto.setLogoBase64(Base64.getEncoder().encodeToString(photo.getPhotoData()));
         });
 
         kycRepository.findByMoneyChangerIdAndIsDeletedFalse(entity.getId()).ifPresent(kyc -> {
-            dto.setDocumentFilename(kyc.getDocumentFilename());
+            dto.setKycFilename(kyc.getDocumentFilename());
             dto.setDocumentMimetype(kyc.getDocumentMimetype());
-            dto.setBase64Document(Base64.getEncoder().encodeToString(kyc.getDocumentData()));
+            dto.setKycBase64(Base64.getEncoder().encodeToString(kyc.getDocumentData()));
         });
 
         return dto;
@@ -136,8 +137,8 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         dto.setIsDeleted(entity.getIsDeleted() != null && entity.getIsDeleted() ? 1 : 0);
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setUpdatedAt(dto.getUpdatedAt());
-        entity.setCreatedBy(dto.getCreatedBy() != null ? Long.valueOf(dto.getCreatedBy()) : null);
-        entity.setUpdatedBy(dto.getUpdatedBy() != null ? Long.valueOf(dto.getUpdatedBy()) : null);
+        entity.setCreatedBy(dto.getCreatedBy() != null ? dto.getCreatedBy() : null);
+        entity.setUpdatedBy(dto.getUpdatedBy() != null ? dto.getUpdatedBy() : null);
 
         if (dto.getDateOfIncorporation() != null) {
             entity.setDateOfIncorporation(dto.getDateOfIncorporation().toString());
@@ -172,13 +173,12 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
             existing.setIsDeleted(1);
             photoRepository.save(existing);
         });
-
-        if (dto.getBase64Image() != null && !dto.getBase64Image().isEmpty()) {
-            byte[] decoded = Base64.getDecoder().decode(dto.getBase64Image());
+        if (dto.getLogoBase64() != null && !dto.getLogoBase64().isEmpty()) {
+            byte[] decoded = Base64.getDecoder().decode(dto.getLogoBase64());
             MoneyChangerPhoto photo = new MoneyChangerPhoto();
             photo.setMoneyChangerId(moneyChangerId);
             photo.setPhotoData(decoded);
-            photo.setPhotoFilename(dto.getPhotoFilename());
+            photo.setPhotoFilename(dto.getLogoFilename());
             photo.setPhotoMimetype(detectMimeType(decoded));
             photo.setIsDeleted(0);
             photoRepository.save(photo);
@@ -191,12 +191,12 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
             kycRepository.save(existing);
         });
 
-        if (dto.getBase64Document() != null && !dto.getBase64Document().isEmpty()) {
-            byte[] decoded = Base64.getDecoder().decode(dto.getBase64Document());
+        if (dto.getKycBase64() != null && !dto.getKycBase64().isEmpty()) {
+            byte[] decoded = Base64.getDecoder().decode(dto.getKycBase64());
             MoneyChangerKyc kyc = new MoneyChangerKyc();
             kyc.setMoneyChangerId(moneyChangerId);
             kyc.setDocumentData(decoded);
-            kyc.setDocumentFilename(dto.getDocumentFilename());
+            kyc.setDocumentFilename(dto.getKycFilename());
             kyc.setDocumentMimetype(detectMimeType(decoded));
             kyc.setIsDeleted(0);
             kycRepository.save(kyc);
