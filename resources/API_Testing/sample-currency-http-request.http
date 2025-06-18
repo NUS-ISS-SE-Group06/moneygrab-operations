@@ -1,0 +1,11 @@
+###
+GET http://localhost:8688/api/v1/currencies
+Content-Type: application/json
+
+###
+GET http://localhost:8688/api/v1/currencies/1
+Content-Type: application/json
+
+###
+GET http://localhost:8688/api/v1/currencies/code/SGD
+Content-Type: application/json
