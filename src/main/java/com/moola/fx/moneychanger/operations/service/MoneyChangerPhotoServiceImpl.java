@@ -1,13 +1,14 @@
-package com.moola.fx.moneychanger.operations.service.impl;
+package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerPhotoRepository;
-import com.moola.fx.moneychanger.operations.service.MoneyChangerPhotoService;
+//import com.moola.fx.moneychanger.operations.service.MoneyChangerPhotoService;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 
 import java.util.Base64;
 import java.util.Optional;
+
 
 @Service
 public class MoneyChangerPhotoServiceImpl implements MoneyChangerPhotoService {
@@ -34,10 +35,14 @@ public class MoneyChangerPhotoServiceImpl implements MoneyChangerPhotoService {
             photoRepository.save(existing);
         });
 
-        byte[] decoded = Base64.getDecoder().decode(base64Image);
         MoneyChangerPhoto newPhoto = new MoneyChangerPhoto();
         newPhoto.setMoneyChangerId(moneyChangerId);
-        newPhoto.setPhotoData(decoded);
+        String base64Data = base64Image.contains(",")
+                ? base64Image.substring(base64Image.indexOf(',') + 1) // strip prefix
+                : base64Image;
+
+        byte[] decoded = Base64.getDecoder().decode(base64Data);
+        newPhoto.setPhotoData(decoded);               // GOOD data
         newPhoto.setPhotoFilename(filename);
         newPhoto.setPhotoMimetype(detectMimeType(decoded));
         newPhoto.setIsDeleted(0);
@@ -51,4 +56,5 @@ public class MoneyChangerPhotoServiceImpl implements MoneyChangerPhotoService {
             return "application/octet-stream";
         }
     }
+
 }

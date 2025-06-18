@@ -42,11 +42,17 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
 
     @Override
     public MoneyChangerResponseDTO getMoneyChangerById(Long id) {
+        MoneyChanger entity = moneyChangerRepository.findByIdAndIsDeletedFalse(id)
+                .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
+        return mapToDto(entity);
+    }
+    /*
+    public MoneyChangerResponseDTO getMoneyChangerById(Long id) {
         MoneyChanger entity = moneyChangerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
         return mapToDto(entity);
     }
-
+*/
     @Override
     public MoneyChangerResponseDTO createMoneyChanger(MoneyChangerResponseDTO dto) {
         MoneyChanger entity = new MoneyChanger();
@@ -70,7 +76,8 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         // Restore original createdAt and set updatedAt
         // Restore original createdAt and set updatedAt
         entity.setCreatedAt(originalCreatedAt != null ? originalCreatedAt : LocalDateTime.now());
-        entity.setUpdatedAt(LocalDateTime.now());   MoneyChanger updated = moneyChangerRepository.save(entity);
+        entity.setUpdatedAt(LocalDateTime.now());
+        MoneyChanger updated = moneyChangerRepository.save(entity);
         saveLocations(dto, updated.getId());
         savePhoto(dto, updated.getId());
         saveKyc(dto, updated.getId());
@@ -82,6 +89,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         moneyChangerRepository.findById(id).ifPresent(mc -> {
             mc.setIsDeleted(true);
             moneyChangerRepository.save(mc);
+
         });
     }
 
@@ -174,10 +182,15 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
             photoRepository.save(existing);
         });
         if (dto.getLogoBase64() != null && !dto.getLogoBase64().isEmpty()) {
-            byte[] decoded = Base64.getDecoder().decode(dto.getLogoBase64());
+
             MoneyChangerPhoto photo = new MoneyChangerPhoto();
             photo.setMoneyChangerId(moneyChangerId);
-            photo.setPhotoData(decoded);
+            String base64Data = dto.getLogoBase64().contains(",")
+                    ? dto.getLogoBase64().substring(dto.getLogoBase64().indexOf(',') + 1) // strip prefix
+                    : dto.getLogoBase64();
+
+            byte[] decoded = Base64.getDecoder().decode(base64Data);
+            photo.setPhotoData(decoded);               // GOOD data
             photo.setPhotoFilename(dto.getLogoFilename());
             photo.setPhotoMimetype(detectMimeType(decoded));
             photo.setIsDeleted(0);
@@ -192,10 +205,14 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         });
 
         if (dto.getKycBase64() != null && !dto.getKycBase64().isEmpty()) {
-            byte[] decoded = Base64.getDecoder().decode(dto.getKycBase64());
+
             MoneyChangerKyc kyc = new MoneyChangerKyc();
             kyc.setMoneyChangerId(moneyChangerId);
-            kyc.setDocumentData(decoded);
+            String base64Data =dto.getKycBase64().contains(",")
+                    ? dto.getKycBase64().substring(dto.getKycBase64().indexOf(',') + 1) // strip prefix
+                    : dto.getKycBase64();
+            byte[] decoded = Base64.getDecoder().decode(base64Data);
+            kyc.setDocumentData(decoded);               // GOOD data
             kyc.setDocumentFilename(dto.getKycFilename());
             kyc.setDocumentMimetype(detectMimeType(decoded));
             kyc.setIsDeleted(0);

@@ -34,10 +34,16 @@ public class MoneyChangerKycServiceImpl implements MoneyChangerKycService {
             kycRepository.save(existing);
         });
 
-        byte[] decoded = Base64.getDecoder().decode(base64Document);
+
         MoneyChangerKyc newKyc = new MoneyChangerKyc();
         newKyc.setMoneyChangerId(moneyChangerId);
-        newKyc.setDocumentData(decoded);
+
+        String base64Data = base64Document.contains(",")
+                ? base64Document.substring(base64Document.indexOf(',') + 1) // strip prefix
+                : base64Document;
+
+        byte[] decoded = Base64.getDecoder().decode(base64Document);
+        newKyc.setDocumentData(decoded);               // GOOD data
         newKyc.setDocumentFilename(filename);
         newKyc.setDocumentMimetype(detectMimeType(decoded));
         newKyc.setIsDeleted(0);
