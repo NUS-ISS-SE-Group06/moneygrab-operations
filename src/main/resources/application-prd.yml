@@ -15,8 +15,8 @@ spring:
 
   servlet:
     multipart:
-      max-file-size: 2GB
-      max-request-size: 2GB
+      max-file-size: 10MB
+      max-request-size: 10MB
 
 logging:
   config: classpath:log4j2-prd.xml
