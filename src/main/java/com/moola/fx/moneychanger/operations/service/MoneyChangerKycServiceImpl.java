@@ -1,8 +1,8 @@
-package com.moola.fx.moneychanger.operations.service.impl;
+package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.model.MoneyChangerKyc;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerKycRepository;
-import com.moola.fx.moneychanger.operations.service.MoneyChangerKycService;
+
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +42,7 @@ public class MoneyChangerKycServiceImpl implements MoneyChangerKycService {
                 ? base64Document.substring(base64Document.indexOf(',') + 1) // strip prefix
                 : base64Document;
 
-        byte[] decoded = Base64.getDecoder().decode(base64Document);
+        byte[] decoded = Base64.getDecoder().decode(base64Data);
         newKyc.setDocumentData(decoded);               // GOOD data
         newKyc.setDocumentFilename(filename);
         newKyc.setDocumentMimetype(detectMimeType(decoded));

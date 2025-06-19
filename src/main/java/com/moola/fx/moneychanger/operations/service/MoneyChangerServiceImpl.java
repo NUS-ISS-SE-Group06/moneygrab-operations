@@ -46,13 +46,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
                 .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
         return mapToDto(entity);
     }
-    /*
-    public MoneyChangerResponseDTO getMoneyChangerById(Long id) {
-        MoneyChanger entity = moneyChangerRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
-        return mapToDto(entity);
-    }
-*/
+
     @Override
     public MoneyChangerResponseDTO createMoneyChanger(MoneyChangerResponseDTO dto) {
         MoneyChanger entity = new MoneyChanger();
@@ -141,7 +135,6 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         entity.setCountry(dto.getCountry());
         entity.setUen(dto.getUen());
         entity.setSchemeId(dto.getSchemeId());
-        //entity.setIsDeleted(Boolean.TRUE.equals(dto.getIsDeleted()));
         dto.setIsDeleted(entity.getIsDeleted() != null && entity.getIsDeleted() ? 1 : 0);
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setUpdatedAt(dto.getUpdatedAt());

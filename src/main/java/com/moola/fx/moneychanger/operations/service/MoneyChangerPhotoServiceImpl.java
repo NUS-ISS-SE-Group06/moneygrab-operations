@@ -2,7 +2,6 @@ package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerPhotoRepository;
-//import com.moola.fx.moneychanger.operations.service.MoneyChangerPhotoService;
 import org.apache.tika.Tika;
 import org.springframework.stereotype.Service;
 

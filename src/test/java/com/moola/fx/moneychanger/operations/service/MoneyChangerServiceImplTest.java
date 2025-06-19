@@ -1,7 +1,6 @@
 package com.moola.fx.moneychanger.operations.service;
 
-import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
-import com.moola.fx.moneychanger.operations.model.MoneyChanger;
+
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

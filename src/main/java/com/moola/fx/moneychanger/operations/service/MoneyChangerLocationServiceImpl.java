@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
 
 @Service
 public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationService {
@@ -65,7 +65,8 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
                     loc.setUpdatedBy(0L);
                     return loc;
                 })
-                .collect(Collectors.toList());
+                .toList();
+
 
         locationRepository.saveAll(newLocations);
     }
@@ -112,7 +113,8 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
                     loc.setUpdatedBy(0L);
                     return loc;
                 })
-                .collect(Collectors.toList());
+                .toList();
+
 
         locationRepository.saveAll(newLocations);
     }
@@ -122,6 +124,6 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
         return locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId)
                 .stream()
                 .map(MoneyChangerLocation::getLocationName)
-                .collect(Collectors.toList());
+                .toList();
     }
 }
