@@ -1,7 +1,6 @@
 package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerKycRepository;
-import com.moola.fx.moneychanger.operations.service.impl.MoneyChangerKycServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
