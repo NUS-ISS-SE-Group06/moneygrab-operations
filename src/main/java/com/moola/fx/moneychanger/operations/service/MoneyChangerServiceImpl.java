@@ -166,7 +166,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
                 mcRef.setId(moneyChangerId);
                 loc.setMoneyChanger(mcRef);
                 return loc;
-            }).collect(Collectors.toList());
+            }).toList();
             locationRepository.saveAll(newLocs);
         }
     }
