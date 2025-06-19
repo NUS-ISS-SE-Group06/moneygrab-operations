@@ -13,7 +13,6 @@ public class MoneyChangerApiApplication {
     @PostConstruct
     public void init() {
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Singapore"));
-        //System.out.println(">>> TimeZone set to: " + TimeZone.getDefault());
     }
 
     public static void main(String[] args) {

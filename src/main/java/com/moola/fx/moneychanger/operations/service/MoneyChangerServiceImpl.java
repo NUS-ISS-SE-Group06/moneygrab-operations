@@ -34,13 +34,15 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
 
     @Override
     public List<MoneyChangerResponseDTO> getAllMoneyChangers() {
-        return moneyChangerRepository.findAll().stream()
-                .filter(mc -> Boolean.FALSE.equals(mc.getIsDeleted()))
-                .map(this::mapToDto)
-                .collect(Collectors.toList());
+            return moneyChangerRepository.findAll().stream()
+                    .filter(mc -> Boolean.FALSE.equals(mc.getIsDeleted()))
+                    .map(this::mapToDto)
+                    .toList();
     }
 
-    @Override
+
+
+        @Override
     public MoneyChangerResponseDTO getMoneyChangerById(Long id) {
         MoneyChanger entity = moneyChangerRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
