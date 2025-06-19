@@ -1,6 +1,5 @@
 package com.moola.fx.moneychanger.operations.service;
 
-import com.moola.fx.moneychanger.operations.model.MoneyChanger;
 import com.moola.fx.moneychanger.operations.model.MoneyChangerLocation;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerLocationRepository;
 import org.junit.jupiter.api.BeforeEach;
