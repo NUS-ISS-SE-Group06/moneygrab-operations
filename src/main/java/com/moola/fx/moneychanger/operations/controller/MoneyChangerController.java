@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("v1/money-changers")
+@RequestMapping("/v1/money-changers")
 public class MoneyChangerController {
 
     private final MoneyChangerService moneyChangerService;
