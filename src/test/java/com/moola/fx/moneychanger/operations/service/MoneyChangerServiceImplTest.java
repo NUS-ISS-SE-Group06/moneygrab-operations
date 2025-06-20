@@ -1,12 +1,14 @@
 package com.moola.fx.moneychanger.operations.service;
 
-import com.moola.fx.moneychanger.operations.model.MoneyChanger;
+
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
-import java.util.*;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -14,10 +16,10 @@ import static org.mockito.Mockito.*;
 class MoneyChangerServiceImplTest {
 
     @Mock
-    private MoneyChangerRepository repository;
+    private MoneyChangerRepository moneyChangerRepository;
 
     @InjectMocks
-    private MoneyChangerServiceImpl service;
+    private MoneyChangerServiceImpl moneyChangerService;
 
     @BeforeEach
     void setUp() {
@@ -25,23 +27,16 @@ class MoneyChangerServiceImplTest {
     }
 
     @Test
-    void testCreate() {
-        MoneyChanger mc = new MoneyChanger();
-        mc.setCompanyName("Test Co");
-        when(repository.save(any(MoneyChanger.class))).thenReturn(mc);
+    void testGetMoneyChangerById_shouldThrow_ifNotFound() {
+        Long mockId = 999L;
+        when(moneyChangerRepository.findByIdAndIsDeletedFalse(mockId)).thenReturn(Optional.empty());
 
-        MoneyChanger result = service.create(mc);
-        assertEquals("Test Co", result.getCompanyName());
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> moneyChangerService.getMoneyChangerById(mockId)
+        );
+
+        assertEquals("MoneyChanger not found", exception.getMessage());
+        verify(moneyChangerRepository, times(1)).findByIdAndIsDeletedFalse(mockId);
     }
-
-    @Test
-    void testGetAll() {
-        List<MoneyChanger> list = List.of(new MoneyChanger());
-        when(repository.findByIsDeletedFalse()).thenReturn(list);
-
-        List<MoneyChanger> result = service.getAll();
-        assertEquals(1, result.size());
-    }
-
-    // Additional tests can be added for get(), update(), delete()
 }

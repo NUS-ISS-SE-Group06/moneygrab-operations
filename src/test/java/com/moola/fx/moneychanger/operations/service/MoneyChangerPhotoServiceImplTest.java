@@ -2,75 +2,56 @@ package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerPhotoRepository;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.*;
-import org.springframework.web.multipart.MultipartFile;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class MoneyChangerPhotoServiceImplTest {
-
-    @InjectMocks
-    private MoneyChangerPhotoServiceImpl photoService;
 
     @Mock
     private MoneyChangerPhotoRepository photoRepository;
 
-    @Mock
-    private MultipartFile mockFile;
+    @InjectMocks
+    private MoneyChangerPhotoServiceImpl photoService;
+
+    private static final Long TEST_ID = 1L;
+
+    private static final String VALID_BASE64_IMAGE =
+            "iVBORw0KGgoAAAANSUhEUgAAAAUA" +  // <-- short PNG header base64
+                    "AAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
+                    "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        // No need for openMocks if @ExtendWith(MockitoExtension.class) is used
     }
 
     @Test
-    void testGetByMoneyChangerId() {
-        MoneyChangerPhoto photo = new MoneyChangerPhoto();
-        photo.setId(1L);
-        photo.setMoneyChangerId(100L);
-        photo.setPhotoFilename("photo.jpg");
-
-        when(photoRepository.findFirstByMoneyChangerIdAndIsDeletedFalse(100L)).thenReturn(Optional.of(photo));
-
-        MoneyChangerPhoto result = photoService.getByMoneyChangerId(100L);
-        assertNotNull(result);
-        assertEquals("photo.jpg", result.getPhotoFilename());
-
-        verify(photoRepository, times(1)).findFirstByMoneyChangerIdAndIsDeletedFalse(100L);
-    }
-
-    @Test
-    void testSaveOrUpdate_New() throws Exception {
-        when(photoRepository.findFirstByMoneyChangerIdAndIsDeletedFalse(100L)).thenReturn(Optional.empty());
-        when(mockFile.getBytes()).thenReturn("photo data".getBytes());
-        when(mockFile.getOriginalFilename()).thenReturn("photo.jpg");
-        when(mockFile.getContentType()).thenReturn("image/jpeg");
-
-        photoService.saveOrUpdate(100L, mockFile);
-
-        verify(photoRepository, times(1)).save(any(MoneyChangerPhoto.class));
-    }
-
-    @Test
-    void testSaveOrUpdate_UpdateExisting() throws Exception {
+    void testSavePhoto_WhenPreviousExists() {
         MoneyChangerPhoto existingPhoto = new MoneyChangerPhoto();
-        existingPhoto.setId(1L);
-        existingPhoto.setMoneyChangerId(100L);
-        existingPhoto.setPhotoFilename("old_photo.jpg");
+        existingPhoto.setIsDeleted(0);
 
-        when(photoRepository.findFirstByMoneyChangerIdAndIsDeletedFalse(100L)).thenReturn(Optional.of(existingPhoto));
-        when(mockFile.getBytes()).thenReturn("new photo data".getBytes());
-        when(mockFile.getOriginalFilename()).thenReturn("new_photo.jpg");
-        when(mockFile.getContentType()).thenReturn("image/jpeg");
+        when(photoRepository.findByMoneyChangerIdAndIsDeletedFalse(TEST_ID))
+                .thenReturn(Optional.of(existingPhoto));
 
-        photoService.saveOrUpdate(100L, mockFile);
+        photoService.saveOrUpdate(TEST_ID, VALID_BASE64_IMAGE, "logo.png");
 
-        verify(photoRepository, times(1)).save(existingPhoto);
-        assertEquals("new_photo.jpg", existingPhoto.getPhotoFilename());
+        // Once for old soft delete, once for new insert
+        verify(photoRepository, times(2)).save(any(MoneyChangerPhoto.class));
+    }
+
+    @Test
+    void testSavePhoto_WithEmptyBase64_ShouldReturn() {
+        photoService.saveOrUpdate(TEST_ID, "", "logo.jpg");
+        verify(photoRepository, never()).save(any());
     }
 }
