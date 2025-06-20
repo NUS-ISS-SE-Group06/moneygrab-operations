@@ -5,9 +5,6 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  jackson:
-    time-zone: Asia/Singapore
-
   jpa:
     hibernate:
       ddl-auto: update
