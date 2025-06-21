@@ -1,15 +1,10 @@
 package com.moola.fx.moneychanger.operations.model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "money_changer_photo")
-@Getter
-@Setter
 public class MoneyChangerPhoto {
 
     @Id
@@ -30,10 +25,10 @@ public class MoneyChangerPhoto {
     private String photoMimetype;
 
     @Column(name = "created_at", nullable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt = LocalDateTime.now();
 
-    @Column(name = "updated_at", nullable = false)
-    private Timestamp updatedAt;
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt = LocalDateTime.now();
 
     @Column(name = "created_by")
     private Integer createdBy;
@@ -41,6 +36,88 @@ public class MoneyChangerPhoto {
     @Column(name = "updated_by")
     private Integer updatedBy;
 
-    @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    @Column(name = "is_deleted", nullable = false)
+    private Integer isDeleted = 0;
+
+    // === Getters and Setters ===
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getMoneyChangerId() {
+        return moneyChangerId;
+    }
+
+    public void setMoneyChangerId(Long moneyChangerId) {
+        this.moneyChangerId = moneyChangerId;
+    }
+
+    public byte[] getPhotoData() {
+        return photoData;
+    }
+
+    public void setPhotoData(byte[] photoData) {
+        this.photoData = photoData;
+    }
+
+    public String getPhotoFilename() {
+        return photoFilename;
+    }
+
+    public void setPhotoFilename(String photoFilename) {
+        this.photoFilename = photoFilename;
+    }
+
+    public String getPhotoMimetype() {
+        return photoMimetype;
+    }
+
+    public void setPhotoMimetype(String photoMimetype) {
+        this.photoMimetype = photoMimetype;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public Integer getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(Integer createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Integer getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(Integer updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
+    public Integer getIsDeleted() {
+        return isDeleted;
+    }
+
+    public void setIsDeleted(Integer isDeleted) {
+        this.isDeleted = isDeleted;
+    }
 }

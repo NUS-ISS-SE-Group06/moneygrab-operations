@@ -1,11 +1,9 @@
 package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
-import org.springframework.web.multipart.MultipartFile;
+import java.util.Optional;
 
 public interface MoneyChangerPhotoService {
-
-    MoneyChangerPhoto getByMoneyChangerId(Long moneyChangerId);
-
-    void saveOrUpdate(Long moneyChangerId, MultipartFile photoFile);
+    Optional<MoneyChangerPhoto> getByMoneyChangerId(Long moneyChangerId);
+    void saveOrUpdate(Long moneyChangerId, String base64Image, String filename);
 }
