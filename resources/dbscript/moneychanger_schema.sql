@@ -136,6 +136,24 @@ CREATE TABLE money_changer_location (
 );
 
 
+
+CREATE TABLE money_changer_currency (
+                                   id INT AUTO_INCREMENT PRIMARY KEY,
+                                   money_changer_id INT NOT NULL,
+                                   currency_id INT NOT NULL,
+                                   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                   updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                   created_by INT,
+                                   updated_by INT NULL,
+                                   is_deleted TINYINT(1) DEFAULT 0,
+                                   CONSTRAINT fk_mcur_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id),
+                                   CONSTRAINT fk_mcur_currency FOREIGN KEY (currency_id) REFERENCES currency_code(id),
+                                   CONSTRAINT fk_mcur_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
+                                   CONSTRAINT fk_mcur_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
+);
+
+
+
 CREATE TABLE customer (
                           id INT AUTO_INCREMENT PRIMARY KEY,
                           customer_name VARCHAR(255) NOT NULL,
