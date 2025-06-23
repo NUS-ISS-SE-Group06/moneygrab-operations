@@ -20,7 +20,7 @@ public class MoneyChangerCurrencyMapper {
         }
         if (entity.getCurrencyId() != null) {
             dto.setCurrencyId(entity.getCurrencyId().getId());
-            dto.setCurrencyCode(entity.getCurrencyId().getCurrency());
+            dto.setCurrency(entity.getCurrencyId().getCurrency());
             dto.setCurrencyDescription(entity.getCurrencyId().getDescription());
         }
         dto.setCreatedAt(entity.getCreatedAt());
