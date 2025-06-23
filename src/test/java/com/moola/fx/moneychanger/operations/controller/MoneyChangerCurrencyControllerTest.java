@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MoneyChangerCurrencyController.class)
-public class MoneyChangerCurrencyControllerTest {
+class MoneyChangerCurrencyControllerTest {
     @Autowired private MockMvc mockMvc;
     @MockitoBean private MoneyChangerCurrencyService service;
     @MockitoBean private MoneyChangerCurrencyMapper mapper;

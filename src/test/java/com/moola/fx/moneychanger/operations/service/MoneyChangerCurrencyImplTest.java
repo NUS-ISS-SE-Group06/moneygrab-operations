@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class MoneyChangerCurrencyImplTest {
+class MoneyChangerCurrencyImplTest {
 
     @Mock private MoneyChangerCurrencyRepository repo;
     @InjectMocks private MoneyChangerCurrencyServiceImpl service;
