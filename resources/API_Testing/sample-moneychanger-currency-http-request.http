@@ -1,0 +1,38 @@
+
+###
+GET http://localhost:8688/api/v1/money-changers-currencies
+Content-Type: application/json
+
+###
+GET http://localhost:8688/api/v1/money-changers-currencies?
+    moneyChangerId=1
+Content-Type: application/json
+
+###
+GET http://localhost:8688/api/v1/money-changers-currencies/1
+Content-Type: application/json
+
+
+###
+POST http://localhost:8688/api/v1/money-changers-currencies
+Content-Type: application/json
+
+{
+  "moneyChangerId": "2",
+  "currencyId": "2",
+  "createdBy": 1
+}
+
+###
+PUT http://localhost:8688/api/v1/money-changers-currencies/1
+Content-Type: application/json
+
+{
+  "moneyChangerId": 1,
+  "currencyId": 2,
+  "createdBy": 1
+}
+
+### Delete a Money Changer Currency by ID
+DELETE http://localhost:8688/api/v1/money-changers-currencies/2?userId=1
+Content-Type: application/json
