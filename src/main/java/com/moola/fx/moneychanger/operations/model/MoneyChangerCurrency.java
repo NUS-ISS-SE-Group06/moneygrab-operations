@@ -1,8 +1,8 @@
 package com.moola.fx.moneychanger.operations.model;
 
-
 import jakarta.persistence.*;
 import lombok.Data;
+
 import java.sql.Timestamp;
 
 @Data
