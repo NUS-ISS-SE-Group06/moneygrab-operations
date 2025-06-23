@@ -50,12 +50,6 @@ public class MoneyChangerCurrencyServiceImpl implements MoneyChangerCurrencyServ
         MoneyChangerCurrency existing = repo.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Money Changer Currency with ID " + id + " not found"));
 
-//        boolean schemeInUse=companyCommissionSchemeRepo.existsBySchemeId_IdAndIsDeletedFalse(existing.getSchemeId().getId());
-//
-//        if (schemeInUse) {
-//            throw new ForeignKeyConstraintException("Cannot delete: scheme is still in use by a company commission scheme.");
-//        }
-
         existing.setIsDeleted(true);  // Soft delete
         existing.setUpdatedBy(userId);
         repo.save(existing);

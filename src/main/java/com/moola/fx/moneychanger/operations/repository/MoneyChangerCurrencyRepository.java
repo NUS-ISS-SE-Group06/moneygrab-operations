@@ -10,7 +10,6 @@ import java.util.Optional;
 
 public interface MoneyChangerCurrencyRepository extends JpaRepository<MoneyChangerCurrency, Integer> {
     List<MoneyChangerCurrency> findByMoneyChangerId_idAndIsDeletedFalse(Long id);
-    boolean existsByMoneyChangerId_idAndIsDeletedFalse(Long id);
     boolean existsByMoneyChangerIdAndCurrencyIdAndIsDeletedFalse(MoneyChanger moneyChargerId, CurrencyCode currencyId);
     boolean existsByMoneyChangerIdAndCurrencyIdAndIdNotAndIsDeletedFalse(MoneyChanger moneyChangerId, CurrencyCode currencyId, Integer id);
     Optional<MoneyChangerCurrency> findByIdAndIsDeletedFalse(Integer id);
