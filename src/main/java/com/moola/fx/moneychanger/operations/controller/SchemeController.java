@@ -40,6 +40,9 @@ public class SchemeController {
     @PutMapping("/{id}")
     public ResponseEntity<Scheme>  update(@PathVariable("id") Integer id, @RequestBody Scheme entity) {
         Scheme existing = service.get(id);
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         existing.setUpdatedBy(entity.getUpdatedBy());
         existing.setDescription(entity.getDescription());
