@@ -2,14 +2,13 @@ package com.moola.fx.moneychanger.operations.controller;
 
 import com.moola.fx.moneychanger.operations.dto.MoneyChangerCurrencyDTO;
 import com.moola.fx.moneychanger.operations.mapper.MoneyChangerCurrencyMapper;
-import com.moola.fx.moneychanger.operations.model.MoneyChangerCurrency;
 import com.moola.fx.moneychanger.operations.model.CurrencyCode;
+import com.moola.fx.moneychanger.operations.model.MoneyChangerCurrency;
 import com.moola.fx.moneychanger.operations.service.MoneyChangerCurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Currency;
 import java.util.List;
 
 @RestController
