@@ -17,7 +17,8 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CompanyCommissionSchemeController.class)
 class CompanyCommissionSchemeControllerTest {
@@ -114,17 +115,23 @@ class CompanyCommissionSchemeControllerTest {
     @Test
     void update_existingDto_returnsUpdatedDto() throws Exception {
         int id = 3;
+
+        var existing = new CompanyCommissionScheme();
+        existing.setId(id);
+
         var inputDto = new CompanyCommissionSchemeDTO();
-        inputDto.setId(id);
         inputDto.setNameTag("NewTag");
         inputDto.setUpdatedBy(8);
 
         var updated = new CompanyCommissionScheme();
+        updated.setId(id);
+
         var outputDto = new CompanyCommissionSchemeDTO();
         outputDto.setId(id);
         outputDto.setUpdatedBy(8);
 
-        when(service.save(inputDto)).thenReturn(updated);
+        when(service.get(id)).thenReturn(existing);
+        when(service.save(any(CompanyCommissionSchemeDTO.class))).thenReturn(updated);
         when(mapper.toDTO(updated)).thenReturn(outputDto);
 
         mockMvc.perform(put("/v1/company-commission-schemes/{id}", id)
@@ -133,7 +140,12 @@ class CompanyCommissionSchemeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
                 .andExpect(jsonPath("$.updatedBy").value(8));
+
+        verify(service).get(id);
+        verify(service).save(any(CompanyCommissionSchemeDTO.class));
+        verify(mapper).toDTO(updated);
     }
+
 
     @Test
     void delete_validId_returns204() throws Exception {

@@ -52,6 +52,9 @@ public class CommissionRateController {
     @PutMapping("/{id}")
     public ResponseEntity<CommissionRateDTO> update(@PathVariable("id") Integer id, @RequestBody CommissionRateDTO dto) {
         CommissionRate existing = service.get(id);
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         if (dto.getRate() != null) {
             existing.setRate(dto.getRate());
