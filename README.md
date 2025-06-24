@@ -12,7 +12,7 @@ This is a production-ready Spring Boot project for managing money changers, desi
 ## 🏗️ Setup Instructions
 
 ### 1. Requirements
-- Java 17 or higher
+- Java 21
 - Maven
 - MySQL (local or AWS RDS)
 
