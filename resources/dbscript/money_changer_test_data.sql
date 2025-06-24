@@ -11,16 +11,12 @@ SET FOREIGN_KEY_CHECKS = 1;
 
 -- Insert schemes
 INSERT INTO scheme (id, name_tag, description, is_default) VALUES
-                                                               (1, 'Scheme 1', '',0),
-                                                               (2, 'Scheme 2','',0),
-                                                               (3, 'Scheme 3','',0),
-                                                               (4, 'Scheme 4','',0),
-                                                               (5, 'Scheme 5','',0),
-                                                               (6, 'Scheme 6','',0),
-                                                               (7, 'Scheme 7','',0),
-                                                               (8, 'Scheme 8','',0),
-                                                               (9, 'Scheme 9','',0),
-                                                               (10, 'Scheme 10','',0);
+                                                               (1, 'VIP 1', '',0),
+                                                               (2, 'VIP 2','',0),
+                                                               (3, 'VIP 3','',0),
+                                                               (4, 'VIP 4','',0),
+                                                               (5, 'PROMO','',0),
+
 
 -- Insert money_changer
 INSERT INTO money_changer (id, company_name, email, date_of_incorporation, address, country, postal_code, notes, uen, scheme_id, created_by, updated_by) VALUES
@@ -29,11 +25,11 @@ INSERT INTO money_changer (id, company_name, email, date_of_incorporation, addre
                                                                                                                                                              (3, 'Company 3', 'company3@example.com', '2010-02-02', '123 Road St #3', 'Singapore', 'S12334', 'Test notes 3', 'UEN3XYZ', 3, NULL, NULL),
                                                                                                                                                              (4, 'Company 4', 'company4@example.com', '2010-09-03', '123 Road St #4', 'Singapore', 'S12434', 'Test notes 4', 'UEN4XYZ', 4, NULL, NULL),
                                                                                                                                                              (5, 'Company 5', 'company5@example.com', '2010-03-07', '123 Road St #5', 'Singapore', 'S12534', 'Test notes 5', 'UEN5XYZ', 5, NULL, NULL),
-                                                                                                                                                             (6, 'Company 6', 'company6@example.com', '2010-01-08', '123 Road St #6', 'Singapore', 'S12634', 'Test notes 6', 'UEN6XYZ', 6, NULL, NULL),
-                                                                                                                                                             (7, 'Company 7', 'company7@example.com', '2010-02-09', '123 Road St #7', 'Singapore', 'S12734', 'Test notes 7', 'UEN7XYZ', 7, NULL, NULL),
-                                                                                                                                                             (8, 'Company 8', 'company8@example.com', '2010-04-01', '123 Road St #8', 'Singapore', 'S12834', 'Test notes 8', 'UEN8XYZ', 8, NULL, NULL),
-                                                                                                                                                             (9, 'Company 9', 'company9@example.com', '2010-01-04', '123 Road St #9', 'Singapore', 'S12934', 'Test notes 9', 'UEN9XYZ', 9, NULL, NULL),
-                                                                                                                                                             (10, 'Company 10', 'company10@example.com', '2010-05-01', '123 Road St #10', 'Singapore', 'S121034', 'Test notes 10', 'UEN10XYZ', 10, NULL, NULL);
+                                                                                                                                                             (6, 'Company 6', 'company6@example.com', '2010-01-08', '123 Road St #6', 'Singapore', 'S12634', 'Test notes 6', 'UEN6XYZ', 1, NULL, NULL),
+                                                                                                                                                             (7, 'Company 7', 'company7@example.com', '2010-02-09', '123 Road St #7', 'Singapore', 'S12734', 'Test notes 7', 'UEN7XYZ', 2, NULL, NULL),
+                                                                                                                                                             (8, 'Company 8', 'company8@example.com', '2010-04-01', '123 Road St #8', 'Singapore', 'S12834', 'Test notes 8', 'UEN8XYZ', 3, NULL, NULL),
+                                                                                                                                                             (9, 'Company 9', 'company9@example.com', '2010-01-04', '123 Road St #9', 'Singapore', 'S12934', 'Test notes 9', 'UEN9XYZ', 4, NULL, NULL),
+                                                                                                                                                             (10, 'Company 10', 'company10@example.com', '2010-05-01', '123 Road St #10', 'Singapore', 'S121034', 'Test notes 10', 'UEN10XYZ', 5, NULL, NULL);
 
 -- Insert accounts
 INSERT INTO accounts (id, money_changer_id, role, email, created_by, updated_by) VALUES
@@ -254,22 +250,22 @@ INSERT INTO currency_code (
 
 
 -- TEST DATA for money_changer_photo (dummy data)
-INSERT INTO money_changer_photo (money_changer_id, photo_data, photo_filename, photo_mimetype, created_by, updated_by, is_deleted)
-VALUES (1, 'test', 'test.jpg', 'image/jpeg', 1, 1, 0);
+-- INSERT INTO money_changer_photo (money_changer_id, photo_data, photo_filename, photo_mimetype, created_by, updated_by, is_deleted)
+-- VALUES (1, 'test', 'test.jpg', 'image/jpeg', 1, 1, 0);
 
 --  TEST DATA for money_changer_kyc (dummy data — PDF, Word, or Image can be accepted)
 -- Example with PDF:
-INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
-VALUES (1, 'test', 'test.pdf', 'application/pdf', 1, 1, 0);
+-- INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
+-- VALUES (1, 'test', 'test.pdf', 'application/pdf', 1, 1, 0);
 
 -- Example with DOC:
-INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
-VALUES (1, 'test', 'test.doc', 'application/msword', 1, 1, 0);
+-- INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
+-- VALUES (1, 'test', 'test.doc', 'application/msword', 1, 1, 0);
 
 -- Example with DOCX:
-INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
-VALUES (1, 'test', 'test.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 1, 1, 0);
+-- INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
+-- VALUES (1, 'test', 'test.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 1, 1, 0);
 
 -- Example with image KYC:
-INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
-VALUES (1, 'test', 'test.png', 'image/png', 1, 1, 0);
+-- INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
+-- VALUES (1, 'test', 'test.png', 'image/png', 1, 1, 0);
