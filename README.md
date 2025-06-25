@@ -2,22 +2,25 @@
 
 This is a production-ready Spring Boot project for managing money changers, designed with:
 
-- Role-based logic (`admin` vs `staff`)
-- Soft delete support
-- REST API using Spring Web
-- MySQL-compatible schema (can connect to AWS RDS)
+* Role-based logic (`admin` vs `staff`)
+* Soft delete support
+* REST API using Spring Web
+* MySQL-compatible schema (can connect to AWS RDS)
 
 ---
 
 ## 🏗️ Setup Instructions
 
 ### 1. Requirements
-- Java 21
-- Maven
-- MySQL (local or AWS RDS)
+
+* Java 21
+* Maven
+* MySQL (local or AWS RDS)
 
 ### 2. Database Setup
+
 Run the provided `database.sql` to create tables:
+
 ```sql
 CREATE DATABASE moneychanger;
 USE moneychanger;
@@ -25,6 +28,7 @@ USE moneychanger;
 ```
 
 ### 3. Application Properties
+
 Create `src/main/resources/application.properties`:
 
 ```
@@ -37,34 +41,53 @@ server.port=8080
 ```
 
 ### 4. Run the Application
+
 Use IntelliJ IDEA or run:
+
 ```bash
 ./mvnw spring-boot:run
 ```
 
 ### 5. Test the API with Postman
 
-| Method | URL | Description |
-|--------|-----|-------------|
-| GET | /api/moneychangers | List all |
-| GET | /api/moneychangers/{id} | Get by ID |
-| POST | /api/moneychangers | Create |
-| PUT | /api/moneychangers/{id} | Update |
+| Method | URL                                | Description                         |
+| ------ | ---------------------------------- | ----------------------------------- |
+| GET    | /api/moneychangers                 | List all                            |
+| GET    | /api/moneychangers/{id}            | Get by ID                           |
+| POST   | /api/moneychangers                 | Create                              |
+| PUT    | /api/moneychangers/{id}            | Update                              |
 | DELETE | /api/moneychangers/{id}?role=admin | Soft delete (only if role is admin) |
 
 ---
 
 ## 📁 Structure
 
-- `model/` - Entity definitions
-- `repository/` - DB access
-- `service/` - Business logic
-- `controller/` - REST API endpoints
+* `model/` - Entity definitions
+* `repository/` - DB access
+* `service/` - Business logic
+* `controller/` - REST API endpoints
 
 ---
 
 ## ✅ Additional Notes
 
-- `isDeleted` field is used for soft delete.
-- Accounts table includes `role` to differentiate between admin and staff.
-- Prevents non-admin from deleting.
+* `isDeleted` field is used for soft delete.
+* Accounts table includes `role` to differentiate between admin and staff.
+* Prevents non-admin from deleting.
+ 
+---
+
+## 📊 UML Diagrams
+
+### Use Case Diagram for Compute Rate Processing
+
+![Sequence Diagram](resources/uml/compute-rate-use-case-diagram.png)
+
+
+### Sequence Diagram for Compute Rate Use Case
+
+![Sequence Diagram](resources/uml/compute-rates-sequence-diagram.png)
+
+### Class Diagram for Compute Rate
+
+![Class Diagram](resources/uml/compute-rates-class-diagram.png)
