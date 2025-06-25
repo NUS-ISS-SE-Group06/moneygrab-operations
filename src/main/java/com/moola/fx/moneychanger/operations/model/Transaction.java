@@ -17,6 +17,9 @@ public class Transaction {
     @Column(name = "customer_id")
     private int customerId;
 
+    @Column(name = "money_changer_id")
+    private int money_changer_id;
+
     @Column(name = "current_status")
     private String currentStatus;
 
@@ -46,7 +49,12 @@ public class Transaction {
     public void setCustomerId(int customerId) {
         this.customerId = customerId;
     }
-
+     public int getMoneyChangerId() {
+        return money_changer_id;
+    }
+   public void setMoneyChangerId(int money_changer_id) {
+        this.money_changer_id = money_changer_id;
+    }
     public String getCurrentStatus() {
         return currentStatus;
     }
