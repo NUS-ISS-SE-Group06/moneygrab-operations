@@ -79,6 +79,11 @@ Use IntelliJ IDEA or run:
 
 ## 📊 UML Diagrams
 
+### Use Case Diagram for Compute Rate Processing
+
+![Sequence Diagram](resources/uml/compute-rate-use-case-diagram.png)
+
+
 ### Sequence Diagram for Compute Rate Use Case
 
 ![Sequence Diagram](resources/uml/compute-rates-sequence-diagram.png)
