@@ -40,10 +40,10 @@ Then **import the schema and data**:
 
 ```
 -- Step 1: Schema
-Run `moneychanger_schema.sql`
+Run `02_moneychanger_schema.sql`
 
 -- Step 2: Sample Test Data
-Run `moneychanger_test_data.sql`
+Run `05_moneychanger_test_data.sql`
 ```
 
 ---

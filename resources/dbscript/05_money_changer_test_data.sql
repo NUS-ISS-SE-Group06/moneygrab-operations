@@ -15,7 +15,7 @@ INSERT INTO scheme (id, name_tag, description, is_default) VALUES
                                                                (2, 'VIP 2','',0),
                                                                (3, 'VIP 3','',0),
                                                                (4, 'VIP 4','',0),
-                                                               (5, 'PROMO','',0),
+                                                               (5, 'PROMO','',0);
 
 
 -- Insert money_changer
