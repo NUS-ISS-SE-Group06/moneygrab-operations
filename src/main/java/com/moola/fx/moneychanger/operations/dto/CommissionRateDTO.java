@@ -1,6 +1,6 @@
 package com.moola.fx.moneychanger.operations.dto;
 
-import lombok.Data;
+import lombok.Data; 
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
