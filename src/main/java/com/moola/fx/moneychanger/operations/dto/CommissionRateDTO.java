@@ -17,5 +17,5 @@ public class CommissionRateDTO {
     private Timestamp updatedAt;
     private Integer createdBy;
     private Integer updatedBy;
-    private Boolean isDeleted;
+    private Boolean isDeleted; 
 }
