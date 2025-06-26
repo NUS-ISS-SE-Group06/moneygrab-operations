@@ -4,12 +4,8 @@ DROP DATABASE IF EXISTS fxuploaddb;
 
 DROP DATABASE IF EXISTS reservationdb;
 
-DROP DATABASE IF EXISTS computeratedb;
-
 CREATE DATABASE moneychangerdb;
 
 CREATE DATABASE fxuploaddb;
 
 CREATE DATABASE reservationdb;
-
-CREATE DATABASE computeratedb;
