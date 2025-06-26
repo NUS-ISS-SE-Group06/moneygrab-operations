@@ -81,7 +81,7 @@ Use IntelliJ IDEA or run:
 
 ### Use Case Diagram for Compute Rate Processing
 
-![Sequence Diagram](resources/uml/compute-rate-use-case-diagram.png)
+![Use Case Diagram](resources/uml/compute-rate-use-case-diagram.png)
 
 
 ### Sequence Diagram for Compute Rate Use Case
@@ -91,3 +91,17 @@ Use IntelliJ IDEA or run:
 ### Class Diagram for Compute Rate
 
 ![Class Diagram](resources/uml/compute-rates-class-diagram.png)
+
+## 📊 Database Diagrams
+
+### MoneyChanger Microservice ERD Diagram
+
+![ERD Diagram](resources/dbscript/MoneyGrab-ERD.png)
+
+### FxUpload Microservice ERD Diagram
+
+![ERD Diagram](resources/dbscript/fxuploaddb-ERD.png)
+
+### Reservation Microservice ERD Diagram
+
+![ERD Diagram](resources/dbscript/reservationdb-ERD.png)
