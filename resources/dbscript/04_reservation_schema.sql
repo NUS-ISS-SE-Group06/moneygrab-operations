@@ -22,7 +22,7 @@ CREATE TABLE transaction (
                              reservation_id INT NULL,
                              transaction_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                              customer_id INT NOT NULL,
-                             current_status VARCHAR(20) NULL,
+                             current_status VARCHAR(20) NULL, -- e.g., PENDING, CONFIRMED, CANCELLED, REFUNDED, EXPIRED
                              email VARCHAR(255),
                              comments TEXT,
                              money_changer_id INT NOT NULL,
