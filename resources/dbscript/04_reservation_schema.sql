@@ -19,6 +19,7 @@ CREATE TABLE reservation (
 
 CREATE TABLE transaction (
                              id INT AUTO_INCREMENT PRIMARY KEY,
+                             reservation_id INT NULL,
                              transaction_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                              customer_id INT NOT NULL,
                              current_status VARCHAR(20) NULL,
@@ -33,7 +34,8 @@ CREATE TABLE transaction (
                              created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                              updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                              created_by INT,
-                             updated_by INT NULL
+                             updated_by INT NULL,
+                             CONSTRAINT fk_transaction_reservation FOREIGN KEY (reservation_id) REFERENCES reservation(id) ON DELETE SET NULL
 );
 
 
