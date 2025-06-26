@@ -10,26 +10,44 @@ TRUNCATE TABLE currency_code;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- Insert schemes
-INSERT INTO scheme (id, name_tag, description, is_default) VALUES
-                                                               (1, 'VIP 1', '',0),
-                                                               (2, 'VIP 2','',0),
-                                                               (3, 'VIP 3','',0),
-                                                               (4, 'VIP 4','',0),
-                                                               (5, 'PROMO','',0);
+INSERT INTO scheme (id,
+                    name_tag,
+                    description,
+                    is_default
+) VALUES
+    (1, 'VIP 1', 'Premium commission rate for top-tier VIP clients',0),
+    (2, 'VIP 2','Exclusive commission rate for long-term or high-volume customers',0),
+    (3, 'VIP 3','Specialized rate for priority and valued clients',0),
+    (4, 'VIP 4','Tailored commission rate for elite customers and special accounts',0),
+    (5, 'PROMO','Promotional commission rate for limited-time offers and campaigns',0);
 
 
 -- Insert money_changer
-INSERT INTO money_changer (id, company_name, email, date_of_incorporation, address, country, postal_code, notes, uen, scheme_id, created_by, updated_by) VALUES
-                                                                                                                                                             (1, 'Company 1', 'company1@example.com', '2010-04-04', '123 Road St #1', 'Singapore', 'S12134', 'Test notes 1', 'UEN1XYZ', 1, NULL, NULL),
-                                                                                                                                                             (2, 'Company 2', 'company2@example.com', '2010-08-02', '123 Road St #2', 'Singapore', 'S12234', 'Test notes 2', 'UEN2XYZ', 2, NULL, NULL),
-                                                                                                                                                             (3, 'Company 3', 'company3@example.com', '2010-02-02', '123 Road St #3', 'Singapore', 'S12334', 'Test notes 3', 'UEN3XYZ', 3, NULL, NULL),
-                                                                                                                                                             (4, 'Company 4', 'company4@example.com', '2010-09-03', '123 Road St #4', 'Singapore', 'S12434', 'Test notes 4', 'UEN4XYZ', 4, NULL, NULL),
-                                                                                                                                                             (5, 'Company 5', 'company5@example.com', '2010-03-07', '123 Road St #5', 'Singapore', 'S12534', 'Test notes 5', 'UEN5XYZ', 5, NULL, NULL),
-                                                                                                                                                             (6, 'Company 6', 'company6@example.com', '2010-01-08', '123 Road St #6', 'Singapore', 'S12634', 'Test notes 6', 'UEN6XYZ', 1, NULL, NULL),
-                                                                                                                                                             (7, 'Company 7', 'company7@example.com', '2010-02-09', '123 Road St #7', 'Singapore', 'S12734', 'Test notes 7', 'UEN7XYZ', 2, NULL, NULL),
-                                                                                                                                                             (8, 'Company 8', 'company8@example.com', '2010-04-01', '123 Road St #8', 'Singapore', 'S12834', 'Test notes 8', 'UEN8XYZ', 3, NULL, NULL),
-                                                                                                                                                             (9, 'Company 9', 'company9@example.com', '2010-01-04', '123 Road St #9', 'Singapore', 'S12934', 'Test notes 9', 'UEN9XYZ', 4, NULL, NULL),
-                                                                                                                                                             (10, 'Company 10', 'company10@example.com', '2010-05-01', '123 Road St #10', 'Singapore', 'S121034', 'Test notes 10', 'UEN10XYZ', 5, NULL, NULL);
+INSERT INTO money_changer (
+    id,
+    company_name,
+    email,
+    date_of_incorporation,
+    address,
+    country,
+    postal_code,
+    notes,
+    uen,
+    scheme_id,
+    created_by,
+    updated_by
+) VALUES
+      (1, 'Raffles Exchange Pte Ltd', 'raffles.exchange@example.com', '2010-04-04', '1 Raffles Place', 'Singapore', '048616', 'Test notes 1', 'UEN1XYZ', 1, NULL, NULL),
+      (2, 'Marina Money Changer', 'marina.moneychanger@example.com', '2010-08-02', '2 Marina Blvd', 'Singapore', '018797', 'Test notes 2', 'UEN2XYZ', 2, NULL, NULL),
+      (3, 'Robinson Forex Services', 'robinson.forex@example.com', '2010-02-02', '3 Robinson Rd', 'Singapore', '068895', 'Test notes 3', 'UEN3XYZ', 3, NULL, NULL),
+      (4, 'Shenton Remittance & Exchange', 'shenton.remittance@example.com', '2010-09-03', '4 Shenton Way', 'Singapore', '068807', 'Test notes 4', 'UEN4XYZ', 4, NULL, NULL),
+      (5, 'Temasek Currency Services', 'temasek.currency@example.com', '2010-03-07', '5 Temasek Blvd', 'Singapore', '038985', 'Test notes 5', 'UEN5XYZ', 5, NULL, NULL),
+      (6, 'Orchard Money Exchange', 'orchard.exchange@example.com', '2010-01-08', '6 Orchard Rd', 'Singapore', '238801', 'Test notes 6', 'UEN6XYZ', 1, NULL, NULL),
+      (7, 'Beach Road Forex', 'beachroad.forex@example.com', '2010-02-09', '7 Beach Rd', 'Singapore', '189702', 'Test notes 7', 'UEN7XYZ', 2, NULL, NULL),
+      (8, 'Serangoon Money Services', 'serangoon.money@example.com', '2010-04-01', '8 Serangoon Rd', 'Singapore', '217964', 'Test notes 8', 'UEN8XYZ', 3, NULL, NULL),
+      (9, 'Tampines Currency Exchange', 'tampines.exchange@example.com', '2010-01-04', '9 Tampines Ave', 'Singapore', '529551', 'Test notes 9', 'UEN9XYZ', 4, NULL, NULL),
+      (10, 'Bukit Timah Money Changer', 'bukittimah.money@example.com', '2010-05-01', '10 Bukit Timah Rd', 'Singapore', '229840', 'Test notes 10', 'UEN10XYZ', 5, NULL, NULL);
+
 
 -- Insert accounts
 INSERT INTO accounts (id, money_changer_id, role, email, created_by, updated_by) VALUES
@@ -44,19 +62,6 @@ INSERT INTO accounts (id, money_changer_id, role, email, created_by, updated_by)
                                                                                      (9, 9, 'staff', 'user9@example.com', NULL, NULL),
                                                                                      (10, 10, 'admin', 'user10@example.com', NULL, NULL);
 
--- Insert money_changer_photo (invalid because photo url is replaced by actual photo storage) modified on 14June2025
-/*INSERT INTO money_changer_photo (id, money_changer_id, photo_url, created_by, updated_by) VALUES
-                                                                                              (1, 1, 'https://example.com/photo1.jpg', NULL, NULL),
-                                                                                              (2, 2, 'https://example.com/photo2.jpg', NULL, NULL),
-                                                                                              (3, 3, 'https://example.com/photo3.jpg', NULL, NULL),
-                                                                                              (4, 4, 'https://example.com/photo4.jpg', NULL, NULL),
-                                                                                              (5, 5, 'https://example.com/photo5.jpg', NULL, NULL),
-                                                                                              (6, 6, 'https://example.com/photo6.jpg', NULL, NULL),
-                                                                                              (7, 7, 'https://example.com/photo7.jpg', NULL, NULL),
-                                                                                              (8, 8, 'https://example.com/photo8.jpg', NULL, NULL),
-                                                                                              (9, 9, 'https://example.com/photo9.jpg', NULL, NULL),
-                                                                                              (10, 10, 'https://example.com/photo10.jpg', NULL, NULL);
-*/
 
 INSERT INTO company_commission_scheme(id,money_changer_id,scheme_id,is_deleted) VALUES
                                                                                     (1,1,1,0),
@@ -247,25 +252,3 @@ INSERT INTO currency_code (
       (174, 'ZAR', 'South African Rand'),
       (175, 'ZMW', 'Zambian Kwacha'),
       (176, 'ZWL', 'Zimbabwean Dollar');
-
-
--- TEST DATA for money_changer_photo (dummy data)
--- INSERT INTO money_changer_photo (money_changer_id, photo_data, photo_filename, photo_mimetype, created_by, updated_by, is_deleted)
--- VALUES (1, 'test', 'test.jpg', 'image/jpeg', 1, 1, 0);
-
---  TEST DATA for money_changer_kyc (dummy data — PDF, Word, or Image can be accepted)
--- Example with PDF:
--- INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
--- VALUES (1, 'test', 'test.pdf', 'application/pdf', 1, 1, 0);
-
--- Example with DOC:
--- INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
--- VALUES (1, 'test', 'test.doc', 'application/msword', 1, 1, 0);
-
--- Example with DOCX:
--- INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
--- VALUES (1, 'test', 'test.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 1, 1, 0);
-
--- Example with image KYC:
--- INSERT INTO money_changer_kyc (money_changer_id, document_data, document_filename, document_mimetype, created_by, updated_by, is_deleted)
--- VALUES (1, 'test', 'test.png', 'image/png', 1, 1, 0);

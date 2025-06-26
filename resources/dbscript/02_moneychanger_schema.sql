@@ -103,6 +103,7 @@ CREATE TABLE money_changer_photo (
                                      CONSTRAINT fk_photo_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
 
+-- STEP 8: Create money_changer_kyc table
 CREATE TABLE money_changer_kyc (
                                    id INT AUTO_INCREMENT PRIMARY KEY,
                                    money_changer_id INT NOT NULL,
@@ -120,7 +121,7 @@ CREATE TABLE money_changer_kyc (
 );
 
 
-
+-- STEP 9: Create money_changer_location table
 CREATE TABLE money_changer_location (
                                         id INT AUTO_INCREMENT PRIMARY KEY,
                                         money_changer_id INT NOT NULL,
@@ -136,7 +137,7 @@ CREATE TABLE money_changer_location (
 );
 
 
-
+-- STEP 10: Create money_changer_currency table
 CREATE TABLE money_changer_currency (
                                    id INT AUTO_INCREMENT PRIMARY KEY,
                                    money_changer_id INT NOT NULL,
@@ -153,7 +154,7 @@ CREATE TABLE money_changer_currency (
 );
 
 
-
+-- STEP 11: Create customer table
 CREATE TABLE customer (
                           id INT AUTO_INCREMENT PRIMARY KEY,
                           customer_name VARCHAR(255) NOT NULL,
@@ -169,34 +170,7 @@ CREATE TABLE customer (
 );
 
 
-CREATE TABLE transaction (
-                             id INT AUTO_INCREMENT PRIMARY KEY,
-                             transaction_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                             customer_id INT NOT NULL,
-                             current_status VARCHAR(20) NULL,
-                             email VARCHAR(255),
-                             comments TEXT,
-                             money_changer_id INT NOT NULL,
-                             currency_id INT NOT NULL,
-                             exchange_rate DECIMAL(18,8) NOT NULL,
-                             foreign_amount DECIMAL(18,8) NOT NULL,
-                             sgd_amount DECIMAL(18,8) NOT NULL,
-                             received_cash DECIMAL(18,8) NOT NULL,
-                             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                             created_by INT,
-                             updated_by INT NULL,
-                             CONSTRAINT fk_transaction_customer FOREIGN KEY (customer_id) REFERENCES customer(id),
-                             CONSTRAINT fk_transaction_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id),
-                             CONSTRAINT fk_transaction_currency FOREIGN KEY (currency_id) REFERENCES currency_code(id),
-                             CONSTRAINT fk_transaction_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
-                             CONSTRAINT fk_transaction_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
-);
 
-
-
-
--- STEP 9: Add foreign keys (after all tables are created)
 ALTER TABLE money_changer ADD CONSTRAINT fk_money_changer_scheme FOREIGN KEY (scheme_id) REFERENCES scheme(id);
 ALTER TABLE money_changer ADD CONSTRAINT fk_money_changer_created_by FOREIGN KEY (created_by) REFERENCES accounts(id);
 ALTER TABLE money_changer ADD CONSTRAINT fk_money_changer_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id);
