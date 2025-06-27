@@ -169,6 +169,31 @@ CREATE TABLE customer (
                           CONSTRAINT fk_customer_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
 
+-- STEP 11: Create compute_rates table
+CREATE TABLE compute_rates (
+                               currency_code CHAR(3) NOT NULL PRIMARY KEY,
+                               unit VARCHAR(50) NULL,
+                               raw_bid DECIMAL(18,8),
+                               raw_ask DECIMAL(18,8),
+                               spread DECIMAL(18,8),
+                               skew DECIMAL(18,8),
+                               ws_bid DECIMAL(18,8),
+                               ws_ask DECIMAL(18,8),
+                               ref_bid DECIMAL(18,8),
+                               dp_bid DECIMAL(18,8),
+                               mar_bid DECIMAL(18,8),
+                               cf_bid DECIMAL(18,8),
+                               rt_bid DECIMAL(18,8),
+                               ref_ask DECIMAL(18,8),
+                               dp_ask DECIMAL(18,8),
+                               mar_ask DECIMAL(18,8),
+                               cf_ask DECIMAL(18,8),
+                               rt_ask DECIMAL(18,8),
+                               processed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                               processed_by INT NULL,
+                               CONSTRAINT fk_compute_rates_processed_by FOREIGN KEY (processed_by) REFERENCES accounts(id)
+);
+
 
 
 ALTER TABLE money_changer ADD CONSTRAINT fk_money_changer_scheme FOREIGN KEY (scheme_id) REFERENCES scheme(id);
