@@ -1,6 +1,9 @@
 package com.moola.fx.moneychanger.operations.repository;
 
 import com.moola.fx.moneychanger.operations.model.Transaction;
+
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -8,4 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
     // You can define custom queries here if needed, e.g.:
     // List<Transaction> findByCustomerId(int customerId);
+     List<Transaction> findByMoneyChangerId(int moneyChangerId);
 }

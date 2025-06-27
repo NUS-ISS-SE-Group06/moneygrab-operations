@@ -15,7 +15,10 @@ public class TransactionService {
         this.repository = repository;
     }
 
-    public List<Transaction> getAllTransactions() {
-        return repository.findAll();
+    // public List<Transaction> getAllTransactions() {
+    //     return repository.findAll();
+    // }
+    public List<Transaction> listByMoneyChanger(int moneyChangerId) {
+        return repository.findByMoneyChangerId(moneyChangerId);
     }
 }
