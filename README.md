@@ -1,11 +1,11 @@
-# 💱 MoneyChanger Spring Boot Enhanced API
+# 💱 MoneyChanger API
 
-This is a production-ready Spring Boot project for managing money changers, designed with:
+This is a production-ready backend service for managing money changers, featuring:
 
 * Role-based logic (`admin` vs `staff`)
 * Soft delete support
-* REST API using Spring Web
-* MySQL-compatible schema (can connect to AWS RDS)
+* REST API design
+* MySQL-compatible schema (support AWS RDS)
 
 ---
 
@@ -17,27 +17,42 @@ This is a production-ready Spring Boot project for managing money changers, desi
 * Maven
 * MySQL (local or AWS RDS)
 
+
 ### 2. Database Setup
 
-Run the provided `database.sql` to create tables:
+#### Provision MySQL 8.0 container for Docker.
+
+Create the environment variables required for `docker-compose.yml`:
+
+```
+${MYSQL_ROOT_PASSWORD}
+${MYSQL_DATABASE}
+```
+Run Docker Compose
+```bash
+
+
+docker-compose up -d
+```
+Run the SQL script located in `resources/dbscript` using the MySQL terminal to create the database and required tables:
 
 ```sql
-CREATE DATABASE moneychanger;
-USE moneychanger;
--- then run the schema script
+01_db_creation.sql
+02_moneychanger_schema.sql
+03_fxupload_schema.sql
+04_reservation_schema.sql
+05_money_changer_test_data.sql
+06_computeratedb_schema.sql
 ```
 
 ### 3. Application Properties
 
-Create `src/main/resources/application.properties`:
+Create the environment variables required for `src/main/resources/application.yml` configuration:
 
 ```
-spring.datasource.url=jdbc:mysql://localhost:3306/moneychanger
-spring.datasource.username=your_mysql_user
-spring.datasource.password=your_mysql_password
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-server.port=8080
+${DB_URL}
+${DB_USERNAME}
+${DB_PASSWORD}
 ```
 
 ### 4. Run the Application
@@ -45,35 +60,29 @@ server.port=8080
 Use IntelliJ IDEA or run:
 
 ```bash
-./mvnw spring-boot:run
+
+
+mvn spring-boot:run
 ```
 
-### 5. Test the API with Postman
+## 📁 Project Structure
 
-| Method | URL                                | Description                         |
-| ------ | ---------------------------------- | ----------------------------------- |
-| GET    | /api/moneychangers                 | List all                            |
-| GET    | /api/moneychangers/{id}            | Get by ID                           |
-| POST   | /api/moneychangers                 | Create                              |
-| PUT    | /api/moneychangers/{id}            | Update                              |
-| DELETE | /api/moneychangers/{id}?role=admin | Soft delete (only if role is admin) |
-
----
-
-## 📁 Structure
-
-* `model/` - Entity definitions
-* `repository/` - DB access
-* `service/` - Business logic
-* `controller/` - REST API endpoints
-
+* `config/` – Configuration classes for application settings, beans, security, or data sources.
+* `controller/` – Defines REST API endpoints and handles incoming HTTP requests.
+* `dto/` – Data Transfer Objects used for request/response payloads between layers.
+* `exception/` – Custom exception classes and global exception handling (e.g., @ControllerAdvice).
+* `mapper/` – Maps between entities and DTOs, often using MapStruct or manual mapping logic.
+* `model/` – JPA entity classes representing database tables.
+* `repository/` – Spring Data JPA repositories for database access and queries.
+* `service/` – Business logic layer that processes data and orchestrates repository interactions.
 ---
 
 ## ✅ Additional Notes
 
-* `isDeleted` field is used for soft delete.
-* Accounts table includes `role` to differentiate between admin and staff.
-* Prevents non-admin from deleting.
+* `isDeleted` enables soft delete.
+* `accounts.role` distinguishes admin and staff.
+* Only admins can perform delete operations.
+* `created_by`, `updated_by`, `created_at`, and `updated_at` support audit tracking.
  
 ---
 
