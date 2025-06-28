@@ -22,7 +22,7 @@ public class CommissionRate {
     @JoinColumn(name = "scheme_id", nullable = false)
     private Scheme schemeId;
 
-    @Column(nullable = false, precision = 5, scale = 4)
+    @Column(nullable = false, precision = 18, scale = 8)
     private BigDecimal rate;
 
     @Column(name = "created_at", nullable = false, updatable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
