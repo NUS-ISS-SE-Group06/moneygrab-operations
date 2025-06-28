@@ -57,7 +57,7 @@ CREATE TABLE commission_rate (
                                  id INT AUTO_INCREMENT PRIMARY KEY,
                                  currency_id INT NOT NULL,
                                  scheme_id   INT NOT NULL,
-                                 rate DECIMAL(20,10) NOT NULL,
+                                 rate DECIMAL(18,8) NOT NULL,
                                  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                  updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                  created_by INT,
