@@ -114,3 +114,9 @@ mvn spring-boot:run
 ### Reservation Microservice ERD Diagram
 
 ![ERD Diagram](resources/dbscript/reservationdb-ERD.png)
+
+## 📊 Architecture Diagrams
+
+### Overview Logical Architecture 
+
+![Architecture Diagram1](resources/uml/moneygrab-logical-architecture-overview.png)
