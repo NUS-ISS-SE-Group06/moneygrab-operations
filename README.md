@@ -109,11 +109,11 @@ mvn spring-boot:run
 
 ### FxUpload Microservice ERD Diagram
 
-<img src="resources/dbscript/fxuploaddb-ERD.png" alt="ERD Diagram" width="300"/>
+<img src="resources/dbscript/fxuploaddb-ERD.png" alt="ERD Diagram" width="200"/>
 
 ### Reservation Microservice ERD Diagram
 
-<img alt="ERD Diagram" src="resources/dbscript/reservationdb-ERD.png" width="300"/>
+<img alt="ERD Diagram" src="resources/dbscript/reservationdb-ERD.png" width="200"/>
 
 ## 📊 Architecture Diagrams
 
