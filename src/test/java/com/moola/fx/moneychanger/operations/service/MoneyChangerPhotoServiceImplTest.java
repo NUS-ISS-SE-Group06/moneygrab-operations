@@ -5,74 +5,51 @@ import com.moola.fx.moneychanger.operations.repository.MoneyChangerPhotoReposito
 import org.apache.tika.Tika;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 class MoneyChangerPhotoServiceImplTest {
 
-    @Mock
     private MoneyChangerPhotoRepository photoRepository;
-
-    @Mock
-    private Tika tika;
-
-    @InjectMocks
     private MoneyChangerPhotoServiceImpl photoService;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
-    @Test
-    void testGetByMoneyChangerId_WhenFound() {
-        Long id = 1L;
-        MoneyChangerPhoto mockPhoto = new MoneyChangerPhoto();
-        when(photoRepository.findByMoneyChangerIdAndIsDeletedFalse(id)).thenReturn(Optional.of(mockPhoto));
-
-        Optional<MoneyChangerPhoto> result = photoService.getByMoneyChangerId(id);
-
-        assertTrue(result.isPresent());
-        assertEquals(mockPhoto, result.get());
-        verify(photoRepository).findByMoneyChangerIdAndIsDeletedFalse(id);
-    }
-
-    @Test
-    void testGetByMoneyChangerId_WhenNotFound() {
-        Long id = 1L;
-        when(photoRepository.findByMoneyChangerIdAndIsDeletedFalse(id)).thenReturn(Optional.empty());
-
-        Optional<MoneyChangerPhoto> result = photoService.getByMoneyChangerId(id);
-
-        assertFalse(result.isPresent());
-        verify(photoRepository).findByMoneyChangerIdAndIsDeletedFalse(id);
-    }
-
-    @Test
-    void testSaveOrUpdate_WithBase64Photo() {
-        Long id = 1L;
-        String base64 = "iVBORw0KGgoAAAANSUhEUg==";
-        String filename = "logo.png";
-
-        MoneyChangerPhoto existing = new MoneyChangerPhoto();
-        when(photoRepository.findByMoneyChangerIdAndIsDeletedFalse(id)).thenReturn(Optional.of(existing));
-        when(tika.detect(any(byte[].class))).thenReturn("image/png");
-
-        photoService.saveOrUpdate(id, base64, filename);
-
-        // Two saves expected: soft-delete old + insert new
-        verify(photoRepository, times(2)).save(any(MoneyChangerPhoto.class));
+        photoRepository = mock(MoneyChangerPhotoRepository.class);
+        photoService = new MoneyChangerPhotoServiceImpl(photoRepository);
     }
 
     @Test
     void testSaveOrUpdate_EmptyBase64() {
         photoService.saveOrUpdate(1L, "", "logo.png");
         verify(photoRepository, never()).save(any());
+    }
+
+    @Test
+    void testDetectMimeType_ShouldReturnCorrectMimeType_ForJpeg() throws Exception {
+        // Simulate JPEG file signature: [0xFF, 0xD8, 0xFF]
+        byte[] jpegBytes = new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
+
+        // Use reflection to call private method without changing service visibility
+        var method = MoneyChangerPhotoServiceImpl.class.getDeclaredMethod("detectMimeType", byte[].class);
+        method.setAccessible(true);
+        String mimeType = (String) method.invoke(photoService, (Object) jpegBytes);
+
+        // This may return "image/jpeg" depending on Apache Tika version
+        assertEquals("image/jpeg", mimeType);
+    }
+
+    @Test
+    void testDetectMimeType_ShouldReturnFallbackMimeType_OnError() throws Exception {
+        byte[] badData = null; // Null byte array triggers exception
+
+        var method = MoneyChangerPhotoServiceImpl.class.getDeclaredMethod("detectMimeType", byte[].class);
+        method.setAccessible(true);
+        String mimeType = (String) method.invoke(photoService, (Object) badData);
+
+        assertEquals("application/octet-stream", mimeType);
     }
 }

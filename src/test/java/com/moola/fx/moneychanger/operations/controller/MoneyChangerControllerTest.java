@@ -1,10 +1,12 @@
 package com.moola.fx.moneychanger.operations.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
 import com.moola.fx.moneychanger.operations.service.MoneyChangerService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -14,14 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
+
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
-
 
 @WebMvcTest(MoneyChangerController.class)
 class MoneyChangerControllerTest {
@@ -33,6 +31,12 @@ class MoneyChangerControllerTest {
     private MoneyChangerService moneyChangerService;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @BeforeEach
+    void setup() {
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 
     private MoneyChangerResponseDTO getSampleDTO() {
         MoneyChangerResponseDTO dto = new MoneyChangerResponseDTO();
@@ -61,9 +65,8 @@ class MoneyChangerControllerTest {
 
     @Test
     void testGetAllMoneyChangers() throws Exception {
-        MoneyChangerResponseDTO dto = getSampleDTO();
-        List<MoneyChangerResponseDTO> list = List.of(dto);
-        Mockito.when(moneyChangerService.getAllMoneyChangers()).thenReturn(list);
+        List<MoneyChangerResponseDTO> list = List.of(getSampleDTO());
+        when(moneyChangerService.getAllMoneyChangers()).thenReturn(list);
 
         mockMvc.perform(get("/v1/money-changers"))
                 .andExpect(status().isOk())
@@ -72,27 +75,42 @@ class MoneyChangerControllerTest {
 
     @Test
     void testGetMoneyChangerById() throws Exception {
-        MoneyChangerResponseDTO dto = getSampleDTO();
-        Mockito.when(moneyChangerService.getMoneyChangerById(1L)).thenReturn(dto);
+        when(moneyChangerService.getMoneyChangerById(1L)).thenReturn(getSampleDTO());
 
         mockMvc.perform(get("/v1/money-changers/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.companyName").value("ABC FX"));
     }
-    @BeforeEach
-    void setup() {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
+
     @Test
     void testCreateMoneyChanger() throws Exception {
         MoneyChangerResponseDTO dto = getSampleDTO();
-        Mockito.when(moneyChangerService.createMoneyChanger(Mockito.any())).thenReturn(dto);
+        when(moneyChangerService.createMoneyChanger(any())).thenReturn(dto);
 
         mockMvc.perform(post("/v1/money-changers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.uen").value("UEN123456X"));
+    }
+
+    @Test
+    void testUpdateMoneyChanger() throws Exception {
+        MoneyChangerResponseDTO dto = getSampleDTO();
+        when(moneyChangerService.updateMoneyChanger(eq(1L), any())).thenReturn(dto);
+
+        mockMvc.perform(put("/v1/money-changers/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.companyName").value("ABC FX"));
+    }
+
+    @Test
+    void testDeleteMoneyChanger() throws Exception {
+        doNothing().when(moneyChangerService).deleteMoneyChanger(1L);
+
+        mockMvc.perform(delete("/v1/money-changers/1"))
+                .andExpect(status().isNoContent());
     }
 }

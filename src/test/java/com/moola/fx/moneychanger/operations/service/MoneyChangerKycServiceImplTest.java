@@ -13,6 +13,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import java.lang.reflect.Method;
 
 class MoneyChangerKycServiceImplTest {
 
@@ -75,5 +76,35 @@ class MoneyChangerKycServiceImplTest {
     void testSaveOrUpdate_EmptyBase64() {
         kycService.saveOrUpdate(1L, "", "test.pdf");
         verify(kycRepository, never()).save(any());
+    }
+
+
+
+    @Test
+    void testDetectMimeType_ShouldReturnCorrectMimeType_ForJpeg() throws Exception {
+        byte[] jpegBytes = new byte[]{
+                (byte) 0xFF, (byte) 0xD8, (byte) 0xFF, // JPEG header
+                0x00, 0x10, 0x4A, 0x46, 0x49, 0x46, 0x00 // extra junk to simulate content
+        };
+
+        Method method = MoneyChangerKycServiceImpl.class.getDeclaredMethod("detectMimeType", byte[].class);
+        method.setAccessible(true);
+        String result = (String) method.invoke(kycService, (Object) jpegBytes);
+
+        // Use Tika to detect expected value in test
+        String expected = new Tika().detect(jpegBytes);
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void testDetectMimeType_ShouldReturnOctetStream_OnException() throws Exception {
+        // simulate exception by mocking a corrupted input (e.g., null array)
+        byte[] corrupted = null;
+
+        Method method = MoneyChangerKycServiceImpl.class.getDeclaredMethod("detectMimeType", byte[].class);
+        method.setAccessible(true);
+        String result = (String) method.invoke(kycService, (Object) corrupted);
+
+        assertEquals("application/octet-stream", result);
     }
 }
