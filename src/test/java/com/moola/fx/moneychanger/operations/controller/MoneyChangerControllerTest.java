@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 
 @WebMvcTest(MoneyChangerController.class)
-public class MoneyChangerControllerTest {
+class MoneyChangerControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -157,16 +157,6 @@ class MoneyChangerServiceImplTest {
 
         assertEquals("MoneyChanger not found", ex.getMessage());
     }
-    /*
-    void testUpdateMoneyChanger_NotFound() {
-        when(moneyChangerRepository.findByIdAndIsDeletedFalse(2L)).thenReturn(Optional.empty());
-
-        Exception ex = assertThrows(IllegalArgumentException.class,
-                () -> moneyChangerService.updateMoneyChanger(2L, new MoneyChangerResponseDTO()));
-
-        assertEquals("MoneyChanger not found", ex.getMessage());
-    }
-   */
 
     @Test
     void testDeleteMoneyChanger() {
