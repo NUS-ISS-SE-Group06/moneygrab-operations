@@ -18,4 +18,6 @@ public class MoneyChangerApiApplication {
     public static void main(String[] args) {
         SpringApplication.run(MoneyChangerApiApplication.class, args);
     }
+
+    // Additional configuration can be added here if needed
 }

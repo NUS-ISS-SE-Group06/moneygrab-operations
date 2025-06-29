@@ -51,6 +51,13 @@ public class CompanyCommissionSchemeController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CompanyCommissionSchemeDTO> update(@PathVariable("id") Integer id, @RequestBody CompanyCommissionSchemeDTO dto) {
+        CompanyCommissionScheme existing = service.get(id);
+        if (existing == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        dto.setId(id);
+
         CompanyCommissionScheme updated = service.save(dto);
         return ResponseEntity.ok(mapper.toDTO(updated));
     }

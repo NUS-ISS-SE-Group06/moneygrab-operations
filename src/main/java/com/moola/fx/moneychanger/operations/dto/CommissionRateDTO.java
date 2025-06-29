@@ -1,6 +1,6 @@
 package com.moola.fx.moneychanger.operations.dto;
 
-import lombok.Data;
+import lombok.Data; 
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -17,5 +17,5 @@ public class CommissionRateDTO {
     private Timestamp updatedAt;
     private Integer createdBy;
     private Integer updatedBy;
-    private Boolean isDeleted;
+    private Boolean isDeleted; 
 }
