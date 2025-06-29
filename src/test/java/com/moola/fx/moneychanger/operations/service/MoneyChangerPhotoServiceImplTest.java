@@ -2,56 +2,77 @@ package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerPhotoRepository;
-
+import org.apache.tika.Tika;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class MoneyChangerPhotoServiceImplTest {
 
     @Mock
     private MoneyChangerPhotoRepository photoRepository;
 
+    @Mock
+    private Tika tika;
+
     @InjectMocks
     private MoneyChangerPhotoServiceImpl photoService;
 
-    private static final Long TEST_ID = 1L;
-
-    private static final String VALID_BASE64_IMAGE =
-            "iVBORw0KGgoAAAANSUhEUgAAAAUA" +  // <-- short PNG header base64
-                    "AAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
-                    "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
-
     @BeforeEach
     void setUp() {
-        // No need for openMocks if @ExtendWith(MockitoExtension.class) is used
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    void testSavePhoto_WhenPreviousExists() {
-        MoneyChangerPhoto existingPhoto = new MoneyChangerPhoto();
-        existingPhoto.setIsDeleted(0);
+    void testGetByMoneyChangerId_WhenFound() {
+        Long id = 1L;
+        MoneyChangerPhoto mockPhoto = new MoneyChangerPhoto();
+        when(photoRepository.findByMoneyChangerIdAndIsDeletedFalse(id)).thenReturn(Optional.of(mockPhoto));
 
-        when(photoRepository.findByMoneyChangerIdAndIsDeletedFalse(TEST_ID))
-                .thenReturn(Optional.of(existingPhoto));
+        Optional<MoneyChangerPhoto> result = photoService.getByMoneyChangerId(id);
 
-        photoService.saveOrUpdate(TEST_ID, VALID_BASE64_IMAGE, "logo.png");
+        assertTrue(result.isPresent());
+        assertEquals(mockPhoto, result.get());
+        verify(photoRepository).findByMoneyChangerIdAndIsDeletedFalse(id);
+    }
 
-        // Once for old soft delete, once for new insert
+    @Test
+    void testGetByMoneyChangerId_WhenNotFound() {
+        Long id = 1L;
+        when(photoRepository.findByMoneyChangerIdAndIsDeletedFalse(id)).thenReturn(Optional.empty());
+
+        Optional<MoneyChangerPhoto> result = photoService.getByMoneyChangerId(id);
+
+        assertFalse(result.isPresent());
+        verify(photoRepository).findByMoneyChangerIdAndIsDeletedFalse(id);
+    }
+
+    @Test
+    void testSaveOrUpdate_WithBase64Photo() {
+        Long id = 1L;
+        String base64 = "iVBORw0KGgoAAAANSUhEUg==";
+        String filename = "logo.png";
+
+        MoneyChangerPhoto existing = new MoneyChangerPhoto();
+        when(photoRepository.findByMoneyChangerIdAndIsDeletedFalse(id)).thenReturn(Optional.of(existing));
+        when(tika.detect(any(byte[].class))).thenReturn("image/png");
+
+        photoService.saveOrUpdate(id, base64, filename);
+
+        // Two saves expected: soft-delete old + insert new
         verify(photoRepository, times(2)).save(any(MoneyChangerPhoto.class));
     }
 
     @Test
-    void testSavePhoto_WithEmptyBase64_ShouldReturn() {
-        photoService.saveOrUpdate(TEST_ID, "", "logo.jpg");
+    void testSaveOrUpdate_EmptyBase64() {
+        photoService.saveOrUpdate(1L, "", "logo.png");
         verify(photoRepository, never()).save(any());
     }
 }
