@@ -27,19 +27,19 @@ class MoneyChangerServiceImplTest {
     private MoneyChangerLocationRepository locationRepository;
 
     @Mock
-    private MoneyChangerPhotoRepository _photoRepository;
+    private MoneyChangerPhotoRepository photoRepository;
 
     @Mock
-    private MoneyChangerKycRepository _kycRepository;
+    private MoneyChangerKycRepository kycRepository;
 
     @Mock
-    private MoneyChangerPhotoService _moneyChangerPhotoService;
+    private MoneyChangerPhotoService moneyChangerPhotoService;
 
     @Mock
-    private MoneyChangerKycService _moneyChangerKycService;
+    private MoneyChangerKycService moneyChangerKycService;
 
     @Mock
-    private MoneyChangerLocationService _moneyChangerLocationService;
+    private MoneyChangerLocationService moneyChangerLocationService;
 
     @InjectMocks
     private MoneyChangerServiceImpl moneyChangerService;
@@ -49,11 +49,11 @@ class MoneyChangerServiceImplTest {
         MockitoAnnotations.openMocks(this);
 
         // Mark underscore-prefixed mocks as "used" to eliminate warnings & code smells
-        when(_photoRepository.findAll()).thenReturn(Collections.emptyList());
-        when(_kycRepository.findAll()).thenReturn(Collections.emptyList());
-        when(_moneyChangerPhotoService.toString()).thenReturn("used");
-        when(_moneyChangerKycService.toString()).thenReturn("used");
-        when(_moneyChangerLocationService.toString()).thenReturn("used");
+        when(photoRepository.findAll()).thenReturn(Collections.emptyList());
+        when(kycRepository.findAll()).thenReturn(Collections.emptyList());
+        when(moneyChangerPhotoService.toString()).thenReturn("used");
+        when(moneyChangerKycService.toString()).thenReturn("used");
+        when(moneyChangerLocationService.toString()).thenReturn("used");
     }
 
     @Test
