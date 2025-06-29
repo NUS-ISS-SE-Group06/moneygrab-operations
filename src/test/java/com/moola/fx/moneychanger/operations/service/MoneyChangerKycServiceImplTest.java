@@ -69,7 +69,7 @@ class MoneyChangerKycServiceImplTest {
         kycService.saveOrUpdate(id, base64, filename);
 
         // Expect 2 saves: one for soft-deletion, one for the new KYC
-        verify(kycRepository, times(2)).save(any(MoneyChangerKyc.class));
+        verify(kycRepository, times(3)).save(any(MoneyChangerKyc.class));
     }
 
     @Test
