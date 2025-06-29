@@ -170,6 +170,10 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
     }
 
     private void savePhoto(MoneyChangerResponseDTO dto, Long moneyChangerId) {
+        if (dto.getLogoBase64() == null || dto.getLogoBase64().trim().isEmpty()) {
+            return; // No new photo provided, keep existing record untouched
+        }
+
         photoRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
             existing.setIsDeleted(1);
             photoRepository.save(existing);
@@ -192,6 +196,10 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
     }
 
     private void saveKyc(MoneyChangerResponseDTO dto, Long moneyChangerId) {
+
+        if (dto.getKycBase64() == null || dto.getKycBase64().trim().isEmpty()) {
+            return; // No new KYC provided, keep existing record untouched
+        }
         kycRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
             existing.setIsDeleted(1);
             kycRepository.save(existing);
