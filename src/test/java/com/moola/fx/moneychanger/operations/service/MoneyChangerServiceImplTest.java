@@ -17,6 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
+import org.junit.jupiter.api.function.Executable;
 
 class MoneyChangerServiceImplTest {
 
@@ -151,11 +152,21 @@ class MoneyChangerServiceImplTest {
     void testUpdateMoneyChanger_NotFound() {
         when(moneyChangerRepository.findByIdAndIsDeletedFalse(2L)).thenReturn(Optional.empty());
 
+        Executable executable = () -> moneyChangerService.updateMoneyChanger(2L, new MoneyChangerResponseDTO());
+        Exception ex = assertThrows(IllegalArgumentException.class, executable);
+
+        assertEquals("MoneyChanger not found", ex.getMessage());
+    }
+    /*
+    void testUpdateMoneyChanger_NotFound() {
+        when(moneyChangerRepository.findByIdAndIsDeletedFalse(2L)).thenReturn(Optional.empty());
+
         Exception ex = assertThrows(IllegalArgumentException.class,
                 () -> moneyChangerService.updateMoneyChanger(2L, new MoneyChangerResponseDTO()));
 
         assertEquals("MoneyChanger not found", ex.getMessage());
     }
+   */
 
     @Test
     void testDeleteMoneyChanger() {
