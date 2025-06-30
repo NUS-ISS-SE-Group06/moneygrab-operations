@@ -18,7 +18,7 @@ public class MoneyChangerKyc {
     private Long moneyChangerId;
 
     @Lob
-    @Column(name = "document_data", nullable = false)
+    @Column(name = "document_data", nullable = false, columnDefinition = "LONGBLOB")
     private byte[] documentData;
 
     @Column(name = "document_filename")
