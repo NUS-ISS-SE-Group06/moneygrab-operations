@@ -24,7 +24,7 @@ public class MoneyChangerPhoto {
     private Long moneyChangerId;
 
     @Lob
-    @Column(name = "photo_data", nullable = false)
+    @Column(name = "photo_data", nullable = false, columnDefinition = "LONGBLOB")
     private byte[] photoData;
 
     @Column(name = "photo_filename")
