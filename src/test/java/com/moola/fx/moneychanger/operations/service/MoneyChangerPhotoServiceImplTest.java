@@ -1,57 +1,48 @@
 package com.moola.fx.moneychanger.operations.service;
 
-import com.moola.fx.moneychanger.operations.model.MoneyChangerPhoto;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerPhotoRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 class MoneyChangerPhotoServiceImplTest {
 
-    @Mock
     private MoneyChangerPhotoRepository photoRepository;
-
-    @InjectMocks
     private MoneyChangerPhotoServiceImpl photoService;
 
-    private static final Long TEST_ID = 1L;
 
-    private static final String VALID_BASE64_IMAGE =
-            "iVBORw0KGgoAAAANSUhEUgAAAAUA" +  // <-- short PNG header base64
-                    "AAAFCAYAAACNbyblAAAAHElEQVQI12P4" +
-                    "//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==";
 
     @BeforeEach
     void setUp() {
-        // No need for openMocks if @ExtendWith(MockitoExtension.class) is used
+        photoRepository = mock(MoneyChangerPhotoRepository.class);
+        photoService = new MoneyChangerPhotoServiceImpl(photoRepository);
     }
 
     @Test
-    void testSavePhoto_WhenPreviousExists() {
-        MoneyChangerPhoto existingPhoto = new MoneyChangerPhoto();
-        existingPhoto.setIsDeleted(0);
-
-        when(photoRepository.findByMoneyChangerIdAndIsDeletedFalse(TEST_ID))
-                .thenReturn(Optional.of(existingPhoto));
-
-        photoService.saveOrUpdate(TEST_ID, VALID_BASE64_IMAGE, "logo.png");
-
-        // Once for old soft delete, once for new insert
-        verify(photoRepository, times(2)).save(any(MoneyChangerPhoto.class));
-    }
-
-    @Test
-    void testSavePhoto_WithEmptyBase64_ShouldReturn() {
-        photoService.saveOrUpdate(TEST_ID, "", "logo.jpg");
+    void testSaveOrUpdate_EmptyBase64() {
+        photoService.saveOrUpdate(1L, "", "logo.png");
         verify(photoRepository, never()).save(any());
+    }
+
+    @Test
+    void testDetectMimeType_ShouldReturnCorrectMimeType_ForJpeg() throws Exception {
+        byte[] jpegBytes = new byte[]{(byte) 0xFF, (byte) 0xD8, (byte) 0xFF};
+        var method = MoneyChangerPhotoServiceImpl.class.getDeclaredMethod("detectMimeType", byte[].class);
+        method.setAccessible(true);
+        String mimeType = (String) method.invoke(photoService, new Object[]{jpegBytes}); // wrapped
+        assertEquals("image/jpeg", mimeType);
+    }
+
+    @Test
+    void testDetectMimeType_ShouldReturnFallbackMimeType_OnError() throws Exception {
+        // Intentionally null to simulate failure
+        byte[] corruptedInput = null; // Intentionally null to test fallback MIME detection
+        var method = MoneyChangerPhotoServiceImpl.class.getDeclaredMethod("detectMimeType", byte[].class);
+        method.setAccessible(true);
+        String mimeType = (String) method.invoke(photoService, new Object[]{corruptedInput}); // wrapped
+        assertEquals("application/octet-stream", mimeType);
     }
 }

@@ -42,6 +42,15 @@ public class MoneyChangerKycServiceImpl implements MoneyChangerKycService {
                 ? base64Document.substring(base64Document.indexOf(',') + 1) // strip prefix
                 : base64Document;
 
+        if (base64Data.trim().isEmpty()) {
+            return; // prevent saving empty content and deleting old KYC
+        }
+
+        kycRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
+            existing.setIsDeleted(1);
+            kycRepository.save(existing);
+        });
+
         byte[] decoded = Base64.getDecoder().decode(base64Data);
         newKyc.setDocumentData(decoded);               // GOOD data
         newKyc.setDocumentFilename(filename);

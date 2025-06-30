@@ -40,6 +40,16 @@ public class MoneyChangerPhotoServiceImpl implements MoneyChangerPhotoService {
                 ? base64Image.substring(base64Image.indexOf(',') + 1) // strip prefix
                 : base64Image;
 
+        if (base64Data.trim().isEmpty()) {
+            return; // prevent saving empty content and deleting old KYC
+        }
+
+        photoRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
+            existing.setIsDeleted(1);
+            photoRepository.save(existing);
+        });
+
+
         byte[] decoded = Base64.getDecoder().decode(base64Data);
         newPhoto.setPhotoData(decoded);               // GOOD data
         newPhoto.setPhotoFilename(filename);
