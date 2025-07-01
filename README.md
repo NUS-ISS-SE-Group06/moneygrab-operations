@@ -120,3 +120,11 @@ mvn spring-boot:run
 ### Overview Logical Architecture 
 
 ![Architecture Diagram1](resources/uml/moneygrab-logical-architecture-overview.png)
+
+### Logical Architecture (Web) 
+
+![Architecture Diagram1](resources/uml/logical-architecture-diagram-web.png)
+
+### Logical Architecture (Mobile)
+
+![Architecture Diagram1](resources/uml/logical-architecture-diagram-mobile.png)
