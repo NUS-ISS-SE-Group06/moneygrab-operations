@@ -22,8 +22,8 @@ class MoneyChangerPhotoServiceImplTest {
     }
 
     @Test
-    void testSaveOrUpdate_EmptyBase64() {
-        photoService.saveOrUpdate(1L, "", "logo.png");
+    void testSave_EmptyBase64() {
+        photoService.save(1L, "", "logo.png");
         verify(photoRepository, never()).save(any());
     }
 

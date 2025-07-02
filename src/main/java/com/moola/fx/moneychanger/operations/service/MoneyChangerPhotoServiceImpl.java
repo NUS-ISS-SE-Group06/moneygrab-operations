@@ -19,12 +19,12 @@ public class MoneyChangerPhotoServiceImpl implements MoneyChangerPhotoService {
     }
 
     @Override
-    public Optional<MoneyChangerPhoto> getByMoneyChangerId(Long moneyChangerId) {
-        return photoRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
+    public Optional<MoneyChangerPhoto> getByMoneyChangerId(Long id) {
+        return photoRepository.findByMoneyChangerIdAndIsDeletedFalse(id);
     }
 
     @Override
-    public void saveOrUpdate(Long moneyChangerId, String base64Image, String filename) {
+    public void save(Long moneyChangerId, String base64Image, String filename) {
         if (base64Image == null || base64Image.isEmpty()) {
             return;
         }

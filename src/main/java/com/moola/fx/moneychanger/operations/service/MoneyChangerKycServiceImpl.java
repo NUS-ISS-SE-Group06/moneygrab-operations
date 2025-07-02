@@ -19,12 +19,12 @@ public class MoneyChangerKycServiceImpl implements MoneyChangerKycService {
     }
 
     @Override
-    public Optional<MoneyChangerKyc> getByMoneyChangerId(Long moneyChangerId) {
-        return kycRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
+    public Optional<MoneyChangerKyc> getByMoneyChangerId(Long id) {
+        return kycRepository.findByMoneyChangerIdAndIsDeletedFalse(id);
     }
 
     @Override
-    public void saveOrUpdate(Long moneyChangerId, String base64Document, String filename) {
+    public void save(Long moneyChangerId, String base64Document, String filename) {
         if (base64Document == null || base64Document.isEmpty()) {
             return;
         }

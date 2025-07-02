@@ -1,6 +1,6 @@
 package com.moola.fx.moneychanger.operations.controller;
 
-import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
+import com.moola.fx.moneychanger.operations.dto.MoneyChangerDTO;
 import com.moola.fx.moneychanger.operations.service.MoneyChangerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,28 +18,28 @@ public class MoneyChangerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MoneyChangerResponseDTO>> getAll() {
-        return ResponseEntity.ok(moneyChangerService.getAllMoneyChangers());
+    public ResponseEntity<List<MoneyChangerDTO>> getAll() {
+        return ResponseEntity.ok(moneyChangerService.listAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MoneyChangerResponseDTO> getOne(@PathVariable Long id) {
-        return ResponseEntity.ok(moneyChangerService.getMoneyChangerById(id));
+    public ResponseEntity<MoneyChangerDTO> get(@PathVariable Long id) {
+        return ResponseEntity.ok(moneyChangerService.get(id));
     }
 
     @PostMapping
-    public ResponseEntity<MoneyChangerResponseDTO> create(@RequestBody MoneyChangerResponseDTO dto) {
-        return ResponseEntity.ok(moneyChangerService.createMoneyChanger(dto));
+    public ResponseEntity<MoneyChangerDTO> create(@RequestBody MoneyChangerDTO dto) {
+        return ResponseEntity.ok(moneyChangerService.create(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MoneyChangerResponseDTO> update(@PathVariable Long id, @RequestBody MoneyChangerResponseDTO dto) {
-        return ResponseEntity.ok(moneyChangerService.updateMoneyChanger(id, dto));
+    public ResponseEntity<MoneyChangerDTO> update(@PathVariable Long id, @RequestBody MoneyChangerDTO dto) {
+        return ResponseEntity.ok(moneyChangerService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        moneyChangerService.deleteMoneyChanger(id);
+        moneyChangerService.delete(id);
         return ResponseEntity.noContent().build();
     }
 }
