@@ -1,7 +1,7 @@
 package com.moola.fx.moneychanger.operations.service;
 
 
-import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
+import com.moola.fx.moneychanger.operations.dto.MoneyChangerDTO;
 import com.moola.fx.moneychanger.operations.model.*;
 import com.moola.fx.moneychanger.operations.repository.*;
 import org.apache.tika.Tika;
@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.time.LocalDateTime;
 
 @Service
@@ -33,26 +32,26 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
     }
 
     @Override
-    public List<MoneyChangerResponseDTO> getAllMoneyChangers() {
+    public List<MoneyChangerDTO> listAll() {
             return moneyChangerRepository.findAll().stream()
                     .filter(mc -> Boolean.FALSE.equals(mc.getIsDeleted()))
-                    .map(this::mapToDto)
+                    .map(this::toDTO)
                     .toList();
     }
 
 
 
         @Override
-    public MoneyChangerResponseDTO getMoneyChangerById(Long id) {
+    public MoneyChangerDTO get(Long id) {
         MoneyChanger entity = moneyChangerRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
-        return mapToDto(entity);
+        return toDTO(entity);
     }
 
     @Override
-    public MoneyChangerResponseDTO createMoneyChanger(MoneyChangerResponseDTO dto) {
+    public MoneyChangerDTO create(MoneyChangerDTO dto) {
         MoneyChanger entity = new MoneyChanger();
-        mapToEntity(dto, entity);
+        toEntity(dto, entity);
         entity.setCreatedAt(LocalDateTime.now());
         entity.setUpdatedAt(LocalDateTime.now());
         entity.setIsDeleted(false);
@@ -60,15 +59,15 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         saveLocations(dto, saved.getId());
         savePhoto(dto, saved.getId());
         saveKyc(dto, saved.getId());
-        return mapToDto(saved);
+        return toDTO(saved);
     }
 
     @Override
-    public MoneyChangerResponseDTO updateMoneyChanger(Long id, MoneyChangerResponseDTO dto) {
+    public MoneyChangerDTO update(Long id, MoneyChangerDTO dto) {
         MoneyChanger entity = moneyChangerRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("MoneyChanger not found"));
         LocalDateTime originalCreatedAt = entity.getCreatedAt();
-        mapToEntity(dto, entity);
+        toEntity(dto, entity);
         // Restore original createdAt and set updatedAt
         // Restore original createdAt and set updatedAt
         entity.setCreatedAt(originalCreatedAt != null ? originalCreatedAt : LocalDateTime.now());
@@ -77,11 +76,11 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         saveLocations(dto, updated.getId());
         savePhoto(dto, updated.getId());
         saveKyc(dto, updated.getId());
-        return mapToDto(updated);
+        return toDTO(updated);
     }
 
     @Override
-    public void deleteMoneyChanger(Long id) {
+    public void delete(Long id) {
         moneyChangerRepository.findById(id).ifPresent(mc -> {
             mc.setIsDeleted(true);
             moneyChangerRepository.save(mc);
@@ -89,8 +88,8 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         });
     }
 
-    private MoneyChangerResponseDTO mapToDto(MoneyChanger entity) {
-        MoneyChangerResponseDTO dto = new MoneyChangerResponseDTO();
+    private MoneyChangerDTO toDTO(MoneyChanger entity) {
+        MoneyChangerDTO dto = new MoneyChangerDTO();
         dto.setId(entity.getId());
         dto.setCompanyName(entity.getCompanyName());
         dto.setEmail(entity.getEmail());
@@ -126,7 +125,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         return dto;
     }
 
-    private void mapToEntity(MoneyChangerResponseDTO dto, MoneyChanger entity) {
+    private void toEntity(MoneyChangerDTO dto, MoneyChanger entity) {
         entity.setCompanyName(dto.getCompanyName());
         entity.setEmail(dto.getEmail());
         entity.setAddress(dto.getAddress());
@@ -146,7 +145,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         }
     }
 
-    private void saveLocations(MoneyChangerResponseDTO dto, Long moneyChangerId) {
+    private void saveLocations(MoneyChangerDTO dto, Long moneyChangerId) {
         List<MoneyChangerLocation> existing = locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
         for (MoneyChangerLocation loc : existing) {
             loc.setIsDeleted(true);
@@ -169,7 +168,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         }
     }
 
-    private void savePhoto(MoneyChangerResponseDTO dto, Long moneyChangerId) {
+    private void savePhoto(MoneyChangerDTO dto, Long moneyChangerId) {
         if (dto.getLogoBase64() == null || dto.getLogoBase64().trim().isEmpty()) {
             return; // No new photo provided, keep existing record untouched
         }
@@ -195,7 +194,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         }
     }
 
-    private void saveKyc(MoneyChangerResponseDTO dto, Long moneyChangerId) {
+    private void saveKyc(MoneyChangerDTO dto, Long moneyChangerId) {
 
         if (dto.getKycBase64() == null || dto.getKycBase64().trim().isEmpty()) {
             return; // No new KYC provided, keep existing record untouched

@@ -3,7 +3,7 @@ package com.moola.fx.moneychanger.operations.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
+import com.moola.fx.moneychanger.operations.dto.MoneyChangerDTO;
 import com.moola.fx.moneychanger.operations.service.MoneyChangerService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,8 +39,8 @@ class MoneyChangerControllerTest {
         objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     }
 
-    private MoneyChangerResponseDTO getSampleDTO() {
-        MoneyChangerResponseDTO dto = new MoneyChangerResponseDTO();
+    private MoneyChangerDTO getSampleDTO() {
+        MoneyChangerDTO dto = new MoneyChangerDTO();
         dto.setId(1L);
         dto.setCompanyName("ABC FX");
         dto.setEmail("abc@email.com");
@@ -66,8 +66,8 @@ class MoneyChangerControllerTest {
 
     @Test
     void testGetAllMoneyChangers() throws Exception {
-        List<MoneyChangerResponseDTO> list = List.of(getSampleDTO());
-        when(moneyChangerService.getAllMoneyChangers()).thenReturn(list);
+        List<MoneyChangerDTO> list = List.of(getSampleDTO());
+        when(moneyChangerService.listAll()).thenReturn(list);
 
         mockMvc.perform(get("/v1/money-changers"))
                 .andExpect(status().isOk())
@@ -76,7 +76,7 @@ class MoneyChangerControllerTest {
 
     @Test
     void testGetMoneyChangerById() throws Exception {
-        when(moneyChangerService.getMoneyChangerById(1L)).thenReturn(getSampleDTO());
+        when(moneyChangerService.get(1L)).thenReturn(getSampleDTO());
 
         mockMvc.perform(get("/v1/money-changers/1"))
                 .andExpect(status().isOk())
@@ -85,8 +85,8 @@ class MoneyChangerControllerTest {
 
     @Test
     void testCreateMoneyChanger() throws Exception {
-        MoneyChangerResponseDTO dto = getSampleDTO();
-        when(moneyChangerService.createMoneyChanger(any())).thenReturn(dto);
+        MoneyChangerDTO dto = getSampleDTO();
+        when(moneyChangerService.create(any())).thenReturn(dto);
 
         mockMvc.perform(post("/v1/money-changers")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -97,8 +97,8 @@ class MoneyChangerControllerTest {
 
     @Test
     void testUpdateMoneyChanger() throws Exception {
-        MoneyChangerResponseDTO dto = getSampleDTO();
-        when(moneyChangerService.updateMoneyChanger(eq(1L), any())).thenReturn(dto);
+        MoneyChangerDTO dto = getSampleDTO();
+        when(moneyChangerService.update(eq(1L), any())).thenReturn(dto);
 
         mockMvc.perform(put("/v1/money-changers/1")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -109,7 +109,7 @@ class MoneyChangerControllerTest {
 
     @Test
     void testDeleteMoneyChanger() throws Exception {
-        doNothing().when(moneyChangerService).deleteMoneyChanger(1L);
+        doNothing().when(moneyChangerService).delete(1L);
 
         mockMvc.perform(delete("/v1/money-changers/1"))
                 .andExpect(status().isNoContent());

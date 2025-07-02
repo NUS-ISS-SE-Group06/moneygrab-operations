@@ -1,15 +1,13 @@
 package com.moola.fx.moneychanger.operations.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Setter
-public class MoneyChangerResponseDTO {
+@Data
+public class MoneyChangerDTO {
 
     private Long id;
     private String companyName;
@@ -26,20 +24,11 @@ public class MoneyChangerResponseDTO {
     private LocalDateTime updatedAt;
     private Long createdBy;
     private Long updatedBy;
-
-    // Base64 + filenames
     private String kycBase64;
     private String kycFilename;
     private String logoBase64;
     private String logoFilename;
-
-    // Other metadata (optional mimetypes, not required by frontend)
     private String photoMimetype;
     private String documentMimetype;
-
-    // Locations list
     private List<String> locations;
-
-    // === Getters and Setters ===
-
 }

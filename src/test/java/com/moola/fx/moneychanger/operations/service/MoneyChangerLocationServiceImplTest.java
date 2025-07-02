@@ -1,9 +1,9 @@
 package com.moola.fx.moneychanger.operations.service;
 
+import com.moola.fx.moneychanger.operations.dto.MoneyChangerDTO;
 import com.moola.fx.moneychanger.operations.model.MoneyChanger;
 import com.moola.fx.moneychanger.operations.model.MoneyChangerLocation;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerLocationRepository;
-import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,7 @@ class MoneyChangerLocationServiceImplTest {
     }
 
     @Test
-    void testGetLocationsByMoneyChanger() {
+    void testGetLocationsByMoneyChangerId() {
         Long moneyChangerId = 1L;
 
         MoneyChanger moneyChanger = new MoneyChanger();
@@ -57,7 +57,7 @@ class MoneyChangerLocationServiceImplTest {
         when(locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId))
                 .thenReturn(Arrays.asList(loc1, loc2));
 
-        List<MoneyChangerResponseDTO> result = locationService.getLocationsByMoneyChanger(moneyChangerId);
+        List<MoneyChangerDTO> result = locationService.getLocationsByMoneyChangerId(moneyChangerId);
 
         assertEquals(2, result.size()); // assuming your implementation returns two DTOs
         List<String> locations1 = result.get(0).getLocations();
@@ -70,40 +70,40 @@ class MoneyChangerLocationServiceImplTest {
     }
 
     @Test
-    void testAddLocation() {
+    void testAdd() {
         Long moneyChangerId = 1L;
         List<String> locationNames = Arrays.asList("Jurong East", "Bugis");
         Integer createdBy = 100;
         Integer updatedBy = 100;
 
-        locationService.addLocation(moneyChangerId, locationNames, createdBy.longValue(), updatedBy.longValue());
+        locationService.add(moneyChangerId, locationNames, createdBy.longValue(), updatedBy.longValue());
 
         verify(locationRepository).saveAll(anyList());
     }
 
     @Test
-    void testAddLocationWithEmptyList() {
+    void testAddWithEmptyList() {
         Long moneyChangerId = 1L;
         List<String> locations = Collections.emptyList();
 
-        locationService.addLocation(moneyChangerId, locations, 1L, 1L);
+        locationService.add(moneyChangerId, locations, 1L, 1L);
 
         verify(locationRepository, never()).saveAll(anyList());
     }
 
     @Test
-    void testSaveLocations() {
+    void testSave() {
         Long moneyChangerId = 1L;
         List<String> locationNames = Arrays.asList("Woodlands", "Boon Lay");
 
-        locationService.saveLocations(moneyChangerId, locationNames);
+        locationService.save(moneyChangerId, locationNames);
 
         // Fix applied: allow for multiple calls to saveAll
         verify(locationRepository, atLeastOnce()).saveAll(anyList());
     }
 
     @Test
-    void testDeleteLocation() {
+    void testDelete() {
         Long locationId = 10L;
 
         MoneyChangerLocation loc = new MoneyChangerLocation();
@@ -112,24 +112,24 @@ class MoneyChangerLocationServiceImplTest {
 
         when(locationRepository.findById(locationId)).thenReturn(Optional.of(loc));
 
-        locationService.deleteLocation(locationId);
+        locationService.delete(locationId);
 
         assertTrue(loc.getIsDeleted()); // now true
         verify(locationRepository).save(loc);
     }
 
     @Test
-    void testDeleteLocationNotFound() {
+    void testDeleteNotFound() {
         Long locationId = 999L;
         when(locationRepository.findById(locationId)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> locationService.deleteLocation(locationId));
+        assertThrows(IllegalArgumentException.class, () -> locationService.delete(locationId));
 
         verify(locationRepository, never()).save(any());
     }
 
     @Test
-    void testGetLocationNamesByMoneyChanger() {
+    void testGetLocationNamesByMoneyChangerId() {
         Long moneyChangerId = 1L;
 
         MoneyChangerLocation loc1 = new MoneyChangerLocation();
@@ -141,7 +141,7 @@ class MoneyChangerLocationServiceImplTest {
         when(locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId))
                 .thenReturn(Arrays.asList(loc1, loc2));
 
-        List<String> names = locationService.getLocationNamesByMoneyChanger(moneyChangerId);
+        List<String> names = locationService.getLocationNamesByMoneyChangerId(moneyChangerId);
 
         assertEquals(2, names.size());
         assertTrue(names.contains("HarbourFront"));

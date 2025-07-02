@@ -56,7 +56,7 @@ class MoneyChangerKycServiceImplTest {
     }
 
     @Test
-    void testSaveOrUpdate_WithBase64Kyc() {
+    void testSave_WithBase64Kyc() {
         Long id = 1L;
         String base64 = "ZmlsZSBjb250ZW50cw==";
         String filename = "kyc.pdf";
@@ -66,15 +66,15 @@ class MoneyChangerKycServiceImplTest {
         when(kycRepository.findByMoneyChangerIdAndIsDeletedFalse(id)).thenReturn(Optional.of(existing));
         when(tika.detect(any(byte[].class))).thenReturn("application/pdf");
 
-        kycService.saveOrUpdate(id, base64, filename);
+        kycService.save(id, base64, filename);
 
         // Expect 2 saves: one for soft-deletion, one for the new KYC
         verify(kycRepository, times(3)).save(any(MoneyChangerKyc.class));
     }
 
     @Test
-    void testSaveOrUpdate_EmptyBase64() {
-        kycService.saveOrUpdate(1L, "", "test.pdf");
+    void testSave_EmptyBase64() {
+        kycService.save(1L, "", "test.pdf");
         verify(kycRepository, never()).save(any());
     }
 

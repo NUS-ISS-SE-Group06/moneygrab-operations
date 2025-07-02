@@ -1,6 +1,6 @@
 package com.moola.fx.moneychanger.operations.service;
 
-import com.moola.fx.moneychanger.operations.dto.MoneyChangerResponseDTO;
+import com.moola.fx.moneychanger.operations.dto.MoneyChangerDTO;
 import com.moola.fx.moneychanger.operations.model.MoneyChanger;
 import com.moola.fx.moneychanger.operations.model.MoneyChangerLocation;
 import com.moola.fx.moneychanger.operations.repository.MoneyChangerLocationRepository;
@@ -22,12 +22,12 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
     }
 
     @Override
-    public List<MoneyChangerResponseDTO> getLocationsByMoneyChanger(final Long moneyChangerId) {
+    public List<MoneyChangerDTO> getLocationsByMoneyChangerId(final Long id) {
         final List<MoneyChangerLocation> locations =
-                locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
+                locationRepository.findByMoneyChangerIdAndIsDeletedFalse(id);
 
         return locations.stream().map(loc -> {
-            final MoneyChangerResponseDTO dto = new MoneyChangerResponseDTO();
+            final MoneyChangerDTO dto = new MoneyChangerDTO();
             dto.setId(loc.getMoneyChanger().getId());
             dto.setLocations(
                     locations.stream().map(MoneyChangerLocation::getLocationName).toList()
@@ -38,7 +38,7 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
 
     @Override
     @Transactional
-    public void addLocation(
+    public void add(
             final Long moneyChangerId,
             final List<String> locationNames,
             final Long createdBy,
@@ -73,7 +73,7 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
 
     @Override
     @Transactional
-    public void deleteLocation(final Long locationId) {
+    public void delete(final Long locationId) {
         final MoneyChangerLocation location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new IllegalArgumentException("Location not found"));
         location.setIsDeleted(true);
@@ -83,7 +83,7 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
 
     @Override
     @Transactional
-    public void saveLocations(final Long moneyChangerId, final List<String> locationNames) {
+    public void save(final Long moneyChangerId, final List<String> locationNames) {
         final List<MoneyChangerLocation> existing =
                 locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
 
@@ -120,8 +120,8 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
     }
 
     @Override
-    public List<String> getLocationNamesByMoneyChanger(final Long moneyChangerId) {
-        return locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId)
+    public List<String> getLocationNamesByMoneyChangerId(final Long id) {
+        return locationRepository.findByMoneyChangerIdAndIsDeletedFalse(id)
                 .stream()
                 .map(MoneyChangerLocation::getLocationName)
                 .toList();
