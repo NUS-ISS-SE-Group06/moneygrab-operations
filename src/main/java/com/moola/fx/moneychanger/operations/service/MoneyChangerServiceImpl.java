@@ -156,9 +156,6 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
             List<MoneyChangerLocation> newLocs = dto.getLocations().stream().map(name -> {
                 MoneyChangerLocation loc = new MoneyChangerLocation();
                 loc.setLocationName(name);
-                loc.setIsDeleted(false);
-                loc.setCreatedAt(LocalDateTime.now());
-                loc.setUpdatedAt(LocalDateTime.now());
                 MoneyChanger mcRef = new MoneyChanger();
                 mcRef.setId(moneyChangerId);
                 loc.setMoneyChanger(mcRef);
@@ -174,7 +171,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         }
 
         photoRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
-            existing.setIsDeleted(1);
+            existing.setIsDeleted(true);
             photoRepository.save(existing);
         });
         if (dto.getLogoBase64() != null && !dto.getLogoBase64().isEmpty()) {
@@ -189,7 +186,6 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
             photo.setPhotoData(decoded);               // GOOD data
             photo.setPhotoFilename(dto.getLogoFilename());
             photo.setPhotoMimetype(detectMimeType(decoded));
-            photo.setIsDeleted(0);
             photoRepository.save(photo);
         }
     }
@@ -200,7 +196,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
             return; // No new KYC provided, keep existing record untouched
         }
         kycRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
-            existing.setIsDeleted(1);
+            existing.setIsDeleted(true);
             kycRepository.save(existing);
         });
 
@@ -215,7 +211,6 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
             kyc.setDocumentData(decoded);               // GOOD data
             kyc.setDocumentFilename(dto.getKycFilename());
             kyc.setDocumentMimetype(detectMimeType(decoded));
-            kyc.setIsDeleted(0);
             kycRepository.save(kyc);
         }
     }

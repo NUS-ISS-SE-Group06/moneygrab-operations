@@ -58,9 +58,6 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
                     moneyChanger.setId(moneyChangerId);
                     loc.setMoneyChanger(moneyChanger);
 
-                    loc.setIsDeleted(false);
-                    loc.setCreatedAt(LocalDateTime.now());
-                    loc.setUpdatedAt(LocalDateTime.now());
                     loc.setCreatedBy(0L);
                     loc.setUpdatedBy(0L);
                     return loc;
@@ -77,7 +74,6 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
         final MoneyChangerLocation location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new IllegalArgumentException("Location not found"));
         location.setIsDeleted(true);
-        location.setUpdatedAt(LocalDateTime.now());
         locationRepository.save(location);
     }
 
@@ -89,7 +85,6 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
 
         for (MoneyChangerLocation loc : existing) {
             loc.setIsDeleted(true);
-            loc.setUpdatedAt(LocalDateTime.now());
         }
 
         locationRepository.saveAll(existing);
@@ -103,10 +98,6 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
                     final MoneyChanger mc = new MoneyChanger();
                     mc.setId(moneyChangerId);
                     loc.setMoneyChanger(mc);
-
-                    loc.setIsDeleted(false);
-                    loc.setCreatedAt(LocalDateTime.now());
-                    loc.setUpdatedAt(LocalDateTime.now());
 
                     // Use system default ID (e.g. service user, audit system, or null if not applicable)
                     loc.setCreatedBy(0L);
