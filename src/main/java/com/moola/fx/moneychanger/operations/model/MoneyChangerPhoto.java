@@ -2,18 +2,12 @@ package com.moola.fx.moneychanger.operations.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 
-import java.time.LocalDateTime;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "money_changer_photo")
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class MoneyChangerPhoto {
 
     @Id
@@ -34,10 +28,10 @@ public class MoneyChangerPhoto {
     private String photoMimetype;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Timestamp createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Timestamp updatedAt;
 
     @Column(name = "created_by")
     private Integer createdBy;
@@ -46,23 +40,18 @@ public class MoneyChangerPhoto {
     private Integer updatedBy;
 
     @Column(name = "is_deleted", nullable = false)
-    private Integer isDeleted;
+    private Boolean isDeleted=false;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = LocalDateTime.now();
-
-        if (this.isDeleted == null) {
-            this.isDeleted = 0;
-        }
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        this.createdAt = now;
+        this.updatedAt = now;
+        this.isDeleted = false;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-        if (this.isDeleted == null) {
-            this.isDeleted = 0;
-        }
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 }

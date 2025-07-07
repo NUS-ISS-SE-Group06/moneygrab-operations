@@ -3,6 +3,7 @@ package com.moola.fx.moneychanger.operations.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Data
@@ -28,10 +29,10 @@ public class MoneyChangerKyc {
     private String documentMimetype;
 
     @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    private Timestamp createdAt;
 
     @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Timestamp updatedAt;
 
     @Column(name = "created_by")
     private Integer createdBy;
@@ -40,25 +41,18 @@ public class MoneyChangerKyc {
     private Integer updatedBy;
 
     @Column(name = "is_deleted", nullable = false)
-    private Integer isDeleted;
+    private Boolean isDeleted = false;
 
     @PrePersist
     protected void onCreate() {
-        LocalDateTime now = LocalDateTime.now();
+        Timestamp now = new Timestamp(System.currentTimeMillis());
         this.createdAt = now;
         this.updatedAt = now;
-
-        if (this.isDeleted == null) {
-            this.isDeleted = 0;
-        }
-
+        this.isDeleted = false;
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-        if (this.isDeleted == null) {
-            this.isDeleted = 0;
-        }
+        this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
 }

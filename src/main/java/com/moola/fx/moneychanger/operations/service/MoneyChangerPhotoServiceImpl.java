@@ -30,7 +30,7 @@ public class MoneyChangerPhotoServiceImpl implements MoneyChangerPhotoService {
         }
 
         photoRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
-            existing.setIsDeleted(1);
+            existing.setIsDeleted(true);
             photoRepository.save(existing);
         });
 
@@ -45,7 +45,7 @@ public class MoneyChangerPhotoServiceImpl implements MoneyChangerPhotoService {
         }
 
         photoRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
-            existing.setIsDeleted(1);
+            existing.setIsDeleted(true);
             photoRepository.save(existing);
         });
 
@@ -54,7 +54,6 @@ public class MoneyChangerPhotoServiceImpl implements MoneyChangerPhotoService {
         newPhoto.setPhotoData(decoded);               // GOOD data
         newPhoto.setPhotoFilename(filename);
         newPhoto.setPhotoMimetype(detectMimeType(decoded));
-        newPhoto.setIsDeleted(0);
         photoRepository.save(newPhoto);
     }
 
