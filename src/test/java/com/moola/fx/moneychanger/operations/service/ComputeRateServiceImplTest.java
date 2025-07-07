@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-public class ComputeRateServiceImplTest {
+class ComputeRateServiceImplTest {
 
     private ComputeRateRepository repo;
     private ComputeRateServiceImpl service;
