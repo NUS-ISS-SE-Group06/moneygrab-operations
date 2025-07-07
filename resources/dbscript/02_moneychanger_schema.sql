@@ -171,7 +171,8 @@ CREATE TABLE customer (
 
 -- STEP 11: Create compute_rates table
 CREATE TABLE compute_rates (
-                               currency_code CHAR(3) NOT NULL PRIMARY KEY,
+                               currency_code CHAR(3) NOT NULL,
+                               money_changer_id INT NOT NULL,
                                unit VARCHAR(50) NULL,
                                raw_bid DECIMAL(18,8),
                                raw_ask DECIMAL(18,8),
@@ -191,7 +192,9 @@ CREATE TABLE compute_rates (
                                rt_ask DECIMAL(18,8),
                                processed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                processed_by INT NULL,
-                               CONSTRAINT fk_compute_rates_processed_by FOREIGN KEY (processed_by) REFERENCES accounts(id)
+                               PRIMARY KEY (currency_code, money_changer_id),
+                               CONSTRAINT fk_compute_rates_processed_by FOREIGN KEY (processed_by) REFERENCES accounts(id),
+                               CONSTRAINT fk_compute_rates_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id)
 );
 
 
