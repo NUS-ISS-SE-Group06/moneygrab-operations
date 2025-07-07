@@ -1,0 +1,75 @@
+
+###
+GET http://localhost:8688/api/v1/compute-rates
+Content-Type: application/json
+
+###
+GET http://localhost:8688/api/v1/compute-rates?
+    moneyChangerId=1
+Content-Type: application/json
+
+
+###
+GET http://localhost:8688/api/v1/compute-rates/USD/1
+Content-Type: application/json
+
+###
+POST http://localhost:8688/api/v1/compute-rates/batch
+Content-Type: application/json
+
+[
+  {
+    "currencyCode": "USD",
+    "moneyChangerId": 5,
+    "unit": "1",
+    "rawBid": 1.3425,
+    "rawAsk": 1.3590,
+    "spread": 0.0165,
+    "skew": 0.0050,
+    "wsBid": 1.3400,
+    "wsAsk": 1.3600,
+    "refBid": 1.3410,
+    "dpBid": 1.3420,
+    "marBid": 1.3430,
+    "cfBid": 1.3440,
+    "rtBid": 1.3450,
+    "refAsk": 1.3500,
+    "dpAsk": 1.3510,
+    "marAsk": 1.3520,
+    "cfAsk": 1.3530,
+    "rtAsk": 1.3540,
+    "processedAt": "2025-07-07T10:15:30.000+08:00",
+    "createdBy": 1001,
+    "updatedBy": 1001
+  },
+  {
+    "currencyCode": "EUR",
+    "moneyChangerId": 5,
+    "unit": "1",
+    "rawBid": 1.4700,
+    "rawAsk": 1.4900,
+    "spread": 0.0200,
+    "skew": 0.0060,
+    "wsBid": 1.4680,
+    "wsAsk": 1.4920,
+    "refBid": 1.4690,
+    "dpBid": 1.4705,
+    "marBid": 1.4715,
+    "cfBid": 1.4725,
+    "rtBid": 1.4735,
+    "refAsk": 1.4880,
+    "dpAsk": 1.4895,
+    "marAsk": 1.4905,
+    "cfAsk": 1.4915,
+    "rtAsk": 1.4925,
+    "processedAt": "2025-07-07T10:15:30.000+08:00",
+    "createdBy": 1002,
+    "updatedBy": 1002
+  }
+]
+
+###
+DELETE http://localhost:8688/api/v1/compute-rates/USD/5
+
+###
+DELETE http://localhost:8688/api/v1/compute-rates/EUR/5

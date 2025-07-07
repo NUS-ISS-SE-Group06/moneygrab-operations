@@ -14,6 +14,11 @@ public class ComputeRate {
     @EmbeddedId
     private ComputeRateId id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("moneyChangerId") // maps to embeddedId field
+    @JoinColumn(name = "money_changer_id", nullable = false, insertable = false, updatable = false)
+    private MoneyChanger moneyChanger;
+
     @Column(length = 50)
     private String unit;
 
