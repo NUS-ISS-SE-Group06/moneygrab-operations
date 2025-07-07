@@ -39,8 +39,7 @@ Content-Type: application/json
     "cfAsk": 1.3530,
     "rtAsk": 1.3540,
     "processedAt": "2025-07-07T10:15:30.000+08:00",
-    "createdBy": 1001,
-    "updatedBy": 1001
+    "processedBy": 1
   },
   {
     "currencyCode": "EUR",
@@ -63,8 +62,7 @@ Content-Type: application/json
     "cfAsk": 1.4915,
     "rtAsk": 1.4925,
     "processedAt": "2025-07-07T10:15:30.000+08:00",
-    "createdBy": 1002,
-    "updatedBy": 1002
+    "processedBy": 1
   }
 ]
 

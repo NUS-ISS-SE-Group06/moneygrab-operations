@@ -35,8 +35,7 @@ public class ComputeRateMapper {
         dto.setRtAsk(entity.getRtAsk());
 
         dto.setProcessedAt(entity.getProcessedAt());
-        dto.setCreatedBy(entity.getCreatedBy());
-        dto.setUpdatedBy(entity.getUpdatedBy());
+        dto.setProcessedBy(entity.getProcessedBy());
 
         return dto;
     }
@@ -74,8 +73,7 @@ public class ComputeRateMapper {
         entity.setRtAsk(dto.getRtAsk());
 
         entity.setProcessedAt(dto.getProcessedAt());
-        entity.setCreatedBy(dto.getCreatedBy());
-        entity.setUpdatedBy(dto.getUpdatedBy());
+        entity.setProcessedBy(dto.getProcessedBy());
 
         return entity;
     }

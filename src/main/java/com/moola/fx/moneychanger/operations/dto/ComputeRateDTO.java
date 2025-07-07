@@ -33,8 +33,6 @@ public class ComputeRateDTO {
     private BigDecimal rtAsk;
 
     private Timestamp processedAt;
-
-    private Integer createdBy;
-    private Integer updatedBy;
+    private Integer processedBy;
 }
 

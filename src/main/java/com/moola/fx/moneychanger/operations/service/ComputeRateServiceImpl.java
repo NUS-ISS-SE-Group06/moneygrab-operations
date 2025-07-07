@@ -1,10 +1,12 @@
 package com.moola.fx.moneychanger.operations.service;
 
+import com.moola.fx.moneychanger.operations.exception.ForeignKeyConstraintException;
 import com.moola.fx.moneychanger.operations.exception.ResourceNotFoundException;
 import com.moola.fx.moneychanger.operations.model.ComputeRate;
 import com.moola.fx.moneychanger.operations.repository.ComputeRateRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,7 +36,15 @@ public class ComputeRateServiceImpl implements ComputeRateService {
     @Transactional
     public List<ComputeRate> saveAll(List<ComputeRate> entities) {
         if (entities.isEmpty()) return List.of();
-        return repo.saveAll(entities);
+
+        try {
+            return repo.saveAll(entities);
+        } catch (DataIntegrityViolationException ex) {
+            String detailedMessage = ex.getMostSpecificCause() != null
+                    ? ex.getMostSpecificCause().getMessage()
+                    : "Unknown data integrity violation";
+            throw new ForeignKeyConstraintException("Foreign key constraint violated while saving ComputeRates: " + detailedMessage);
+        }
     }
 
 

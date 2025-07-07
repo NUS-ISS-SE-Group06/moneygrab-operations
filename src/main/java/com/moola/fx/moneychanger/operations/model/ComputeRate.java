@@ -73,12 +73,8 @@ public class ComputeRate {
     @Column(name = "processed_at", nullable = false)
     private Timestamp processedAt;
 
-    @Column(name = "created_by")
-    private Integer createdBy;
-
-    @Column(name = "updated_by")
-    private Integer updatedBy;
-
+    @Column(name = "processed_by")
+    private Integer processedBy;
 
     // Getters and Setters
 
