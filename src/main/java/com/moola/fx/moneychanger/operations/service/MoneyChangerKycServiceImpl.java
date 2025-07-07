@@ -30,7 +30,7 @@ public class MoneyChangerKycServiceImpl implements MoneyChangerKycService {
         }
 
         kycRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
-            existing.setIsDeleted(1);
+            existing.setIsDeleted(true);
             kycRepository.save(existing);
         });
 
@@ -47,7 +47,7 @@ public class MoneyChangerKycServiceImpl implements MoneyChangerKycService {
         }
 
         kycRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId).ifPresent(existing -> {
-            existing.setIsDeleted(1);
+            existing.setIsDeleted(true);
             kycRepository.save(existing);
         });
 
@@ -55,7 +55,7 @@ public class MoneyChangerKycServiceImpl implements MoneyChangerKycService {
         newKyc.setDocumentData(decoded);               // GOOD data
         newKyc.setDocumentFilename(filename);
         newKyc.setDocumentMimetype(detectMimeType(decoded));
-        newKyc.setIsDeleted(0);
+        newKyc.setIsDeleted(false);
         kycRepository.save(newKyc);
     }
 
