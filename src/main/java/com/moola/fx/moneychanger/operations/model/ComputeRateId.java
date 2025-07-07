@@ -15,7 +15,7 @@ public class ComputeRateId implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "money_changer_id", nullable = false, foreignKey = @ForeignKey(name = "fk_compute_rates_money_changer"))
-    private MoneyChanger moneyChanger;
+    private transient MoneyChanger moneyChanger;
 
     @Override
     public boolean equals(Object o) {
@@ -23,11 +23,15 @@ public class ComputeRateId implements Serializable {
         if (!(o instanceof ComputeRateId)) return false;
         ComputeRateId that = (ComputeRateId) o;
         return Objects.equals(currencyCode, that.currencyCode) &&
-                Objects.equals(moneyChanger, that.moneyChanger);
+                Objects.equals(getMoneyChangerId(), that.getMoneyChangerId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(currencyCode, moneyChanger);
+        return Objects.hash(currencyCode, getMoneyChangerId());
+    }
+
+    private Long getMoneyChangerId() {
+        return moneyChanger != null ? moneyChanger.getId() : null;
     }
 }
