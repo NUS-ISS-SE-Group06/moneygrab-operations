@@ -101,6 +101,9 @@ mvn spring-boot:run
 
 ![Class Diagram](resources/uml/compute-rates-class-diagram.png)
 
+### Compute Rate Business Logic (Standard-Formula)
+<img src="resources/uml/compute-rate-formula.png" alt="Formula Notation" width="600"/>
+
 ## 📊 Database Diagrams
 
 ### MoneyChanger Microservice ERD Diagram

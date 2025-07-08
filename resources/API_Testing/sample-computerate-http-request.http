@@ -65,9 +65,11 @@ Content-Type: application/json
     "processedBy": 1
   }
 ]
+> {% client.global.set("usdCurrency", "USD"); client.global.set("eurCurrency", "EUR"); client.global.set("mcId", "5"); %}
 
-###
-DELETE http://localhost:8688/api/v1/compute-rates/USD/5
+### DELETE USD
+DELETE http://localhost:8688/api/v1/compute-rates/{{usdCurrency}}/{{mcId}}
 
-###
-DELETE http://localhost:8688/api/v1/compute-rates/EUR/5
+### DELETE EUR
+DELETE http://localhost:8688/api/v1/compute-rates/{{eurCurrency}}/{{mcId}}
+
