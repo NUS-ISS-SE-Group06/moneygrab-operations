@@ -14,6 +14,11 @@ public class ComputeRate {
     @EmbeddedId
     private ComputeRateId id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("moneyChangerId") // maps to embeddedId field
+    @JoinColumn(name = "money_changer_id", nullable = false, insertable = false, updatable = false)
+    private MoneyChanger moneyChanger;
+
     @Column(length = 50)
     private String unit;
 
@@ -68,12 +73,8 @@ public class ComputeRate {
     @Column(name = "processed_at", nullable = false)
     private Timestamp processedAt;
 
-    @Column(name = "created_by")
-    private Integer createdBy;
-
-    @Column(name = "updated_by")
-    private Integer updatedBy;
-
+    @Column(name = "processed_by")
+    private Integer processedBy;
 
     // Getters and Setters
 

@@ -12,7 +12,7 @@ public class ComputeRateMapper {
     public ComputeRateDTO toDTO(ComputeRate entity) {
         ComputeRateDTO dto = new ComputeRateDTO();
         dto.setCurrencyCode(entity.getId().getCurrencyCode());
-        dto.setMoneyChangerId(entity.getId().getMoneyChanger().getId());
+        dto.setMoneyChangerId(entity.getId().getMoneyChangerId());
 
         dto.setUnit(entity.getUnit());
         dto.setRawBid(entity.getRawBid());
@@ -35,19 +35,22 @@ public class ComputeRateMapper {
         dto.setRtAsk(entity.getRtAsk());
 
         dto.setProcessedAt(entity.getProcessedAt());
-        dto.setCreatedBy(entity.getCreatedBy());
-        dto.setUpdatedBy(entity.getUpdatedBy());
+        dto.setProcessedBy(entity.getProcessedBy());
 
         return dto;
     }
 
-    public ComputeRate toEntity(ComputeRateDTO dto, MoneyChanger moneyChanger) {
+    public ComputeRate toEntity(ComputeRateDTO dto) {
         ComputeRate entity = new ComputeRate();
 
         ComputeRateId id = new ComputeRateId();
         id.setCurrencyCode(dto.getCurrencyCode());
-        id.setMoneyChanger(moneyChanger);
+        id.setMoneyChangerId(dto.getMoneyChangerId());
         entity.setId(id);
+
+        MoneyChanger moneyChanger =new MoneyChanger();
+        moneyChanger.setId(dto.getMoneyChangerId());
+        entity.setMoneyChanger(moneyChanger);
 
         entity.setUnit(dto.getUnit());
         entity.setRawBid(dto.getRawBid());
@@ -70,8 +73,7 @@ public class ComputeRateMapper {
         entity.setRtAsk(dto.getRtAsk());
 
         entity.setProcessedAt(dto.getProcessedAt());
-        entity.setCreatedBy(dto.getCreatedBy());
-        entity.setUpdatedBy(dto.getUpdatedBy());
+        entity.setProcessedBy(dto.getProcessedBy());
 
         return entity;
     }
