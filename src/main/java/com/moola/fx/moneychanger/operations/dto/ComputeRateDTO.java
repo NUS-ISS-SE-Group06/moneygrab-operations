@@ -12,6 +12,9 @@ public class ComputeRateDTO {
     private Long moneyChangerId;
 
     private String unit;
+    private String tradeType;
+    private String tradeDeno;
+    private Integer tradeRound;
 
     private BigDecimal rawBid;
     private BigDecimal rawAsk;

@@ -22,6 +22,15 @@ public class ComputeRate {
     @Column(length = 50)
     private String unit;
 
+    @Column(name = "trade_type", length = 50)
+    private String tradeType;  // BUY_SELL, BUY_ONLY, SELL_ONLY
+
+    @Column(name = "trade_deno", length = 50)
+    private String tradeDeno; // ALL, 50, 100, 1000, 10000, 100000
+
+    @Column(name = "trade_round")
+    private Integer tradeRound=0; // 0, 1, 2
+
     @Column(name = "raw_bid", precision = 18, scale = 8)
     private BigDecimal rawBid;
 
