@@ -59,7 +59,7 @@ public class ComputeRateServiceImpl implements ComputeRateService {
     @Override
     @Transactional
     public void deleteOrphanedRates(Long moneyChangerId) {
-        int deletedCount = repo.deleteOrphanedComputeRates(moneyChangerId);
+        repo.deleteOrphanedComputeRates(moneyChangerId);
     }
 
 
