@@ -85,4 +85,18 @@ class ComputeRateServiceImplTest {
         service.delete("USD", 1L);
         verify(repo).delete(rate);
     }
+
+
+    @Test
+    void testDeleteOrphanedRatesByMoneyChanger_shouldCallRepositoryWithCorrectId() {
+        // Arrange
+        Long moneyChangerId = 123L;
+        when(repo.deleteOrphanedComputeRates(moneyChangerId)).thenReturn(3);
+
+        // Act
+        service.deleteOrphanedRates(moneyChangerId);
+
+        // Assert
+        verify(repo, times(1)).deleteOrphanedComputeRates(moneyChangerId);
+    }
 }

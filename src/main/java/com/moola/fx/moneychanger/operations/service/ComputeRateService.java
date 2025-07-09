@@ -10,4 +10,5 @@ public interface ComputeRateService {
     List<ComputeRate> saveAll(List<ComputeRate> entities);
     void delete(String currencyCode, Long moneyChangerId);
     List<ComputeRate> findByMoneyChangerId(Long moneyChangerId);
+    void deleteOrphanedRates(Long moneyChangerId);
 }
