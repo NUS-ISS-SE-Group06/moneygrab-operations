@@ -57,6 +57,13 @@ public class ComputeRateServiceImpl implements ComputeRateService {
     }
 
     @Override
+    @Transactional
+    public void deleteOrphanedRates(Long moneyChangerId) {
+        repo.deleteOrphanedComputeRates(moneyChangerId);
+    }
+
+
+    @Override
     public List<ComputeRate> findByMoneyChangerId(Long moneyChangerId) {
         return repo.findByIdMoneyChangerId(moneyChangerId);
     }

@@ -173,23 +173,26 @@ CREATE TABLE customer (
 CREATE TABLE compute_rates (
                                currency_code CHAR(3) NOT NULL,
                                money_changer_id INT NOT NULL,
-                               unit VARCHAR(50) NULL,
-                               raw_bid DECIMAL(18,8),
-                               raw_ask DECIMAL(18,8),
-                               spread DECIMAL(18,8),
-                               skew DECIMAL(18,8),
-                               ws_bid DECIMAL(18,8),
-                               ws_ask DECIMAL(18,8),
-                               ref_bid DECIMAL(18,8),
-                               dp_bid DECIMAL(18,8),
-                               mar_bid DECIMAL(18,8),
-                               cf_bid DECIMAL(18,8),
-                               rt_bid DECIMAL(18,8),
-                               ref_ask DECIMAL(18,8),
-                               dp_ask DECIMAL(18,8),
-                               mar_ask DECIMAL(18,8),
-                               cf_ask DECIMAL(18,8),
-                               rt_ask DECIMAL(18,8),
+                               unit VARCHAR(50) NOT NULL DEFAULT '1', -- 1, 100, 1000, 10000, 100000
+                               trade_type VARCHAR(50) NOT NULL DEFAULT 'BUY_SELL', -- BUY_SELL, BUY_ONLY, SELL_ONLY
+                               trade_deno VARCHAR(50) NOT NULL DEFAULT 'ALL', -- ALL, 50, 100, 1000, 10000, 100000
+                               trade_round INT NOT NULL DEFAULT 0, -- 0, 1, 2
+                               raw_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               raw_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               spread DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               skew DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               ws_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               ws_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               ref_bid DECIMAL(18,8) NOT NULL DEFAULT 0, -- 0, 1
+                               dp_bid DECIMAL(18,8) NOT NULL DEFAULT 3,
+                               mar_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               cf_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               rt_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               ref_ask DECIMAL(18,8) NOT NULL DEFAULT 0, -- 0, 1
+                               dp_ask DECIMAL(18,8) NOT NULL DEFAULT 3,
+                               mar_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               cf_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
+                               rt_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
                                processed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                processed_by INT NULL,
                                PRIMARY KEY (currency_code, money_changer_id),

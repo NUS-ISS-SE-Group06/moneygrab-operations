@@ -20,55 +20,64 @@ public class ComputeRate {
     private MoneyChanger moneyChanger;
 
     @Column(length = 50)
-    private String unit;
+    private String unit ="1";
+
+    @Column(name = "trade_type", length = 50)
+    private String tradeType ="BUY_SELL";  // BUY_SELL, BUY_ONLY, SELL_ONLY
+
+    @Column(name = "trade_deno", length = 50)
+    private String tradeDeno="ALL"; // ALL, 50, 100, 1000, 10000, 100000
+
+    @Column(name = "trade_round")
+    private Integer tradeRound=0; // 0, 1, 2
 
     @Column(name = "raw_bid", precision = 18, scale = 8)
-    private BigDecimal rawBid;
+    private BigDecimal rawBid=BigDecimal.ZERO;
 
     @Column(name = "raw_ask", precision = 18, scale = 8)
-    private BigDecimal rawAsk;
+    private BigDecimal rawAsk=BigDecimal.ZERO;
 
     @Column(precision = 18, scale = 8)
-    private BigDecimal spread;
+    private BigDecimal spread=BigDecimal.ZERO;
 
     @Column(precision = 18, scale = 8)
-    private BigDecimal skew;
+    private BigDecimal skew=BigDecimal.ZERO;
 
     @Column(name = "ws_bid", precision = 18, scale = 8)
-    private BigDecimal wsBid;
+    private BigDecimal wsBid=BigDecimal.ZERO;
 
     @Column(name = "ws_ask", precision = 18, scale = 8)
-    private BigDecimal wsAsk;
+    private BigDecimal wsAsk=BigDecimal.ZERO;
 
     @Column(name = "ref_bid", precision = 18, scale = 8)
-    private BigDecimal refBid;
+    private BigDecimal refBid=BigDecimal.ZERO;
 
     @Column(name = "dp_bid", precision = 18, scale = 8)
-    private BigDecimal dpBid;
+    private BigDecimal dpBid=BigDecimal.ZERO;
 
     @Column(name = "mar_bid", precision = 18, scale = 8)
-    private BigDecimal marBid;
+    private BigDecimal marBid=BigDecimal.ZERO;
 
     @Column(name = "cf_bid", precision = 18, scale = 8)
-    private BigDecimal cfBid;
+    private BigDecimal cfBid=BigDecimal.ZERO;
 
     @Column(name = "rt_bid", precision = 18, scale = 8)
-    private BigDecimal rtBid;
+    private BigDecimal rtBid=BigDecimal.ZERO;
 
     @Column(name = "ref_ask", precision = 18, scale = 8)
-    private BigDecimal refAsk;
+    private BigDecimal refAsk=BigDecimal.ZERO;
 
     @Column(name = "dp_ask", precision = 18, scale = 8)
-    private BigDecimal dpAsk;
+    private BigDecimal dpAsk=BigDecimal.ZERO;
 
     @Column(name = "mar_ask", precision = 18, scale = 8)
-    private BigDecimal marAsk;
+    private BigDecimal marAsk=BigDecimal.ZERO;
 
     @Column(name = "cf_ask", precision = 18, scale = 8)
-    private BigDecimal cfAsk;
+    private BigDecimal cfAsk=BigDecimal.ZERO;
 
     @Column(name = "rt_ask", precision = 18, scale = 8)
-    private BigDecimal rtAsk;
+    private BigDecimal rtAsk=BigDecimal.ZERO;
 
     @Column(name = "processed_at", nullable = false)
     private Timestamp processedAt;

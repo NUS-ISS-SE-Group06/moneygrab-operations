@@ -15,6 +15,9 @@ public class ComputeRateMapper {
         dto.setMoneyChangerId(entity.getId().getMoneyChangerId());
 
         dto.setUnit(entity.getUnit());
+        dto.setTradeType(entity.getTradeType());
+        dto.setTradeDeno(entity.getTradeDeno());
+        dto.setTradeRound(entity.getTradeRound() );
         dto.setRawBid(entity.getRawBid());
         dto.setRawAsk(entity.getRawAsk());
         dto.setSpread(entity.getSpread());
@@ -53,6 +56,9 @@ public class ComputeRateMapper {
         entity.setMoneyChanger(moneyChanger);
 
         entity.setUnit(dto.getUnit());
+        entity.setTradeType(dto.getTradeType());
+        entity.setTradeDeno(dto.getTradeDeno());
+        entity.setTradeRound(dto.getTradeRound() );
         entity.setRawBid(dto.getRawBid());
         entity.setRawAsk(dto.getRawAsk());
         entity.setSpread(dto.getSpread());
