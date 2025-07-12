@@ -18,8 +18,8 @@ public class MoneyChangerLocation {
     @JoinColumn(name = "money_changer_id", nullable = false)
     private MoneyChanger moneyChanger;
 
-    @Column(name = "location_name", nullable = false, length = 255)
-    private String locationName;
+    @Column(name = "location_id", nullable = false)
+    private Integer locationId;
 
     @Column(name = "created_at", nullable = false)
     private Timestamp createdAt;
