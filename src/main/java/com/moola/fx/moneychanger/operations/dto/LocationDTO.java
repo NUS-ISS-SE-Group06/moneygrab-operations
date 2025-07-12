@@ -10,12 +10,6 @@ public class LocationDTO {
 
     private String locationName;
 
-    private Integer countryCode;
-
-    private Timestamp createdAt;
-
-    private Integer createdBy;
-
-    private Boolean isDeleted;
+    private String countryCode;
 
 }
