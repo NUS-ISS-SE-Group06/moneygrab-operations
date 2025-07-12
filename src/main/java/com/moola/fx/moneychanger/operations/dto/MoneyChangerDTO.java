@@ -30,5 +30,5 @@ public class MoneyChangerDTO {
     private String logoFilename;
     private String photoMimetype;
     private String documentMimetype;
-    private List<String> locations;
+    private List<Integer> locations;
 }
