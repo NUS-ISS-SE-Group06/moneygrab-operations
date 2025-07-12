@@ -15,7 +15,7 @@ public class LocationDTO {
     private Timestamp createdAt;
 
     private Integer createdBy;
-    
+
     private Boolean isDeleted;
 
 }
