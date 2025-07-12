@@ -1,7 +1,6 @@
 package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.dto.LocationDTO;
-import com.moola.fx.moneychanger.operations.model.Locations;
 
 import java.util.List;
 

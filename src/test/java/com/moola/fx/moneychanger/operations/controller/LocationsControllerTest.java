@@ -18,7 +18,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(LocationsController.class)
-public class LocationsControllerTest {
+class LocationsControllerTest {
 
     @Autowired private MockMvc mockMvc;
 
