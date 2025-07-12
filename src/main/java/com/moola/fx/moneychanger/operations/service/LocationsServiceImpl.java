@@ -28,7 +28,7 @@ public class LocationsServiceImpl implements LocationsService{
     @Override
     public List<LocationDTO> findByCountryCode(String countryCode) {
         // Implementation to find locations by country code
-        return locationRepository.findAll().stream()
+        return locationRepository.findByCountryCodeAndIsDeletedFalse(countryCode).stream()
                 .filter(location -> Boolean.FALSE.equals(location.getIsDeleted()))
                 .filter(location -> countryCode.equals(location.getCountryCode()))
                 .map(this::toLocationDTO)
