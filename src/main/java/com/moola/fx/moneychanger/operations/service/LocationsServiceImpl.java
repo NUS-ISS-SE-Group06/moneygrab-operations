@@ -3,9 +3,11 @@ package com.moola.fx.moneychanger.operations.service;
 import com.moola.fx.moneychanger.operations.dto.LocationDTO;
 import com.moola.fx.moneychanger.operations.model.Locations;
 import com.moola.fx.moneychanger.operations.repository.LocationRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Service
 public class LocationsServiceImpl implements LocationsService{
 
     private final LocationRepository locationRepository;
