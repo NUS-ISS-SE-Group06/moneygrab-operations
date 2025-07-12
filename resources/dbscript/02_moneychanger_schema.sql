@@ -85,7 +85,6 @@ CREATE TABLE company_commission_scheme (
                                            CONSTRAINT fk_company_commission_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
 
-
 -- STEP 7: Create money_changer_photo table
 CREATE TABLE money_changer_photo (
                                      id INT AUTO_INCREMENT PRIMARY KEY,
@@ -120,12 +119,21 @@ CREATE TABLE money_changer_kyc (
                                    CONSTRAINT fk_kyc_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
 
+-- STEP 9: Create static data for Location table
+create table locations (
+                           id INT AUTO_INCREMENT PRIMARY KEY,
+                           location_name VARCHAR(255) NOT NULL,
+                           country_code VARCHAR(5) NOT NULL,
+                           created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                           created_by INT,
+                           is_deleted TINYINT(1) DEFAULT 0
+);
 
--- STEP 9: Create money_changer_location table
+-- STEP 10: Create money_changer_location table
 CREATE TABLE money_changer_location (
                                         id INT AUTO_INCREMENT PRIMARY KEY,
                                         money_changer_id INT NOT NULL,
-                                        location_name VARCHAR(255) NOT NULL,
+                                        location_id INT NOT NULL,
                                         created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                         updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                                         created_by INT,
@@ -133,11 +141,11 @@ CREATE TABLE money_changer_location (
                                         is_deleted TINYINT(1) DEFAULT 0,
                                         CONSTRAINT fk_location_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id) ON DELETE CASCADE,
                                         CONSTRAINT fk_location_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
-                                        CONSTRAINT fk_location_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
+                                        CONSTRAINT fk_location_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id),
+                                        CONSTRAINT fk_location_location_id FOREIGN KEY (location_id) REFERENCES locations(id)
 );
 
-
--- STEP 10: Create money_changer_currency table
+-- STEP 11: Create money_changer_currency table
 CREATE TABLE money_changer_currency (
                                    id INT AUTO_INCREMENT PRIMARY KEY,
                                    money_changer_id INT NOT NULL,
@@ -153,8 +161,7 @@ CREATE TABLE money_changer_currency (
                                    CONSTRAINT fk_mcur_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
 
-
--- STEP 11: Create customer table
+-- STEP 12: Create customer table
 CREATE TABLE customer (
                           id INT AUTO_INCREMENT PRIMARY KEY,
                           customer_name VARCHAR(255) NOT NULL,
@@ -169,7 +176,7 @@ CREATE TABLE customer (
                           CONSTRAINT fk_customer_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
 );
 
--- STEP 11: Create compute_rates table
+-- STEP 13: Create compute_rates table
 CREATE TABLE compute_rates (
                                currency_code CHAR(3) NOT NULL,
                                money_changer_id INT NOT NULL,

@@ -110,7 +110,7 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         }
 
         List<MoneyChangerLocation> locations = locationRepository.findByMoneyChangerIdAndIsDeletedFalse(entity.getId());
-        dto.setLocations(locations.stream().map(MoneyChangerLocation::getLocationName).toList());
+        dto.setLocations(locations.stream().map(MoneyChangerLocation::getLocationId).toList());
 
         photoRepository.findByMoneyChangerIdAndIsDeletedFalse(entity.getId()).ifPresent(photo -> {        dto.setPhotoMimetype(photo.getPhotoMimetype());
             dto.setLogoBase64(Base64.getEncoder().encodeToString(photo.getPhotoData()));
@@ -153,9 +153,9 @@ public class MoneyChangerServiceImpl implements MoneyChangerService {
         locationRepository.saveAll(existing);
 
         if (dto.getLocations() != null) {
-            List<MoneyChangerLocation> newLocs = dto.getLocations().stream().map(name -> {
+            List<MoneyChangerLocation> newLocs = dto.getLocations().stream().map(locationId -> {
                 MoneyChangerLocation loc = new MoneyChangerLocation();
-                loc.setLocationName(name);
+                loc.setLocationId(locationId);
                 MoneyChanger mcRef = new MoneyChanger();
                 mcRef.setId(moneyChangerId);
                 loc.setMoneyChanger(mcRef);

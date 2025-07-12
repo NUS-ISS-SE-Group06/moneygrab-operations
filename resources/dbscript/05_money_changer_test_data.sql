@@ -9,6 +9,67 @@ TRUNCATE TABLE scheme;
 TRUNCATE TABLE currency_code;
 SET FOREIGN_KEY_CHECKS = 1;
 
+
+-- Insert Locations static Data
+INSERT INTO locations(
+    id,
+    country_code,
+    location_name
+) VALUES
+      (1,'SG','Ang Mo Kio'),
+      (2,'SG','Bedok'),
+      (3,'SG','Bishan'),
+      (4,'SG','Boon Lay'),
+      (5,'SG','Bukit Batok'),
+      (6,'SG','Bukit Merah'),
+      (7,'SG','Bukit Panjang'),
+      (8,'SG','Bukit Timah'),
+      (9,'SG','Central Water Catchment'),
+      (10,'SG','Changi'),
+      (11,'SG','Chinatown (Rochor/Others in Central Area)'),
+      (12,'SG','Choa Chu Kang'),
+      (13,'SG','Clementi'),
+      (14,'SG','Geylang'),
+      (15,'SG','Hougang'),
+      (16,'SG','Jurong East'),
+      (17,'SG','Jurong West'),
+      (18,'SG','Kallang'),
+      (19,'SG','Lim Chu Kang'),
+      (20,'SG','Mandai'),
+      (21,'SG','Marina East'),
+      (22,'SG','Marina South'),
+      (23,'SG','Marine Parade'),
+      (24,'SG','Museum'),
+      (25,'SG','Newton'),
+      (26,'SG','Novena'),
+      (27,'SG','Orchard'),
+      (28,'SG','Outram'),
+      (29,'SG','Pasir Ris'),
+      (30,'SG','Paya Lebar'),
+      (31,'SG','Pioneer'),
+      (32,'SG','Punggol'),
+      (33,'SG','Queenstown'),
+      (34,'SG','River Valley'),
+      (35,'SG','Rochor'),
+      (36,'SG','Seletar'),
+      (37,'SG','Sembawang'),
+      (38,'SG','Sengkang'),
+      (39,'SG','Serangoon'),
+      (40,'SG','Simei (part of Tampines planning area)'),
+      (41,'SG','Simpang'),
+      (42,'SG','Singapore River'),
+      (43,'SG','Southern Islands'),
+      (44,'SG','Straits View'),
+      (45,'SG','Sungei Kadut'),
+      (46,'SG','Tampines'),
+      (47,'SG','Tengah'),
+      (48,'SG','Toa Payoh'),
+      (49,'SG','Tuas'),
+      (50,'SG','Western Islands'),
+      (51,'SG','Western Water Catchment'),
+      (52,'SG','Woodlands'),
+      (53,'SG','Yishun');
+
 -- Insert schemes
 INSERT INTO scheme (id,
                     name_tag,
@@ -68,8 +129,6 @@ INSERT INTO company_commission_scheme(id,money_changer_id,scheme_id,is_deleted) 
                                                                                     (2,2,2,0),
                                                                                     (3,3,3,0),
                                                                                     (4,4,1,0);
-
-
 
 INSERT INTO currency_code (
     id,

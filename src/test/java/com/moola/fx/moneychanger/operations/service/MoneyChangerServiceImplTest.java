@@ -63,7 +63,7 @@ class MoneyChangerServiceImplTest {
         dto.setCompanyName("Test FX");
         dto.setCreatedBy(1L);
         dto.setUpdatedBy(1L);
-        dto.setLocations(List.of("Orchard"));
+        dto.setLocations(List.of(1));
         dto.setLogoBase64("ZHVtbXk=");
         dto.setLogoFilename("logo.jpg");
         dto.setKycBase64("ZHVtbXk=");

@@ -58,7 +58,7 @@ class MoneyChangerControllerTest {
         dto.setDocumentMimetype("application/pdf");
         dto.setCreatedBy(1L);
         dto.setUpdatedBy(1L);
-        dto.setLocations(Arrays.asList("Jurong East", "Bishan"));
+        dto.setLocations(Arrays.asList(1, 2));
         dto.setLogoBase64("base64-encoded-logo");
         dto.setKycBase64("base64-encoded-kyc");
         return dto;
