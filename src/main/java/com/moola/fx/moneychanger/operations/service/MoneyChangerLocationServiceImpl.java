@@ -30,7 +30,7 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
             final MoneyChangerDTO dto = new MoneyChangerDTO();
             dto.setId(loc.getMoneyChanger().getId());
             dto.setLocations(
-                    locations.stream().map(MoneyChangerLocation::getLocationName).toList()
+                    locations.stream().map(MoneyChangerLocation::getLocationId).toList()
             );
             return dto;
         }).toList();
@@ -40,19 +40,19 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
     @Transactional
     public void add(
             final Long moneyChangerId,
-            final List<String> locationNames,
+            final List<Integer> locations,
             final Long createdBy,
             final Long updatedBy
     ) {
-        if (locationNames == null || locationNames.isEmpty()) {
+        if (locations == null || locations.isEmpty()) {
             return;
         }
 
-        final List<MoneyChangerLocation> newLocations = locationNames.stream()
+        final List<MoneyChangerLocation> newLocations = locations.stream()
                 .filter(Objects::nonNull)
-                .map(name -> {
+                .map(locationId -> {
                     final MoneyChangerLocation loc = new MoneyChangerLocation();
-                    loc.setLocationName(name);
+                    loc.setLocationId(locationId);
 
                     final MoneyChanger moneyChanger = new MoneyChanger();
                     moneyChanger.setId(moneyChangerId);
@@ -79,7 +79,7 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
 
     @Override
     @Transactional
-    public void save(final Long moneyChangerId, final List<String> locationNames) {
+    public void save(final Long moneyChangerId, final List<Integer> locations) {
         final List<MoneyChangerLocation> existing =
                 locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId);
 
@@ -89,11 +89,11 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
 
         locationRepository.saveAll(existing);
 
-        final List<MoneyChangerLocation> newLocations = locationNames.stream()
+        final List<MoneyChangerLocation> newLocations = locations.stream()
                 .filter(Objects::nonNull)
-                .map(name -> {
+                .map(locationId -> {
                     final MoneyChangerLocation loc = new MoneyChangerLocation();
-                    loc.setLocationName(name);
+                    loc.setLocationId(locationId);
 
                     final MoneyChanger mc = new MoneyChanger();
                     mc.setId(moneyChangerId);
@@ -111,10 +111,10 @@ public class MoneyChangerLocationServiceImpl implements MoneyChangerLocationServ
     }
 
     @Override
-    public List<String> getLocationNamesByMoneyChangerId(final Long id) {
+    public List<Integer> getLocationNamesByMoneyChangerId(final Long id) {
         return locationRepository.findByMoneyChangerIdAndIsDeletedFalse(id)
                 .stream()
-                .map(MoneyChangerLocation::getLocationName)
+                .map(MoneyChangerLocation::getLocationId)
                 .toList();
     }
 }
