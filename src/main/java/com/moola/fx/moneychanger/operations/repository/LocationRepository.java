@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface LocationRepository extends JpaRepository<Locations, Integer>{
-    List<Locations> findByCountryCodeAndIsDeletedFalse(Integer id);
+public interface LocationRepository extends JpaRepository<Locations, String>{
+    List<Locations> findByCountryCodeAndIsDeletedFalse(String countryCode);
 }
