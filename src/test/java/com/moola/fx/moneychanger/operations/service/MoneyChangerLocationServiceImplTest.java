@@ -47,11 +47,11 @@ class MoneyChangerLocationServiceImplTest {
         moneyChanger.setId(moneyChangerId);
 
         MoneyChangerLocation loc1 = new MoneyChangerLocation();
-        loc1.setLocationName("Jurong East");
+        loc1.setLocationId(1);
         loc1.setMoneyChanger(moneyChanger);
 
         MoneyChangerLocation loc2 = new MoneyChangerLocation();
-        loc2.setLocationName("Orchard");
+        loc2.setLocationId(2);
         loc2.setMoneyChanger(moneyChanger);
 
         when(locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId))
@@ -60,23 +60,23 @@ class MoneyChangerLocationServiceImplTest {
         List<MoneyChangerDTO> result = locationService.getLocationsByMoneyChangerId(moneyChangerId);
 
         assertEquals(2, result.size()); // assuming your implementation returns two DTOs
-        List<String> locations1 = result.get(0).getLocations();
-        List<String> locations2 = result.get(1).getLocations();
+        List<Integer> locations1 = result.get(0).getLocations();
+        List<Integer> locations2 = result.get(1).getLocations();
 
         assertNotNull(locations1);
         assertNotNull(locations2);
-        assertTrue(locations1.contains("Jurong East") || locations2.contains("Jurong East"));
-        assertTrue(locations1.contains("Orchard") || locations2.contains("Orchard"));
+        assertTrue(locations1.contains(1) || locations2.contains(1));
+        assertTrue(locations1.contains(2) || locations2.contains(2));
     }
 
     @Test
     void testAdd() {
         Long moneyChangerId = 1L;
-        List<String> locationNames = Arrays.asList("Jurong East", "Bugis");
+        List<Integer> locations = Arrays.asList(1, 2);
         Integer createdBy = 100;
         Integer updatedBy = 100;
 
-        locationService.add(moneyChangerId, locationNames, createdBy.longValue(), updatedBy.longValue());
+        locationService.add(moneyChangerId, locations, createdBy.longValue(), updatedBy.longValue());
 
         verify(locationRepository).saveAll(anyList());
     }
@@ -84,7 +84,7 @@ class MoneyChangerLocationServiceImplTest {
     @Test
     void testAddWithEmptyList() {
         Long moneyChangerId = 1L;
-        List<String> locations = Collections.emptyList();
+        List<Integer> locations = Collections.emptyList();
 
         locationService.add(moneyChangerId, locations, 1L, 1L);
 
@@ -94,9 +94,9 @@ class MoneyChangerLocationServiceImplTest {
     @Test
     void testSave() {
         Long moneyChangerId = 1L;
-        List<String> locationNames = Arrays.asList("Woodlands", "Boon Lay");
+        List<Integer> locations = Arrays.asList(1, 2);
 
-        locationService.save(moneyChangerId, locationNames);
+        locationService.save(moneyChangerId, locations);
 
         // Fix applied: allow for multiple calls to saveAll
         verify(locationRepository, atLeastOnce()).saveAll(anyList());
@@ -133,18 +133,18 @@ class MoneyChangerLocationServiceImplTest {
         Long moneyChangerId = 1L;
 
         MoneyChangerLocation loc1 = new MoneyChangerLocation();
-        loc1.setLocationName("HarbourFront");
+        loc1.setLocationId(1);
 
         MoneyChangerLocation loc2 = new MoneyChangerLocation();
-        loc2.setLocationName("Raffles");
+        loc2.setLocationId(2);
 
         when(locationRepository.findByMoneyChangerIdAndIsDeletedFalse(moneyChangerId))
                 .thenReturn(Arrays.asList(loc1, loc2));
 
-        List<String> names = locationService.getLocationNamesByMoneyChangerId(moneyChangerId);
+        List<Integer> names = locationService.getLocationNamesByMoneyChangerId(moneyChangerId);
 
         assertEquals(2, names.size());
-        assertTrue(names.contains("HarbourFront"));
-        assertTrue(names.contains("Raffles"));
+        assertTrue(names.contains(1));
+        assertTrue(names.contains(2));
     }
 }
