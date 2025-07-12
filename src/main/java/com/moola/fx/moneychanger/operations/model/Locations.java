@@ -18,7 +18,7 @@ public class Locations {
     private String locationName;
 
     @Column(nullable = false, length = 10)
-    private Integer countryCode;
+    private String countryCode;
 
     private String createdAt;
 
