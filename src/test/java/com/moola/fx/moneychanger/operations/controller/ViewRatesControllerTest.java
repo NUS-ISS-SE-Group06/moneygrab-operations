@@ -5,13 +5,14 @@ import com.moola.fx.moneychanger.operations.dto.RateDisplayDTO;
 import com.moola.fx.moneychanger.operations.service.RateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 class ViewRatesControllerTest {
@@ -28,11 +29,8 @@ class ViewRatesControllerTest {
     }
 
     @Test
-    void testGetRatesByMoneyChangerId_shouldReturnRates() {
-        // Arrange
-        Long moneyChangerId = 1L;
-        String style = "Normal Monitor Style";
-
+    @Timeout(5)
+    void testGetRates_shouldReturnRates() {
         RateDTO dto = new RateDTO();
         dto.setCurrencyCode("USD");
         dto.setUnit("1");
@@ -41,18 +39,19 @@ class ViewRatesControllerTest {
         dto.setBuyRate(dto.getRtBid());
         dto.setSellRate(dto.getRtAsk());
 
-        when(rateService.getRatesByMoneyChangerId(moneyChangerId))
+        when(rateService.getRatesByMoneyChangerId(1L))
                 .thenReturn(Collections.singletonList(dto));
 
-        // Act
         RateDisplayDTO response = viewRatesController.getRates();
 
-        // Assert
-        assertEquals(style, response.getStyle());
+        assertNotNull(response);
+        assertEquals("Normal Monitor Style", response.getStyle());
         assertEquals(1, response.getRates().size());
-        assertEquals("USD", response.getRates().get(0).getCurrencyCode());
-        assertEquals("1", response.getRates().get(0).getUnit());
-        assertEquals(1.2345, response.getRates().get(0).getBuyRate());
-        assertEquals(1.3456, response.getRates().get(0).getSellRate());
+
+        RateDTO rate = response.getRates().getFirst();
+        assertEquals("USD", rate.getCurrencyCode());
+        assertEquals("1", rate.getUnit());
+        assertEquals(1.2345, rate.getBuyRate());
+        assertEquals(1.3456, rate.getSellRate());
     }
 }
