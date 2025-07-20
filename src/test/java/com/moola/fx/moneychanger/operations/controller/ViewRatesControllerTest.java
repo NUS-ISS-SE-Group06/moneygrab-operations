@@ -2,6 +2,7 @@ package com.moola.fx.moneychanger.operations.controller;
 
 import com.moola.fx.moneychanger.operations.dto.RateDTO;
 import com.moola.fx.moneychanger.operations.dto.RateDisplayDTO;
+import com.moola.fx.moneychanger.operations.dto.RateValuesDTO;
 import com.moola.fx.moneychanger.operations.service.RateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,19 +32,23 @@ class ViewRatesControllerTest {
     @Test
     @Timeout(5)
     void testGetRates_shouldReturnRates() {
+        // Arrange: create RateValuesDTO and embed into RateDTO
+        RateValuesDTO rateValues = new RateValuesDTO();
+        rateValues.setBuyRate(1.2345);
+        rateValues.setSellRate(1.3456);
+
         RateDTO dto = new RateDTO();
         dto.setCurrencyCode("USD");
         dto.setUnit("1");
-        dto.setRtBid(1.2345);
-        dto.setRtAsk(1.3456);
-        dto.setBuyRate(dto.getRtBid());
-        dto.setSellRate(dto.getRtAsk());
+        dto.setRateValues(rateValues);
 
         when(rateService.getRatesByMoneyChangerId(1L))
                 .thenReturn(Collections.singletonList(dto));
 
+        // Act
         RateDisplayDTO response = viewRatesController.getRates();
 
+        // Assert
         assertNotNull(response);
         assertEquals("Normal Monitor Style", response.getStyle());
         assertEquals(1, response.getRates().size());
@@ -51,7 +56,7 @@ class ViewRatesControllerTest {
         RateDTO rate = response.getRates().getFirst();
         assertEquals("USD", rate.getCurrencyCode());
         assertEquals("1", rate.getUnit());
-        assertEquals(1.2345, rate.getBuyRate());
-        assertEquals(1.3456, rate.getSellRate());
+        assertEquals(1.2345, rate.getRateValues().getBuyRate());
+        assertEquals(1.3456, rate.getRateValues().getSellRate());
     }
 }

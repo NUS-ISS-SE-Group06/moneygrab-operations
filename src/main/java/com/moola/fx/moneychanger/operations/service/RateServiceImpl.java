@@ -1,37 +1,65 @@
 package com.moola.fx.moneychanger.operations.service;
 
 import com.moola.fx.moneychanger.operations.dto.RateDTO;
+import com.moola.fx.moneychanger.operations.dto.RateValuesDTO;
+import com.moola.fx.moneychanger.operations.model.ViewRatesEntity;
 import com.moola.fx.moneychanger.operations.repository.ViewRatesRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RateServiceImpl implements RateService {
 
     private final ViewRatesRepository viewRatesRepository;
 
-    public RateServiceImpl(ViewRatesRepository viewRatesRepository) {
-        this.viewRatesRepository = viewRatesRepository;
-    }
-
     @Override
     public List<RateDTO> getRatesByMoneyChangerId(Long moneyChangerId) {
-        //return viewRatesRepository.findRatesByMoneyChangerId(moneyChangerId);
-        List<RateDTO> dtos = viewRatesRepository.findRatesByMoneyChangerId(moneyChangerId);
+        List<ViewRatesEntity> entities = viewRatesRepository.findByMoneyChangerId(moneyChangerId);
+        List<RateDTO> dtos = new ArrayList<>();
 
-        for (RateDTO dto : dtos) {
-            dto.setBuyRate(dto.getRtBid());   // Fix here: assign rtBid to buyRate
-            dto.setSellRate(dto.getRtAsk());  // Fix here: assign rtAsk to sellRate
+        for (ViewRatesEntity entity : entities) {
+            RateValuesDTO values = new RateValuesDTO();
+            values.setRefBid(entity.getRefBid());
+            values.setRefAsk(entity.getRefAsk());
+            values.setDpBid(entity.getDpBid());
+            values.setDpAsk(entity.getDpAsk());
+            values.setMarBid(entity.getMarBid());
+            values.setMarAsk(entity.getMarAsk());
+            values.setCbBid(entity.getCbBid());
+            values.setCbAsk(entity.getCbAsk());
+            values.setCfBid(entity.getCfBid());
+            values.setCfAsk(entity.getCfAsk());
+            values.setRtBid(entity.getRtBid());
+            values.setRtAsk(entity.getRtAsk());
+            //values.setBuyRate(entity.getRtBid());    // buy = rtBid
+            //values.setSellRate(entity.getRtAsk());   // sell = rtAsk
+            values.setSpread(entity.getSpread());
+
+            values.setBuyRate(defaultIfNull(entity.getRtBid()));
+            values.setSellRate(defaultIfNull(entity.getRtAsk()));
+
+            RateDTO dto = new RateDTO();
+            dto.setCurrencyCode(entity.getCurrencyCode());
+            dto.setUnit(entity.getUnit());
+            dto.setRateValues(values);
+
+            dtos.add(dto);
         }
 
         return dtos;
-
     }
 
     @Override
     public String getStyleForMoneyChanger(Long moneyChangerId) {
-        // TODO: Replace with DB lookup in the future
-        return "Extended Monitor Style"; // Hardcoded for now
+        // TODO: update later for DB lookup
+        return "Normal Monitor Style";
+    }
+
+    private Double defaultIfNull(Double value) {
+        return value != null ? value : 0.0;
     }
 }

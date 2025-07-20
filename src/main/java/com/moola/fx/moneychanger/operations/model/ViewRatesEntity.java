@@ -3,22 +3,20 @@ package com.moola.fx.moneychanger.operations.model;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @Entity
+@IdClass(ViewRatesKey.class)
 @Table(name = "compute_rates")
 public class ViewRatesEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     @Column(name = "money_changer_id", nullable = false)
     private Integer moneyChangerId;
 
+    @Id
     @Column(name = "currency_code", length = 3, nullable = false)
     private String currencyCode;
 
@@ -26,49 +24,49 @@ public class ViewRatesEntity {
     private String unit;
 
     @Column(name = "buy_rate")
-    private double buyRate;
+    private Double buyRate;
 
     @Column(name = "sell_rate")
-    private double sellRate;
+    private Double sellRate;
 
     @Column(name = "spread")
-    private double spread;
+    private Double spread;
 
     @Column(name = "ref_bid")
-    private double refBid;
+    private Double refBid;
 
     @Column(name = "ref_ask")
-    private double refAsk;
+    private Double refAsk;
 
     @Column(name = "dp_bid")
-    private double dpBid;
+    private Double dpBid;
 
     @Column(name = "dp_ask")
-    private double dpAsk;
+    private Double dpAsk;
 
     @Column(name = "mar_bid")
-    private double marBid;
+    private Double marBid;
 
     @Column(name = "mar_ask")
-    private double marAsk;
+    private Double marAsk;
 
     @Column(name = "cb_bid")
-    private double cbBid;
+    private Double cbBid;
 
     @Column(name = "cb_ask")
-    private double cbAsk;
+    private Double cbAsk;
 
     @Column(name = "cf_bid")
-    private double cfBid;
+    private Double cfBid;
 
     @Column(name = "cf_ask")
-    private double cfAsk;
+    private Double cfAsk;
 
     @Column(name = "rt_bid")
-    private double rtBid;
+    private Double rtBid;
 
     @Column(name = "rt_ask")
-    private double rtAsk;
+    private Double rtAsk;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
