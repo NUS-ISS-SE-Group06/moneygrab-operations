@@ -35,8 +35,6 @@ public class RateServiceImpl implements RateService {
             values.setCfAsk(entity.getCfAsk());
             values.setRtBid(entity.getRtBid());
             values.setRtAsk(entity.getRtAsk());
-            //values.setBuyRate(entity.getRtBid());    // buy = rtBid
-            //values.setSellRate(entity.getRtAsk());   // sell = rtAsk
             values.setSpread(entity.getSpread());
 
             values.setBuyRate(defaultIfNull(entity.getRtBid()));
@@ -55,7 +53,7 @@ public class RateServiceImpl implements RateService {
 
     @Override
     public String getStyleForMoneyChanger(Long moneyChangerId) {
-        // TODO: update later for DB lookup
+
         return "Normal Monitor Style";
     }
 
