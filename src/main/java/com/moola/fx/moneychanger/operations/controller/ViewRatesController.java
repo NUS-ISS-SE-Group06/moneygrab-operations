@@ -19,7 +19,7 @@ public class ViewRatesController {
 
 
     @GetMapping
-    //public List<RateDTO> getRates() {
+
     public RateDisplayDTO getRates() {
         Long moneyChangerId = 1L; //  Temporary hardcoded ID
         String style = "Normal Monitor Style";
