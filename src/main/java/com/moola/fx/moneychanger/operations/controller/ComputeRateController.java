@@ -25,7 +25,7 @@ public class ComputeRateController {
     @GetMapping
     public ResponseEntity<List<ComputeRateDTO>> list(@RequestParam(value = "moneyChangerId", required = false) Long moneyChangerId) {
         List<ComputeRate> list = (moneyChangerId != null)
-                ? service.findByMoneyChangerId(moneyChangerId) 
+                ? service.findByMoneyChangerId(moneyChangerId)
                 : service.listAll();
 
         List<ComputeRateDTO> result = list.stream().map(mapper::toDTO).toList();

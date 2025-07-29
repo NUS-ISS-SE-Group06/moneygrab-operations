@@ -208,6 +208,24 @@ CREATE TABLE compute_rates (
 );
 
 
+-- STEP 14: Create application_setting table
+CREATE TABLE application_setting (
+                             id INT AUTO_INCREMENT PRIMARY KEY,
+                             category VARCHAR(100) NOT NULL,
+                             setting_key VARCHAR(100) NOT NULL,
+                             setting_value VARCHAR(100) NOT NULL,
+                             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                             created_by INT,
+                             updated_by INT NULL,
+                             CONSTRAINT uq_application_setting UNIQUE (category, setting_key),
+                             CONSTRAINT fk_app_setting_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
+                             CONSTRAINT fk_app_setting_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
+);
+
+
+
+
 
 ALTER TABLE money_changer ADD CONSTRAINT fk_money_changer_scheme FOREIGN KEY (scheme_id) REFERENCES scheme(id);
 ALTER TABLE money_changer ADD CONSTRAINT fk_money_changer_created_by FOREIGN KEY (created_by) REFERENCES accounts(id);

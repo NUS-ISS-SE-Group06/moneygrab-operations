@@ -348,3 +348,33 @@ INSERT INTO compute_rates (
 ('IDR', 4, '1000','BUY_SELL','100000',2, 0.0782, 0.0790, 0.0008, 0.0002, 0.0783, 0.0789, 0.0784, 0.0785, 0.0786, 0.0787, 0.0788, 0.07895, 0.07885, 0.07875, 0.07865, 0.07855, CURRENT_TIMESTAMP, 1),
 ('VND', 4, '100000','BUY_SELL','100000',2, 5.2920, 5.3080, 0.0160, 0.0020, 5.2935, 5.3065, 5.2950, 5.2970, 5.2990, 5.3010, 5.3030, 5.3075, 5.3060, 5.3045, 5.3030, 5.3015, CURRENT_TIMESTAMP, 1)
 
+
+
+
+INSERT INTO application_setting
+(category, setting_key, setting_value, created_by, updated_by)
+VALUES
+-- General settings
+('General', 'site_name', 'MoneyGrab FX', 1, 1),
+('General', 'default_language', 'en', 1, 1),
+('General', 'timezone', 'Asia/Singapore', 1, 1),
+
+-- Email settings
+('Email', 'smtp_host', 'smtp.mailtrap.io', 1, NULL),
+('Email', 'smtp_port', '587', 1, NULL),
+('Email', 'smtp_username', 'noreply@moneygrab.com', 1, NULL),
+('Email', 'smtp_secure', 'TLS', 1, NULL),
+
+-- Security settings
+('Security', 'password_min_length', '8', 1, 1),
+('Security', 'password_expiry_days', '90', 1, 1),
+('Security', 'max_login_attempts', '5', 1, 1),
+
+-- UI settings
+('UI', 'theme', 'dark', 1, NULL),
+('UI', 'items_per_page', '20', 1, NULL),
+
+-- Rate Preview settings
+('RatePreviewMoneyChangerId', '1', 'Normal Monitor Style', 1, NULL),
+('RatePreviewMoneyChangerId', '2', 'Normal Monitor Style', 1, NULL),
+('RatePreviewMoneyChangerId', '3', 'Normal Monitor Style', 1, NULL);
