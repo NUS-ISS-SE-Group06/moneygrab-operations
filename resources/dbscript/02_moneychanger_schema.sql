@@ -190,13 +190,13 @@ CREATE TABLE compute_rates (
                                skew DECIMAL(18,8) NOT NULL DEFAULT 0,
                                ws_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
                                ws_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
-                               ref_bid DECIMAL(18,8) NOT NULL DEFAULT 0, -- 0, 1
-                               dp_bid DECIMAL(18,8) NOT NULL DEFAULT 3,
+                               ref_bid INT NOT NULL DEFAULT 0, -- 0, 1
+                               dp_bid INT NOT NULL DEFAULT 3,
                                mar_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
                                cf_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
                                rt_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
-                               ref_ask DECIMAL(18,8) NOT NULL DEFAULT 0, -- 0, 1
-                               dp_ask DECIMAL(18,8) NOT NULL DEFAULT 3,
+                               ref_ask INT NOT NULL DEFAULT 0, -- 0, 1
+                               dp_ask INT NOT NULL DEFAULT 3,
                                mar_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
                                cf_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
                                rt_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
