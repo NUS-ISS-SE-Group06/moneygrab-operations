@@ -190,13 +190,13 @@ CREATE TABLE compute_rates (
                                skew DECIMAL(18,8) NOT NULL DEFAULT 0,
                                ws_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
                                ws_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
-                               ref_bid DECIMAL(18,8) NOT NULL DEFAULT 0, -- 0, 1
-                               dp_bid DECIMAL(18,8) NOT NULL DEFAULT 3,
+                               ref_bid INT NOT NULL DEFAULT 0, -- 0, 1
+                               dp_bid INT NOT NULL DEFAULT 3,
                                mar_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
                                cf_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
                                rt_bid DECIMAL(18,8) NOT NULL DEFAULT 0,
-                               ref_ask DECIMAL(18,8) NOT NULL DEFAULT 0, -- 0, 1
-                               dp_ask DECIMAL(18,8) NOT NULL DEFAULT 3,
+                               ref_ask INT NOT NULL DEFAULT 0, -- 0, 1
+                               dp_ask INT NOT NULL DEFAULT 3,
                                mar_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
                                cf_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
                                rt_ask DECIMAL(18,8) NOT NULL DEFAULT 0,
@@ -206,6 +206,24 @@ CREATE TABLE compute_rates (
                                CONSTRAINT fk_compute_rates_processed_by FOREIGN KEY (processed_by) REFERENCES accounts(id),
                                CONSTRAINT fk_compute_rates_money_changer FOREIGN KEY (money_changer_id) REFERENCES money_changer(id)
 );
+
+
+-- STEP 14: Create application_setting table
+CREATE TABLE application_setting (
+                             id INT AUTO_INCREMENT PRIMARY KEY,
+                             category VARCHAR(100) NOT NULL,
+                             setting_key VARCHAR(100) NOT NULL,
+                             setting_value VARCHAR(100) NOT NULL,
+                             created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                             created_by INT,
+                             updated_by INT NULL,
+                             CONSTRAINT uq_application_setting UNIQUE (category, setting_key),
+                             CONSTRAINT fk_app_setting_created_by FOREIGN KEY (created_by) REFERENCES accounts(id),
+                             CONSTRAINT fk_app_setting_updated_by FOREIGN KEY (updated_by) REFERENCES accounts(id)
+);
+
+
 
 
 

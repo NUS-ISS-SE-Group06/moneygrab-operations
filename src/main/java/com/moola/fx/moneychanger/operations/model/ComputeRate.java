@@ -50,10 +50,10 @@ public class ComputeRate {
     private BigDecimal wsAsk=BigDecimal.ZERO;
 
     @Column(name = "ref_bid", precision = 18, scale = 8)
-    private BigDecimal refBid=BigDecimal.ZERO;
+    private Integer refBid=0;
 
     @Column(name = "dp_bid", precision = 18, scale = 8)
-    private BigDecimal dpBid=BigDecimal.ZERO;
+    private Integer dpBid=4;
 
     @Column(name = "mar_bid", precision = 18, scale = 8)
     private BigDecimal marBid=BigDecimal.ZERO;
@@ -65,10 +65,10 @@ public class ComputeRate {
     private BigDecimal rtBid=BigDecimal.ZERO;
 
     @Column(name = "ref_ask", precision = 18, scale = 8)
-    private BigDecimal refAsk=BigDecimal.ZERO;
+    private Integer refAsk=0;
 
     @Column(name = "dp_ask", precision = 18, scale = 8)
-    private BigDecimal dpAsk=BigDecimal.ZERO;
+    private Integer dpAsk=4;
 
     @Column(name = "mar_ask", precision = 18, scale = 8)
     private BigDecimal marAsk=BigDecimal.ZERO;

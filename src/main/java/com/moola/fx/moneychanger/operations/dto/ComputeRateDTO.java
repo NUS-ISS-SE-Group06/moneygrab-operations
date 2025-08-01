@@ -23,14 +23,14 @@ public class ComputeRateDTO {
     private BigDecimal wsBid;
     private BigDecimal wsAsk;
 
-    private BigDecimal refBid;
-    private BigDecimal dpBid;
+    private Integer refBid;
+    private Integer dpBid;
     private BigDecimal marBid;
     private BigDecimal cfBid;
     private BigDecimal rtBid;
 
-    private BigDecimal refAsk;
-    private BigDecimal dpAsk;
+    private Integer refAsk;
+    private Integer dpAsk;
     private BigDecimal marAsk;
     private BigDecimal cfAsk;
     private BigDecimal rtAsk;
