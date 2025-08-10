@@ -12,6 +12,10 @@ import java.util.List;
 @Service
 public class ApplicationSettingServiceImpl implements ApplicationSettingService {
 
+    private static final String ERR_NOT_FOUND_PREFIX = "Application setting not found: ";
+    private static final String ERR_DUPLICATE_FMT =
+            "Duplicate application setting for category=%s, key=%s";
+
     private final ApplicationSettingRepository repository;
 
     public ApplicationSettingServiceImpl(ApplicationSettingRepository repository) {
@@ -26,7 +30,7 @@ public class ApplicationSettingServiceImpl implements ApplicationSettingService 
     @Override
     public ApplicationSettingDTO get(Long id) {
         ApplicationSetting entity = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Application setting not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ERR_NOT_FOUND_PREFIX + id));
         return toDTO(entity);
     }
 
@@ -48,9 +52,8 @@ public class ApplicationSettingServiceImpl implements ApplicationSettingService 
     public ApplicationSettingDTO create(ApplicationSettingDTO dto) {
         // protect unique (category, setting_key)
         if (repository.existsByCategoryIgnoreCaseAndSettingKeyIgnoreCase(dto.getCategory(), dto.getSettingKey())) {
-            throw new DuplicateResourceException(
-                    "Duplicate application setting for category=" + dto.getCategory()
-                            + ", key=" + dto.getSettingKey());
+            throw new DuplicateResourceException(String.format(
+                    ERR_DUPLICATE_FMT, dto.getCategory(), dto.getSettingKey()));
         }
         ApplicationSetting toSave = toEntity(dto);
         ApplicationSetting saved = repository.save(toSave);
@@ -60,7 +63,7 @@ public class ApplicationSettingServiceImpl implements ApplicationSettingService 
     @Override
     public ApplicationSettingDTO update(Long id, ApplicationSettingDTO dto) {
         ApplicationSetting existing = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Application setting not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ERR_NOT_FOUND_PREFIX + id));
 
         // If either category or key changes, ensure uniqueness
         boolean changingIdentity =
@@ -69,9 +72,8 @@ public class ApplicationSettingServiceImpl implements ApplicationSettingService 
 
         if (changingIdentity &&
                 repository.existsByCategoryIgnoreCaseAndSettingKeyIgnoreCase(dto.getCategory(), dto.getSettingKey())) {
-            throw new DuplicateResourceException(
-                    "Duplicate application setting for category=" + dto.getCategory()
-                            + ", key=" + dto.getSettingKey());
+            throw new DuplicateResourceException(String.format(
+                    ERR_DUPLICATE_FMT, dto.getCategory(), dto.getSettingKey()));
         }
 
         existing.setCategory(dto.getCategory());
@@ -87,7 +89,7 @@ public class ApplicationSettingServiceImpl implements ApplicationSettingService 
     @Override
     public void delete(Long id) {
         ApplicationSetting existing = repository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Application setting not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(ERR_NOT_FOUND_PREFIX + id));
         repository.delete(existing);
     }
 
