@@ -144,9 +144,10 @@ class ApplicationSettingServiceImplTest {
     @Test
     void update_notFound_throws() {
         when(repository.findById(404L)).thenReturn(Optional.empty());
-
-        assertThrows(ResourceNotFoundException.class, () -> service.update(404L, dto("X", "Y", "Z")));
+        ApplicationSettingDTO req = dto("X", "Y", "Z");  // build outside the lambda
+        assertThrows(ResourceNotFoundException.class, () -> service.update(404L, req));
     }
+
 
     @Test
     void delete_ok() {
@@ -160,7 +161,6 @@ class ApplicationSettingServiceImplTest {
     @Test
     void delete_notFound_throws() {
         when(repository.findById(404L)).thenReturn(Optional.empty());
-
         assertThrows(ResourceNotFoundException.class, () -> service.delete(404L));
     }
 }
