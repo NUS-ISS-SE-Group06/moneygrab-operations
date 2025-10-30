@@ -124,10 +124,10 @@ mvn spring-boot:run
 
 ![Architecture Diagram1](resources/uml/moneygrab-logical-architecture-overview.png)
 
-### Logical Architecture (Web) 
+### Logical Architecture 
 
 ![Architecture Diagram1](resources/uml/logical-architecture-diagram-web.png)
 
-### Logical Architecture (Mobile)
+### MoneyChanger Physical Architecture
 
-![Architecture Diagram1](resources/uml/logical-architecture-diagram-mobile.png)
+![MoneyGrabArchitectureDiagram_V5.png](resources/uml/MoneyGrabArchitectureDiagram_V5.png)
