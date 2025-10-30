@@ -7,11 +7,11 @@ on:
     types: [closed]
 
 jobs:
-  build:
+  build-and-deploy:
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: read # Still good practice to specify minimal permissions for checkout
 
     steps:
       - name: Checkout Code
@@ -22,12 +22,13 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          cache: maven
+          cache: maven # Cache Maven dependencies for faster builds
 
       - name: Build JAR with Maven
         run: mvn clean package -DskipTests
 
       - name: Prepare Deployment Package
+        # If your scripts are in a different location, adjust the path above
         run: |
           echo "Preparing deployment package moneygrab-operations"
           mkdir -p deploy-package/scripts
@@ -43,34 +44,27 @@ jobs:
       - name: Zip App for Deployment
         id: zip_bundle
         run: |
-#         Using a unique key for the S3 bundle to avoid conflicts and ensure fresh deployments
-          ZIP_FILE_NAME="app-${{ github.sha }}.zip"
+          # Use a unique key for the S3 bundle to avoid conflicts and ensure fresh deployments
+          ZIP_FILE_NAME="app-${{ github.sha }}.zip" # Unique based on commit SHA
           cd deploy-package
           zip -r $ZIP_FILE_NAME .
-          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_OUTPUT
+          echo "ZIP_FILE_NAME=$ZIP_FILE_NAME" >> $GITHUB_OUTPUT # Store for later use
 
-      - name: Upload Build Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: deployment-package
-          path: deploy-package/${{ steps.zip_bundle.outputs.ZIP_FILE_NAME }}
-          retention-days: 1
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-
-    steps:
-      - name: Download Build Artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: deployment-package
+#      - name: Upload to S3
+#        uses: jakejarvis/s3-sync-action@v0.5.1
+#        with:
+#          args: --exact-timestamps
+#          SOURCE_DIR: deploy-package/${{ steps.zip_bundle.outputs.ZIP_FILE_NAME }}
+#          DEST_DIR: / # Upload the zip file to the root of the S3 bucket
+#        env:
+#          AWS_S3_BUCKET: ${{ secrets.S3_BUCKET }}
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#          AWS_REGION: ap-southeast-1
 
       - name: Upload ZIP to S3
         run: |
-          aws s3 cp app-${{ github.sha }}.zip s3://${{ secrets.S3_BUCKET }}/moneygrab-operations/
+          aws s3 cp deploy-package/${{ steps.zip_bundle.outputs.ZIP_FILE_NAME }} s3://${{ secrets.S3_BUCKET }}/moneygrab-operations/
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -81,7 +75,7 @@ jobs:
           aws deploy create-deployment \
             --application-name MoneyGrab_Deployment \
             --deployment-group-name MoneyGrab_EC2_Operations \
-            --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=moneygrab-operations/app-${{ github.sha }}.zip \
+            --s3-location bucket=${{ secrets.S3_BUCKET }},bundleType=zip,key=moneygrab-operations/${{ steps.zip_bundle.outputs.ZIP_FILE_NAME }} \
             --deployment-config-name CodeDeployDefault.AllAtOnce \
             --region ap-southeast-1
         env:
