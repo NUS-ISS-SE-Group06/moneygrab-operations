@@ -52,7 +52,7 @@ class ApplicationSettingServiceImplTest {
 
     @BeforeEach
     void init() {
-        //nothing needed; MockitoExtension handles initialization
+        // nothing needed; MockitoExtension handles initialization
     }
 
     @Test
