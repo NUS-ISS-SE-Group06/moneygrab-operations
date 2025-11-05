@@ -52,7 +52,7 @@ class ApplicationSettingServiceImplTest {
 
     @BeforeEach
     void init() {
-        // nothing needed; MockitoExtension handles initialization
+        //nothing needed; MockitoExtension handles initialization
     }
 
     @Test
@@ -120,7 +120,7 @@ class ApplicationSettingServiceImplTest {
         assertEquals(42L, created.getId());
         assertEquals("UI", created.getCategory());
     }
-
+   
     @Test
     void create_duplicate_throws() {
         ApplicationSettingDTO request = dto("UI", "theme", "dark");
