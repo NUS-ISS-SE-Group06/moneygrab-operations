@@ -104,17 +104,21 @@ mvn spring-boot:run
 ### Compute Rate Business Logic (Standard-Formula)
 <img src="resources/uml/compute-rate-formula.png" alt="Formula Notation" width="600"/>
 
-## 📊 Database Diagrams
+## 📊 Database ER Diagrams
 
-### MoneyChanger Microservice ERD Diagram
+### Operation Microservice Schema
 
 ![ERD Diagram](resources/dbscript/MoneyGrab-ERD.png)
 
-### FxUpload Microservice ERD Diagram
+### FxUpload Lambda Microservice Schema
 
 <img src="resources/dbscript/fxuploaddb-ERD.png" alt="ERD Diagram" width="200"/>
 
-### Reservation Microservice ERD Diagram
+### Rate Lambda Microservice Schema
+
+<img src="resources/dbscript/computeratedb-ERD.png" alt="ERD Diagram" width="200"/>
+
+### Reservation Microservice Schema
 
 <img alt="ERD Diagram" src="resources/dbscript/reservationdb-ERD.png" width="200"/>
 
