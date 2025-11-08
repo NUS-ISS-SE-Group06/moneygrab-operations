@@ -83,6 +83,7 @@ mvn spring-boot:run
 * `accounts.role` distinguishes admin and staff.
 * Only admins can perform delete operations.
 * `created_by`, `updated_by`, `created_at`, and `updated_at` support audit tracking.
+* `New Man Testing` - add the additional api in the postman collection to make sure that apis are working at all the times. Update the collection in API_Testing
  
 ---
 
