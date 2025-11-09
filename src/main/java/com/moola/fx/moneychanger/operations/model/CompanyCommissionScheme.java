@@ -50,4 +50,5 @@ public class CompanyCommissionScheme {
     protected void onUpdate() {
         this.updatedAt = new Timestamp(System.currentTimeMillis());
     }
+    
 }
