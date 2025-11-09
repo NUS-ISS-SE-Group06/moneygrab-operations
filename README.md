@@ -77,7 +77,7 @@ mvn spring-boot:run
 * `service/` – Business logic layer that processes data and orchestrates repository interactions.
 ---
 
-## ✅ Additional Notes
+## Additional Notes
 
 * `isDeleted` enables soft delete.
 * `accounts.role` distinguishes admin and staff.
