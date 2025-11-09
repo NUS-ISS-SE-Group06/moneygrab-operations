@@ -29,4 +29,5 @@ public class ComputeRateId implements Serializable {
     public int hashCode() {
         return Objects.hash(currencyCode, moneyChangerId);
     }
+    
 }
